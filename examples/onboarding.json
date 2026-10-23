@@ -1,0 +1,1280 @@
+{
+  "name": "Корсик — адаптация",
+  "version": 1,
+  "steps": [
+    {
+      "id": "preboarding",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": -3,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Здравствуйте, {name}! Я Корсик, ваш помощник на период адаптации. Я присылаю материалы, провожу опросы и помогаю связаться с HR. Выберите удобный формат общения.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "employment_documents",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": -3,
+        "working_day": null,
+        "at": "09:05",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Подготовьте документы к первому рабочему дню. Перечень зависит от условий оформления; уточните его у рекрутера.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "employment_documents"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "transport",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": -3,
+        "working_day": null,
+        "at": "09:10",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Как добраться до площадки {branch}:",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "transport"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "company_facts",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": -3,
+        "working_day": null,
+        "at": "09:15",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Мы создаём инфраструктуру для жизни и бизнеса. Познакомьтесь с материалами о компании.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "company"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "tomorrow",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": -1,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "survey",
+      "text": "Завтра ваш первый рабочий день. Напоминаю подготовить документы.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "employment_documents"
+      ],
+      "document_ids": [],
+      "survey_id": "readiness",
+      "manual": false
+    },
+    {
+      "id": "welcome",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "10:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "{name}, поздравляю с первым рабочим днём! Коллеги и рекрутер помогут освоиться.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "welcome_letter",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "10:05",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Добро пожаловать в команду. Материалы для начала работы:",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "welcome_letter"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "map",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "11:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Карта территории или офиса:",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "map"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "equipment",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "12:00",
+        "next_workday": false
+      },
+      "kind": "survey",
+      "text": "Проверим готовность рабочего места.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": "equipment",
+      "manual": false
+    },
+    {
+      "id": "lunch",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "12:30",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Информация о питании. К ней можно вернуться командой /food.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "food"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "contacts",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "13:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Справочник коллег может требовать корпоративную сеть и учётную запись.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "contacts"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "presentation",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "15:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Вы — часть команды. Предлагаю познакомиться с компанией.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "company"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "first_day_end",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "18:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Первый рабочий день позади. Если нужна помощь, отправьте /hr.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [
+        "office"
+      ],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "introduction",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 2,
+        "at": "10:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Расскажите рекрутеру о своём опыте и навыках для представления коллегам.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": true
+    },
+    {
+      "id": "adaptation_plan",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 3,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Руководитель подготовил адаптационный план. Уточните задачи и ожидаемые результаты.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [
+        "office"
+      ],
+      "resource_keys": [
+        "adaptation_plan"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": true
+    },
+    {
+      "id": "sports",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 3,
+        "at": "11:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Информация о спортивном комплексе:",
+      "informal_text": null,
+      "branch_codes": [
+        "GTP"
+      ],
+      "categories": [],
+      "resource_keys": [
+        "sports"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "day3",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 3,
+        "at": "17:30",
+        "next_workday": false
+      },
+      "kind": "survey",
+      "text": "Поделитесь впечатлениями о первых днях.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": "day3",
+      "manual": false
+    },
+    {
+      "id": "events",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 10,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Как проходят корпоративные мероприятия:",
+      "informal_text": null,
+      "branch_codes": [
+        "GrPP",
+        "Luzhniki"
+      ],
+      "categories": [],
+      "resource_keys": [
+        "events"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "week2",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 14,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "survey",
+      "text": "Прошло две недели. Проверим, достаточно ли поддержки.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": "week2",
+      "manual": false
+    },
+    {
+      "id": "month1",
+      "schedule": {
+        "anchor": "hire",
+        "months": 1,
+        "days": 0,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "survey",
+      "text": "Поздравляю с первым месяцем работы! Как идёт адаптация?",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": "month1",
+      "manual": false
+    },
+    {
+      "id": "meeting",
+      "schedule": {
+        "anchor": "hire",
+        "months": 1,
+        "days": 14,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "В ближайшие дни запланируйте встречу с рекрутером по адаптационному плану. Точное время согласует рекрутер.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "manager_meeting",
+      "schedule": {
+        "anchor": "hire",
+        "months": 1,
+        "days": 14,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "manager_reminder",
+      "text": "Проведите встречу с новым сотрудником {name} из {department}.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "movies",
+      "schedule": {
+        "anchor": "hire",
+        "months": 1,
+        "days": 14,
+        "working_day": null,
+        "at": "17:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Подборка фильмов о начале работы и профессиональном развитии:",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "movies"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "month2_survey",
+      "schedule": {
+        "anchor": "hire",
+        "months": 1,
+        "days": 21,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "survey",
+      "text": "Поделитесь впечатлениями об адаптации.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": "month2",
+      "manual": false
+    },
+    {
+      "id": "third_month",
+      "schedule": {
+        "anchor": "hire",
+        "months": 2,
+        "days": 0,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Начался третий месяц работы. До завершения адаптации осталось немного.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "books",
+      "schedule": {
+        "anchor": "hire",
+        "months": 2,
+        "days": 14,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Книги для профессионального развития:",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [
+        "office"
+      ],
+      "resource_keys": [
+        "books"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    },
+    {
+      "id": "final",
+      "schedule": {
+        "anchor": "probation_end",
+        "months": 0,
+        "days": 0,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "survey",
+      "text": "Период адаптации подходит к концу. Поделитесь итоговыми впечатлениями.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": "final",
+      "manual": false
+    },
+    {
+      "id": "farewell",
+      "schedule": {
+        "anchor": "probation_end",
+        "months": 0,
+        "days": 0,
+        "working_day": null,
+        "at": "09:10",
+        "next_workday": false
+      },
+      "kind": "message",
+      "text": "Спасибо за обратную связь! При необходимости вы можете обратиться к HR.",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [
+        "playlist"
+      ],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false
+    }
+  ],
+  "surveys": [
+    {
+      "id": "readiness",
+      "title": "Перед первым рабочим днём",
+      "questions": [
+        {
+          "id": "ready",
+          "text": "Готовы к первому рабочему дню?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "ready",
+              "label": "Да, готов",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "excited",
+              "label": "Жду с нетерпением",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "worried",
+              "label": "Немного волнуюсь",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Волноваться перед первым днём нормально. Рекрутер и коллеги помогут освоиться."
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        }
+      ],
+      "reminder_days": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "equipment",
+      "title": "Рабочее место",
+      "questions": [
+        {
+          "id": "access",
+          "text": "Есть ли всё необходимое оборудование и доступы?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "yes",
+              "label": "Да",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "no",
+              "label": "Нет",
+              "needs_comment": true,
+              "notify_hr": true,
+              "reply": "Опишите, чего не хватает. Передадим информацию рекрутеру."
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        }
+      ],
+      "reminder_days": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "day3",
+      "title": "Первые три рабочих дня",
+      "questions": [
+        {
+          "id": "registration",
+          "text": "Были ли вопросы при оформлении?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "ok",
+              "label": "Всё отлично",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "questions",
+              "label": "Остались вопросы",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "documents",
+              "label": "Трудности с документами",
+              "needs_comment": true,
+              "notify_hr": true,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "colleagues",
+          "text": "Как вас встретили коллеги?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "great",
+              "label": "Отлично",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "looking",
+              "label": "Пока присматриваюсь",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "alone",
+              "label": "Все заняты",
+              "needs_comment": true,
+              "notify_hr": true,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "tasks",
+          "text": "Понятны ли задачи на период адаптации?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "yes",
+              "label": "Да",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "waiting",
+              "label": "Жду разъяснений",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "no",
+              "label": "Пока непонятны",
+              "needs_comment": true,
+              "notify_hr": true,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        }
+      ],
+      "reminder_days": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "week2",
+      "title": "Две недели работы",
+      "questions": [
+        {
+          "id": "tasks",
+          "text": "Понятны ли поставленные задачи?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "yes",
+              "label": "Да",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "no",
+              "label": "Нет",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "information",
+          "text": "Достаточно ли информации для качественной работы?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "yes",
+              "label": "Да",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "no",
+              "label": "Нет",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "manager_available",
+          "text": "Насколько руководитель доступен для вопросов?",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "manager_feedback",
+          "text": "Оцените качество обратной связи руководителя.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "colleagues_support",
+          "text": "Оцените поддержку коллег.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "equipment_support",
+          "text": "Оцените помощь с техникой и рабочим местом.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "access_timeliness",
+          "text": "Насколько своевременно предоставили доступы?",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "hr_support",
+          "text": "Оцените поддержку HR по возникающим вопросам.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "hiring_support",
+          "text": "Оцените поддержку HR при подготовке к трудоустройству.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        }
+      ],
+      "reminder_days": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "month1",
+      "title": "Первый месяц",
+      "questions": [
+        {
+          "id": "plan",
+          "text": "Как продвигается работа по адаптационному плану?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "good",
+              "label": "По плану",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "slightly_late",
+              "label": "Немного отстаю",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "late",
+              "label": "Значительно отстаю",
+              "needs_comment": true,
+              "notify_hr": true,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        }
+      ],
+      "reminder_days": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "month2",
+      "title": "Впечатления после двух месяцев",
+      "questions": [
+        {
+          "id": "mood",
+          "text": "С каким настроением приходите на работу?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "great",
+              "label": "Мне всё нравится",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "indifferent",
+              "label": "Безразлично",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "tired",
+              "label": "Устал от объёма задач",
+              "needs_comment": true,
+              "notify_hr": true,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "helpers",
+          "text": "Кто помогает в период адаптации?",
+          "kind": "multiple",
+          "options": [
+            {
+              "id": "manager",
+              "label": "Руководитель",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "colleagues",
+              "label": "Коллеги",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "recruiter",
+              "label": "Рекрутер",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "nobody",
+              "label": "Никто",
+              "needs_comment": true,
+              "notify_hr": true,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "improvement",
+          "text": "Что помогло бы ускорить адаптацию?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "clear_tasks",
+              "label": "Более чёткие задачи",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "automation",
+              "label": "Автоматизация",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "help",
+              "label": "Помощь коллег",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "other",
+              "label": "Свой вариант",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        }
+      ],
+      "reminder_days": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "final",
+      "title": "Итоги адаптации",
+      "questions": [
+        {
+          "id": "difficulty",
+          "text": "Что было самым сложным?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "ok",
+              "label": "Со всем справился",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "communications",
+              "label": "Коммуникации с отделами",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "tasks",
+              "label": "Нечёткие задачи",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "other",
+              "label": "Другое",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "stay",
+          "text": "Планируете продолжить работу?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "yes",
+              "label": "Да",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "unsure",
+              "label": "Не уверен",
+              "needs_comment": true,
+              "notify_hr": true,
+              "reply": null
+            },
+            {
+              "id": "no",
+              "label": "Задумываюсь об уходе",
+              "needs_comment": true,
+              "notify_hr": true,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "workload",
+          "text": "Насколько комфортна нагрузка?",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "expectations",
+          "text": "Насколько работа соответствует ожиданиям?",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "information",
+          "text": "Достаточно ли информации для работы?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "yes",
+              "label": "Да",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null
+            },
+            {
+              "id": "no",
+              "label": "Нет",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "manager_available",
+          "text": "Насколько руководитель доступен для вопросов?",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "manager_feedback",
+          "text": "Оцените качество обратной связи руководителя.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "colleagues_support",
+          "text": "Оцените поддержку коллег.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "departments",
+          "text": "Оцените взаимодействие с другими подразделениями.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "hr_support",
+          "text": "Оцените поддержку HR.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "goals",
+          "text": "Насколько удалось выполнить задачи периода адаптации?",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        },
+        {
+          "id": "suggestion",
+          "text": "Что улучшить для более комфортной адаптации?",
+          "kind": "text",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее."
+        }
+      ],
+      "reminder_days": [
+        1,
+        2
+      ]
+    }
+  ]
+}

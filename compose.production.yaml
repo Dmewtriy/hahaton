@@ -1,0 +1,15 @@
+# Usage: docker compose -f compose.yaml -f compose.production.yaml up -d --build
+# Terminate public TLS at a reverse proxy pointing to 127.0.0.1:8000.
+services:
+  api:
+    environment:
+      KORSIK_ENVIRONMENT: production
+      KORSIK_ENABLE_DEMO: 'false'
+      KORSIK_TRANSPORT: max
+      KORSIK_ML_MODE: http
+  worker:
+    environment:
+      KORSIK_ENVIRONMENT: production
+      KORSIK_ENABLE_DEMO: 'false'
+      KORSIK_TRANSPORT: max
+      KORSIK_ML_MODE: http

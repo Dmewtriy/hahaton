@@ -1,0 +1,30 @@
+name: backend
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: korsik
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: korsik_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U korsik -d korsik_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.lock && pip install --no-deps -e .
+      - run: ruff check src tests scripts && ruff format --check src tests scripts migrations
+      - run: pytest -q
+      - name: PostgreSQL migrations and integration
+        env:
+          KORSIK_BOOTSTRAP_TOKEN: ci-only-bootstrap-token-0000000000000000
+          KORSIK_DATABASE_URL: postgresql+psycopg://korsik:test_password@localhost:5432/korsik_test
+          KORSIK_TEST_DATABASE_URL: postgresql+psycopg://korsik:test_password@localhost:5432/korsik_test
+        run: python -m korsik.cli migrate && alembic check && pytest -q tests/test_postgres.py

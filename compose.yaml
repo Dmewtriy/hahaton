@@ -1,0 +1,65 @@
+name: korsik
+x-app: &app
+  build: .
+  env_file: .env
+  environment:
+    KORSIK_DATABASE_URL: postgresql+psycopg://korsik:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/korsik
+    KORSIK_DATA_DIR: /app/data
+  volumes:
+    - app_data:/app/data
+  init: true
+  security_opt:
+    - no-new-privileges:true
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: korsik
+      POSTGRES_USER: korsik
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U korsik -d korsik]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
+  migrate:
+    <<: *app
+    command: [python, -m, korsik.cli, migrate]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: 'no'
+  api:
+    <<: *app
+    ports:
+      - 127.0.0.1:8000:8000
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+  worker:
+    <<: *app
+    command: [python, -m, korsik.cli, worker]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+  poll:
+    <<: *app
+    profiles: [max-poll]
+    command: [python, -m, korsik.cli, poll]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  app_data:
+  postgres_data:

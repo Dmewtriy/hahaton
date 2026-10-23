@@ -1,0 +1,409 @@
+{
+  "contract_version": "1",
+  "schemas": {
+    "AnswerRequest": {
+      "$defs": {
+        "AccessContext": {
+          "additionalProperties": false,
+          "properties": {
+            "branch_code": {
+              "title": "Branch Code",
+              "type": "string"
+            },
+            "category": {
+              "title": "Category",
+              "type": "string"
+            }
+          },
+          "required": [
+            "branch_code",
+            "category"
+          ],
+          "title": "AccessContext",
+          "type": "object"
+        },
+        "AllowedDocument": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "title": "Id",
+              "type": "string"
+            },
+            "title": {
+              "title": "Title",
+              "type": "string"
+            },
+            "version": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "id",
+            "title",
+            "version"
+          ],
+          "title": "AllowedDocument",
+          "type": "object"
+        },
+        "HistoryMessage": {
+          "additionalProperties": false,
+          "properties": {
+            "role": {
+              "enum": [
+                "user",
+                "assistant",
+                "hr"
+              ],
+              "title": "Role",
+              "type": "string"
+            },
+            "text": {
+              "maxLength": 2000,
+              "title": "Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "role",
+            "text"
+          ],
+          "title": "HistoryMessage",
+          "type": "object"
+        },
+        "StepContext": {
+          "additionalProperties": false,
+          "properties": {
+            "stage": {
+              "title": "Stage",
+              "type": "string"
+            },
+            "survey_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Survey Id"
+            },
+            "question_index": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Question Index"
+            }
+          },
+          "required": [
+            "stage"
+          ],
+          "title": "StepContext",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "employee_id": {
+          "title": "Employee Id",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 15000,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "history": {
+          "items": {
+            "$ref": "#/$defs/HistoryMessage"
+          },
+          "maxItems": 8,
+          "title": "History",
+          "type": "array"
+        },
+        "step_context": {
+          "$ref": "#/$defs/StepContext"
+        },
+        "access": {
+          "$ref": "#/$defs/AccessContext"
+        },
+        "allowed_documents": {
+          "items": {
+            "$ref": "#/$defs/AllowedDocument"
+          },
+          "title": "Allowed Documents",
+          "type": "array"
+        },
+        "address_style": {
+          "enum": [
+            "formal",
+            "informal"
+          ],
+          "title": "Address Style",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "employee_id",
+        "question",
+        "step_context",
+        "access",
+        "address_style"
+      ],
+      "title": "AnswerRequest",
+      "type": "object"
+    },
+    "AnswerResult": {
+      "$defs": {
+        "Source": {
+          "additionalProperties": false,
+          "properties": {
+            "document_id": {
+              "title": "Document Id",
+              "type": "string"
+            },
+            "version": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            },
+            "page": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Page"
+            }
+          },
+          "required": [
+            "document_id",
+            "version"
+          ],
+          "title": "Source",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "answered",
+            "not_found",
+            "clarification"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "answer": {
+          "maxLength": 12000,
+          "minLength": 1,
+          "title": "Answer",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "maxItems": 20,
+          "title": "Sources",
+          "type": "array"
+        },
+        "topics": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Topics",
+          "type": "array"
+        },
+        "needs_hr": {
+          "default": false,
+          "title": "Needs Hr",
+          "type": "boolean"
+        },
+        "processor_version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Processor Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "answer",
+        "processor_version"
+      ],
+      "title": "AnswerResult",
+      "type": "object"
+    },
+    "AnalysisRequest": {
+      "$defs": {
+        "AccessContext": {
+          "additionalProperties": false,
+          "properties": {
+            "branch_code": {
+              "title": "Branch Code",
+              "type": "string"
+            },
+            "category": {
+              "title": "Category",
+              "type": "string"
+            }
+          },
+          "required": [
+            "branch_code",
+            "category"
+          ],
+          "title": "AccessContext",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "employee_id": {
+          "title": "Employee Id",
+          "type": "string"
+        },
+        "question": {
+          "title": "Question",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 15000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "answer": {
+          "additionalProperties": true,
+          "title": "Answer",
+          "type": "object"
+        },
+        "access": {
+          "$ref": "#/$defs/AccessContext"
+        }
+      },
+      "required": [
+        "request_id",
+        "employee_id",
+        "question",
+        "text",
+        "answer",
+        "access"
+      ],
+      "title": "AnalysisRequest",
+      "type": "object"
+    },
+    "AnalysisResult": {
+      "additionalProperties": false,
+      "properties": {
+        "sentiment": {
+          "enum": [
+            "positive",
+            "neutral",
+            "negative"
+          ],
+          "title": "Sentiment",
+          "type": "string"
+        },
+        "risk": {
+          "enum": [
+            "none",
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Risk",
+          "type": "string"
+        },
+        "topics": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Topics",
+          "type": "array"
+        },
+        "explanation": {
+          "maxLength": 3000,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "needs_hr": {
+          "default": false,
+          "title": "Needs Hr",
+          "type": "boolean"
+        },
+        "processor_version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Processor Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sentiment",
+        "risk",
+        "explanation",
+        "processor_version"
+      ],
+      "title": "AnalysisResult",
+      "type": "object"
+    },
+    "IndexResult": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "processing",
+            "ready",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "external_id": {
+          "title": "External Id",
+          "type": "string"
+        },
+        "processor_version": {
+          "title": "Processor Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "external_id",
+        "processor_version"
+      ],
+      "title": "IndexResult",
+      "type": "object"
+    }
+  }
+}
