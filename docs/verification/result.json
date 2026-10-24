@@ -1,0 +1,24 @@
+{
+  "baseline_passed": 197,
+  "final_passed": 237,
+  "skipped": 1,
+  "new_test_cases": 40,
+  "lint": "ruff check src tests scripts migrations: passed",
+  "javascript": "node --check for changed JS: passed",
+  "database_copy": {
+    "source_revision": "0005",
+    "target_revision": "0006",
+    "preserved_original_tables": 35,
+    "integrity_check": "ok",
+    "foreign_key_check": "ok",
+    "alembic_check": "no pending operations"
+  },
+  "ui": "Browser: local mock database, planning create/save, task detail and grants selectors; synthetic records only",
+  "not_run": [
+    "real MAX",
+    "MAX on Mac",
+    "ML service or models",
+    "dedicated PostgreSQL integration"
+  ],
+  "final_suite": "237 passed, 1 skipped; complete suite after final source changes"
+}

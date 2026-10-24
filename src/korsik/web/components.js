@@ -76,6 +76,13 @@ export const dateTime = (value) =>
       }).format(new Date(value))
     : "—";
 const statuses = {
+  assigned: ["Назначено", "blue"],
+  blocked: ["Нужна помощь", "red"],
+  resolved: ["Решено", "green"],
+  accepted: ["Принято", "green"],
+  rejected: ["Отклонено", "orange"],
+  published: ["Опубликовано", "green"],
+  archived: ["В архиве", ""],
   expired: ["Срок истёк", "orange"],
   waiting_material: ["Нужен материал", "red"],
   late_review: ["Решение HR", "orange"],

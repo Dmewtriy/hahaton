@@ -205,7 +205,7 @@ class Worker:
                 scenarios.dispatch_step(session, employee, step)
         elif job.kind == "reminder":
             run = session.get(SurveyRun, data["run_id"])
-            if run and run.status == "active":
+            if run and surveys.reminder_allowed(session, run.id):
                 employee = session.get(Employee, run.employee_id)
                 step = session.get(ScheduledStep, run.scheduled_step_id)
                 if (
@@ -214,15 +214,37 @@ class Worker:
                     and (step.campaign_id or employee.onboarding_status != "stopped")
                     and (not run.expires_at or now(session) < run.expires_at)
                 ):
-                    send(
+                    item = send(
                         session,
                         employee.identity_id,
                         "Напоминаю о незавершённом опросе. Продолжить: /resume.",
                         job.dedupe_key,
                         now(session),
+                        buttons=[{"text": "Продолжить опрос", "payload": "resume:" + run.id}],
                     )
+                    item.body = {**item.body, "reminder_run_id": run.id}
+            else:
+                job.payload = {**job.payload, "suppressed_reason": "Опрос недоступен или первое сообщение не доставлено"}
         elif job.kind == "analyze":
             self.analyze(session, job)
+        elif job.kind == "personal_plan":
+            from . import access, optional
+
+            employee = session.get(Employee, data["employee_id"])
+            author = session.get(Identity, data["author_id"])
+            current = optional.plan(session, employee) if employee else None
+            if (
+                employee
+                and author
+                and author.active
+                and access.can_support(author, employee)
+                and current
+                and current.id == data["document_id"]
+            ):
+                item = optional.send_plan(session, employee, job.dedupe_key)
+                item.body = {**item.body, "plan_author_id": author.id, "plan_employee_id": employee.id}
+            else:
+                job.payload = {**job.payload, "suppressed_reason": "plan_or_access_changed"}
         elif job.kind in {"index_document", "index_status"}:
             self.index_document(session, job)
         elif job.kind == "digest":
@@ -231,7 +253,7 @@ class Worker:
                 end = datetime.fromisoformat(data["end"])
                 from .digests import create_snapshot
 
-                snapshot = create_snapshot(session, actor, end, job.dedupe_key)
+                snapshot = create_snapshot(session, actor, end, job.dedupe_key, self.runtime.settings)
                 item = send(session, actor.id, snapshot.text, job.dedupe_key, now(session))
                 item.body = {**item.body, "digest_snapshot_id": snapshot.id}
         else:
@@ -268,7 +290,7 @@ class Worker:
 
     def index_document(self, session, job):
         doc = session.get(Document, job.payload["document_id"])
-        if not doc or not doc.active:
+        if not doc or not doc.active or doc.purpose != "knowledge":
             return
         if job.kind == "index_document":
             result = self.runtime.ml.index(
@@ -315,6 +337,37 @@ class Worker:
                 now(session) + timedelta(seconds=30),
             )
 
+    def extension_delivery_allowed(self, session, item):
+        from . import access, management, optional
+
+        if item.body.get("planning_id") and not self.runtime.settings.enable_optional:
+            return False
+        if item.body.get("management_task_id") and not self.runtime.settings.enable_management:
+            return False
+        if not optional.delivery_allowed(session, item) or not management.delivery_allowed(session, item):
+            return False
+        if item.body.get("plan_author_id"):
+            author = session.get(Identity, item.body["plan_author_id"])
+            owner = session.get(Employee, item.body["plan_employee_id"])
+            if not author or not author.active or not owner or not access.can_support(author, owner):
+                return False
+        if item.body.get("reminder_run_id") and not surveys.reminder_allowed(
+            session, item.body["reminder_run_id"]
+        ):
+            return False
+        for doc_id in item.body.get("required_document_ids", []):
+            doc = session.get(Document, doc_id)
+            actor = session.get(Identity, item.recipient_id) if item.recipient_id else None
+            if not doc or not actor or not actor.active or not documents.can_read(session, actor, doc):
+                return False
+            if doc.purpose == "personal_plan" and (
+                not doc.published
+                or not optional.plan(session, session.get(Employee, doc.owner_employee_id))
+                or optional.plan(session, session.get(Employee, doc.owner_employee_id)).id != doc.id
+            ):
+                return False
+        return True
+
     def deliver_one(self):
         db = self.runtime.db
         with db.transaction(write_lock=True) as session:
@@ -342,6 +395,9 @@ class Worker:
             )
             if not item:
                 return False
+            if not self.extension_delivery_allowed(session, item):
+                item.status, item.last_error = "cancelled", "extension_delivery_revoked"
+                return True
             if not onboarding.delivery_allowed(session, item):
                 item.status = "cancelled"
                 return True
@@ -433,6 +489,13 @@ class Worker:
             item.status, item.lease_owner = "sending", self.owner
             item.lease_until = utcnow() + timedelta(seconds=180)
             item.attempts += 1
+            if "message_chunks" not in item.body:
+                from .message_presentation import split_message
+
+                legacy = item.body.get("next_chunk", 0) > 0
+                chunks = ([item.body["text"][i:i + 3500] for i in range(0, len(item.body["text"]), 3500)] or [""]) if legacy else split_message(item.body["text"])
+                item.body = {**item.body, "message_chunks": chunks,
+                             "presentation_format": "legacy-plain" if legacy else "html-v1"}
             item_id, body = item.id, dict(item.body)
             media = []
             for doc_id in body.get("document_ids", []):
@@ -454,10 +517,16 @@ class Worker:
                         if not state:
                             session.add(State(key="max-media:" + doc_id, value=cached))
                 attachments.append(cached)
-            chunks = [body["text"][i : i + 3500] for i in range(0, len(body["text"]), 3500)] or [""]
+            chunks = body["message_chunks"]
             for index in range(body.get("next_chunk", 0), len(chunks)):
+                with db.transaction(write_lock=True) as session:
+                    current = session.get(Outbox, item_id)
+                    if current.status != "sending" or not self.extension_delivery_allowed(session, current):
+                        current.status, current.last_error = "cancelled", "extension_delivery_revoked"
+                        return True
                 message = {
                     "text": chunks[index],
+                    "presentation_format": body["presentation_format"],
                     "buttons": body.get("buttons", []) if index == len(chunks) - 1 else [],
                 }
                 provider_id = self.runtime.transport.send(
@@ -467,6 +536,9 @@ class Worker:
                     item = session.get(Outbox, item_id)
                     item.body = {**item.body, "next_chunk": index + 1}
                     item.provider_message_id = provider_id
+                    if not self.extension_delivery_allowed(session, item):
+                        item.status, item.last_error = "uncertain", "source_changed_during_delivery"
+                        return True
                 if self.runtime.settings.transport == "max":
                     time.sleep(0.55)  # Single delivery worker: below 2 messages/s per dialogue and 30 rps.
             with db.transaction(write_lock=True) as session:

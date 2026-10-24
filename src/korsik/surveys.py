@@ -16,6 +16,8 @@ def start_survey(session, employee, step):
         employee_id=employee.id,
         scheduled_step_id=step.id,
         definition=step.payload["survey"],
+        branch_code_at_start=employee.branch_code,
+        data_mode=step.payload["survey"].get("data_mode", "real"),
         started_at=now(session),
         expires_at=datetime.fromisoformat(step.payload["expires_at"])
         if step.payload.get("expires_at")
@@ -27,9 +29,9 @@ def start_survey(session, employee, step):
         enqueue(
             session,
             "reminder",
-            {"run_id": run.id},
+            {"run_id": run.id, "offset_days": day},
             f"reminder:{run.id}:{day}",
-            now(session) + timedelta(days=day),
+            run.started_at + timedelta(days=day),
         )
     prompt(session, employee, run, "start")
 
@@ -94,11 +96,27 @@ def prompt(session, employee, run, suffix):
     )
     from .models import RouteRun
 
+    item.body = {**item.body, "buttons": item.body["buttons"] + [{"text": "☰ Меню", "payload": "nav:page:0"}]}
+
     route = session.scalar(select(RouteRun).where(RouteRun.scheduled_step_id == run.scheduled_step_id))
     if route:
         item.body = {**item.body, "route_run_id": route.id, "route_node": route.position}
     if item.status == "blocked_material":
         item.status = "pending"
+
+
+def reminder_allowed(session, run_id):
+    from .models import Employee, Outbox
+    from .scenarios import step_allowed
+
+    run = session.get(SurveyRun, run_id)
+    if not run or run.status != "active" or run.expires_at and run.expires_at <= now(session):
+        return False
+    employee = session.get(Employee, run.employee_id)
+    step = session.get(ScheduledStep, run.scheduled_step_id)
+    initial = session.scalar(select(Outbox).where(Outbox.dedupe_key == f"survey:{run.id}:0:start"))
+    return bool(employee and employee.active and employee.status == "active" and step
+                and step_allowed(session, employee, step) and initial and initial.status == "sent")
 
 
 def consume_answer(session, employee, run, text, event_key, callback=None):

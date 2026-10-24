@@ -85,4 +85,11 @@ export const api = {
     anchor.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   },
+  async previewImage(id) {
+    const response = await fetch(`/api/documents/${encodeURIComponent(id)}/download`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error("Изображение недоступно");
+    return URL.createObjectURL(await response.blob());
+  },
 };

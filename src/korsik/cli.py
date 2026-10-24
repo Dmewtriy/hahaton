@@ -20,6 +20,7 @@ def main():
     sub.add_parser("migrate")
     sub.add_parser("seed-demo")
     sub.add_parser("install-v04", help="Install source-backed v0.4 scenario and missing-material registry")
+    sub.add_parser("install-brand-assets", help="Bind supplied Korsik images to empty Excel material references")
     sub.add_parser("worker")
     sub.add_parser("poll")
     sub.add_parser("sync-commands", help="Register Russian slash-command hints in MAX")
@@ -97,6 +98,11 @@ def main():
                         }
                     )
                 )
+        elif args.command == "install-brand-assets":
+            from .brand_assets import install
+
+            with runtime.db.transaction(write_lock=True) as session:
+                print(json.dumps(install(session), ensure_ascii=False))
         elif args.command == "worker":
             Worker(runtime).run()
         elif args.command == "tick":
@@ -104,7 +110,7 @@ def main():
         elif args.command == "poll":
             poll(runtime)
         elif args.command == "sync-commands":
-            from .commands import PUBLIC_COMMANDS
+            from .commands import configured_commands
 
             if settings.transport != "max":
                 raise ValueError("Command registration requires transport=max")
@@ -116,10 +122,11 @@ def main():
             (backup / ("max_commands_" + utcnow().strftime("%Y%m%d_%H%M%S") + ".json")).write_text(
                 json.dumps(previous, ensure_ascii=False, indent=2), encoding="utf-8"
             )
-            result = runtime.transport.set_commands(PUBLIC_COMMANDS)
-            if result.get("commands") != PUBLIC_COMMANDS:
+            commands = configured_commands(runtime.settings)
+            result = runtime.transport.set_commands(commands)
+            if result.get("commands") != commands:
                 raise ValueError("MAX returned a different command list; check the registered hints")
-            print(f"Registered {len(PUBLIC_COMMANDS)} command hints in MAX.")
+            print(f"Registered {len(commands)} command hints in MAX.")
         elif args.command == "subscribe":
             if not settings.max_webhook_secret:
                 raise ValueError("Set KORSIK_MAX_WEBHOOK_SECRET")

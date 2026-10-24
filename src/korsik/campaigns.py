@@ -114,12 +114,17 @@ def save_campaign(session, actor, data, campaign_id=None):
         snapshot = template.definition
     for doc_id in data.document_ids:
         doc = session.get(Document, doc_id)
-        if not doc or not documents.can_read(session, actor, doc) or not doc.active:
+        if not doc or doc.purpose == "personal_plan" or not documents.can_read(session, actor, doc) or not doc.active:
             raise HTTPException(422, "Вложение недоступно")
         if any(not documents.employee_can_read(e, doc) for e in members):
             raise HTTPException(422, "Вложение недоступно части выбранных сотрудников")
+    if data.message_type == "first_day_card" and not any(
+        session.get(Document, d).purpose == "card_image" for d in data.document_ids
+    ):
+        raise HTTPException(422, "Для открытки первого дня необходимо изображение")
     campaign.title, campaign.kind, campaign.text = data.title, data.kind, data.text
     campaign.document_ids, campaign.template_id = data.document_ids, data.template_id
+    campaign.message_type = data.message_type
     campaign.survey_snapshot = snapshot
     campaign.audience = data.audience.model_dump()
     campaign.branch_codes = scope
@@ -139,6 +144,9 @@ def audience_hash(members):
 
 def publish(session, actor, campaign, expected_hash):
     from .admin_schemas import AudienceInput
+    from .optional import validate_source
+
+    validate_source(session, campaign)
 
     if campaign.status != "draft" or not campaign.active:
         raise HTTPException(409, "Эта рассылка уже опубликована или находится в архиве")
@@ -159,8 +167,12 @@ def publish(session, actor, campaign, expected_hash):
             raise HTTPException(409, "Область доступа опросника изменилась. Обновите черновик")
     for doc_id in campaign.document_ids:
         doc = session.get(Document, doc_id)
-        if not doc or not doc.active or any(not documents.employee_can_read(e, doc) for e in members):
+        if not doc or not doc.active or doc.purpose == "personal_plan" or any(not documents.employee_can_read(e, doc) for e in members):
             raise HTTPException(409, "Вложение больше недоступно выбранным получателям")
+    if campaign.message_type == "first_day_card" and not any(
+        session.get(Document, d).purpose == "card_image" for d in campaign.document_ids
+    ):
+        raise HTTPException(409, "Изображение открытки недоступно")
     # Preserve exactly the reviewed questions, not whatever the template contains at send time.
     definition = {
         "name": "Рассылка " + campaign.id,
@@ -185,6 +197,9 @@ def publish(session, actor, campaign, expected_hash):
             "document_ids": campaign.document_ids,
             "resource_keys": [],
             "campaign_title": campaign.title,
+            "planning_id": campaign.source_id,
+            "planning_revision": campaign.source_revision,
+            "planning_author_id": campaign.created_by,
             "expires_at": campaign.expires_at.isoformat() if campaign.expires_at else None,
         }
         if campaign.survey_snapshot:
@@ -322,6 +337,10 @@ def campaign_dto(session, campaign, include_recipients=False):
         "id": campaign.id,
         "title": campaign.title,
         "kind": campaign.kind,
+        "message_type": campaign.message_type,
+        "source_kind": campaign.source_kind,
+        "source_id": campaign.source_id,
+        "source_revision": campaign.source_revision,
         "text": campaign.text,
         "document_ids": campaign.document_ids,
         "template_id": campaign.template_id,

@@ -67,6 +67,12 @@ def create_app(runtime=None):
 
     app = FastAPI(title="Корсик: backend", version="0.1.0", lifespan=lifespan)
     app.state.runtime = runtime
+    from .extension_api import management_router, optional_router
+    from .improvements_api import router as improvements_router
+
+    app.include_router(optional_router)
+    app.include_router(management_router)
+    app.include_router(improvements_router)
     from .admin_api import router as admin_router
 
     app.include_router(admin_router)
@@ -160,6 +166,7 @@ def create_app(runtime=None):
             "branch_codes": actor.branch_codes,
             "is_admin": access.is_admin(actor),
             "can_use_workspace": access.can_use_workspace(actor),
+            "features": {"optional": runtime.settings.enable_optional, "management": runtime.settings.enable_management},
             "capabilities": {
                 "manage_hr": access.is_hr(actor),
                 "manage_people": access.can_manage_people(actor),
@@ -170,6 +177,24 @@ def create_app(runtime=None):
                 and runtime.settings.environment != "production",
             },
         }
+
+    @app.get("/api/menu", tags=["Navigation"])
+    def action_menu(session: Session, actor: Actor):
+        from .menu import available
+
+        employee = session.scalar(select(Employee).where(Employee.identity_id == actor.id))
+        return [{"id": a.id, "label": a.label, "description": a.description}
+                for a in available(runtime, actor, employee)]
+
+    @app.post("/api/menu/{action_id}", tags=["Navigation"])
+    def menu_action(action_id: str, session: Session, actor: Actor):
+        from . import menu
+
+        employee = session.scalar(select(Employee).where(Employee.identity_id == actor.id))
+        access.require(actor.max_user_id and any(a.id == action_id for a in menu.available(runtime, actor, employee)))
+        ingest(session, {"event_id": "web-menu:" + uid(), "max_user_id": actor.max_user_id,
+                         "kind": "callback", "payload": "nav:do:" + action_id, "text": ""})
+        return {"queued": True}
 
     @app.get("/api/identities", tags=["Access"])
     def identities(session: Session, actor: Actor):
@@ -591,7 +616,7 @@ def create_app(runtime=None):
         return [
             documents.public_document(d)
             for d in session.scalars(select(Document))
-            if documents.can_read(session, actor, d)
+            if d.purpose == "knowledge" and documents.can_read(session, actor, d)
         ]
 
     @app.get("/api/documents/{document_id}/download", tags=["Documents"])
@@ -652,6 +677,8 @@ def create_app(runtime=None):
         if not doc:
             raise HTTPException(404)
         access.require(doc.active and documents.can_edit(actor, doc))
+        if doc.purpose != "knowledge":
+            raise HTTPException(422, "Персональные планы и вложения не индексируются в базе знаний")
         doc.status = "pending"
         doc.last_error = None
         enqueue(session, "index_document", {"document_id": doc.id}, f"reindex:{doc.id}:{uid()}", now(session))

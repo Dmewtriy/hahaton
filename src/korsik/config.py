@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     ml_token: str = ""
     ml_timeout_seconds: float = 15
     enable_demo: bool = False
+    enable_optional: bool = True
+    enable_management: bool = True
     max_upload_bytes: int = 35 * 1024 * 1024
     invitation_hours: int = 168
     worker_interval_seconds: float = 1

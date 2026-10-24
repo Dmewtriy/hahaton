@@ -349,6 +349,7 @@ def save_survey(session, actor, data, template_id=None):
         template = SurveyTemplate(id=uid(), created_by=actor.id)
         session.add(template)
     definition = SurveyDefinition(
+        data_mode=data.data_mode,
         id=template.id,
         title=data.title,
         questions=data.questions,

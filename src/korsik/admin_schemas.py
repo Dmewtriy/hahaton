@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, StrictInt, field_validator, model_validator
 
 from .schemas import BranchInput, EmployeeCreate, Question, ScenarioDefinition, StrictModel
 
@@ -36,11 +36,12 @@ class DocumentInput(StrictModel):
 
 
 class SurveyInput(StrictModel):
+    data_mode: Literal["real", "demo"] = "real"
     title: str = Field(min_length=1, max_length=200)
     description: str = Field(default="", max_length=3000)
     branch_codes: list[str] = Field(min_length=1)
     questions: list[Question] = Field(min_length=1, max_length=100)
-    reminder_days: list[int] = Field(default_factory=lambda: [1, 2], max_length=10)
+    reminder_days: list[StrictInt] = Field(default_factory=list, max_length=10)
     revision: int | None = Field(default=None, ge=1)
     kind: Literal["survey", "quiz"] = "survey"
     pass_percent: int = Field(default=70, ge=0, le=100)
@@ -53,6 +54,7 @@ class SurveyInput(StrictModel):
             raise ValueError("Идентификаторы вопросов должны быть уникальными")
         if any(day < 1 or day > 30 for day in self.reminder_days):
             raise ValueError("Напоминания задаются через 1–30 дней")
+        self.reminder_days = sorted(set(self.reminder_days))
         return self
 
 
@@ -90,6 +92,7 @@ class CampaignInput(StrictModel):
     due_at: datetime | None = None
     revision: int | None = Field(default=None, ge=1)
     expires_at: datetime | None = None
+    message_type: Literal["message", "welcome_letter", "first_day_card"] = "message"
 
     @field_validator("due_at", "expires_at")
     @classmethod
@@ -100,6 +103,8 @@ class CampaignInput(StrictModel):
 
     @model_validator(mode="after")
     def survey_required(self):
+        if self.kind == "survey" and self.message_type != "message":
+            raise ValueError("Приветственное письмо и открытка — отдельные сообщения, не опрос")
         if self.kind == "survey" and not self.template_id:
             raise ValueError("Выберите опросник")
         if self.expires_at and self.due_at and self.expires_at <= self.due_at:

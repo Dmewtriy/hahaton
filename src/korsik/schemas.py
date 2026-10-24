@@ -3,7 +3,7 @@ from string import Formatter
 from typing import Literal
 from zoneinfo import ZoneInfo
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator, model_validator
 
 Role = Literal["employee", "hr", "manager", "hr_head"]
 
@@ -172,10 +172,11 @@ class Question(StrictModel):
 
 
 class SurveyDefinition(StrictModel):
+    data_mode: Literal["real", "demo"] = "real"
     id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
     title: str = Field(min_length=1, max_length=200)
     questions: list[Question] = Field(min_length=1, max_length=100)
-    reminder_days: list[int] = Field(default_factory=lambda: [1, 2], max_length=10)
+    reminder_days: list[StrictInt] = Field(default_factory=lambda: [1, 2], max_length=10)
     kind: Literal["survey", "quiz"] = "survey"
     pass_percent: int = Field(default=70, ge=0, le=100)
     completion_text: str = Field(default="Спасибо за обратную связь! Опрос завершён.", max_length=12000)
@@ -187,6 +188,7 @@ class SurveyDefinition(StrictModel):
             raise ValueError("Question IDs must be unique")
         if any(day < 1 or day > 30 for day in self.reminder_days):
             raise ValueError("Reminder offsets must be 1..30 days")
+        self.reminder_days = sorted(set(self.reminder_days))
         if self.kind == "quiz" and any(not q.correct_options for q in self.questions):
             raise ValueError("Для теста у каждого вопроса должны быть правильные варианты")
         return self

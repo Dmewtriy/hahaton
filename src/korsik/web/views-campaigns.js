@@ -210,6 +210,7 @@ export async function campaignEditor(ctx, item = {}) {
         })),
         item.template_id || "",
       )}</div>` +
+      select("message_type", "Вид сообщения", [{value:"message",label:"Обычное сообщение"},{value:"welcome_letter",label:"Приветственное письмо"},{value:"first_day_card",label:"Открытка первого дня — нужно изображение"}],item.message_type||"message",null) +
       textarea(
         "text",
         "Сообщение сотруднику",
@@ -230,10 +231,27 @@ export async function campaignEditor(ctx, item = {}) {
         ],
         audience.mode,
         null,
-      )}<div data-audience-options></div><div data-audience-summary class="audience-preview">Нажмите «Проверить получателей» перед публикацией.</div><div class="spacer"></div>${button("Проверить получателей", "audience-preview")}</div><div class="form-section"><h3>Когда отправить</h3>${input("due_at", "Дата и время в вашем часовом поясе", due, "datetime-local", "", "Оставьте пустым, чтобы отправить сразу после публикации.")}${input("expires_at", "Пройти / доставить до (необязательно)", item.expires_at ? new Date(new Date(item.expires_at).getTime() - new Date(item.expires_at).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "", "datetime-local", "", "После срока опрос закроется, ответы сохранятся, напоминания прекратятся.")}<span class="field-label">Вложения</span><div class="recipient-grid">${ctx.refs.documents.map((d) => checkbox("document_ids", d.title, item.document_ids?.includes(d.id), d.id)).join("") || "<small>Документов пока нет</small>"}</div></div><div class="notice">${icon("info")}Сейчас создаётся только черновик. Перед отправкой вы отдельно подтвердите получателей. Уже начатые диалоги и опросы будут учтены очередью.</div>`,
+      )}<div data-audience-options></div><div data-audience-summary class="audience-preview">Нажмите «Проверить получателей» перед публикацией.</div><div class="spacer"></div>${button("Проверить получателей", "audience-preview")}</div><div class="form-section"><h3>Когда отправить</h3>${input("due_at", "Дата и время в вашем часовом поясе", due, "datetime-local", "", "Оставьте пустым, чтобы отправить сразу после публикации.")}${input("expires_at", "Пройти / доставить до (необязательно)", item.expires_at ? new Date(new Date(item.expires_at).getTime() - new Date(item.expires_at).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "", "datetime-local", "", "После срока опрос закроется, ответы сохранятся, напоминания прекратятся.")}<span class="field-label">Вложения</span><div class="recipient-grid">${ctx.refs.documents.filter(d => d.purpose !== "personal_plan").map((d) => checkbox("document_ids", d.title, item.document_ids?.includes(d.id), d.id)).join("") || "<small>Документов пока нет</small>"}</div></div><div data-card-preview></div><div class="notice">${icon("info")}Сейчас создаётся только черновик. Перед отправкой вы отдельно подтвердите получателей. Уже начатые диалоги и опросы будут учтены очередью.</div>`,
     {
       submitLabel: "Сохранить черновик",
       bind: (form) => {
+        let imageUrls=[];
+        const renderImages=async()=>{
+          imageUrls.forEach(u=>URL.revokeObjectURL(u)); imageUrls=[];
+          const target=form.querySelector("[data-card-preview]");
+          if(!target)return;
+          const chosen=new FormData(form).getAll("document_ids");
+          const images=ctx.refs.documents.filter(d=>chosen.includes(d.id)&&d.purpose==="card_image");
+          target.replaceChildren();
+          for(const image of images) {
+            try { const objectUrl=await ctx.api.previewImage(image.id);imageUrls.push(objectUrl);
+              const element=document.createElement("img");element.src=objectUrl;element.alt=image.title;element.style.maxWidth="100%";element.style.maxHeight="260px";target.append(element);
+            } catch(error) {target.textContent=error.message;}
+          }
+        };
+        form.addEventListener("change",event=>{if(event.target.name==="document_ids")renderImages();});
+        document.querySelector("#drawer").addEventListener("close",()=>imageUrls.forEach(u=>URL.revokeObjectURL(u)),{once:true});
+        renderImages();
         const renderAudience = () => {
           const mode = form.elements.audience_mode.value;
           audience.mode = mode;
@@ -297,6 +315,7 @@ export async function campaignEditor(ctx, item = {}) {
           body = {
             title: fields.title,
             kind: fields.kind,
+            message_type: fields.message_type || "message",
             text: fields.text,
             template_id:
               fields.kind === "survey" ? fields.template_id || null : null,

@@ -15,6 +15,15 @@ from .templates import TOKENS
 router = APIRouter(prefix="/api/admin", tags=["Route configuration"])
 
 
+@router.post("/materials/company-images")
+def install_company_images(session: Session, actor: Admin):
+    from .brand_assets import install
+
+    result = install(session, actor)
+    admin_service.audit(session, actor, "materials.company_images", "company-images/1")
+    return result
+
+
 class MaterialInput(StrictModel):
     document_id: str | None = None
     url: str | None = Field(default=None, max_length=1024)
@@ -162,6 +171,8 @@ def save_material(key: str, data: MaterialInput, session: Session, actor: Admin)
     if data.document_id:
         doc = session.get(Document, data.document_id)
         access.require(bool(doc and documents.can_read(session, actor, doc)))
+        if doc.purpose == "personal_plan":
+            raise HTTPException(422, "Персональный план нельзя использовать как общий материал")
         if not routes.document_matches(m, doc):
             raise HTTPException(422, "Для изображения выберите PNG/JPG; для питания — PDF")
         if not ("*" in doc.branch_codes or set(m.branch_codes) <= set(doc.branch_codes)):

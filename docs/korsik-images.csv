@@ -1,0 +1,29 @@
+﻿id,source_ref,cell,label,mandatory,image_number,file,status
+MAT-R003,XLS1-R003,I3,Изображение 14,True,14,korsik-14.jpg,exact_number
+MAT-R004,XLS1-R004,I4,Изображение 2,True,2,korsik-02.jpg,exact_number
+MAT-R008,XLS1-R008,I8,Изображение 1,True,1,korsik-01.jpg,exact_number
+MAT-R009,XLS1-R009,I9,Изображение 3,True,3,korsik-03.jpg,exact_number
+MAT-R010,XLS1-R010,I10,Изображение 3,True,3,korsik-03.jpg,exact_number
+MAT-R017,XLS1-R017,I17,Изображение 3,True,3,korsik-03.jpg,exact_number
+MAT-R018,XLS1-R018,I18,Изображение 4,True,4,korsik-04.jpg,exact_number
+MAT-R026,XLS1-R026,I26,Изображение 5,True,5,korsik-05.jpg,exact_number
+MAT-R027,XLS1-R027,I27,Изображение 5,True,5,korsik-05.jpg,exact_number
+MAT-R028,XLS1-R028,I28,Изображение 5,True,5,korsik-05.jpg,exact_number
+MAT-R030,XLS1-R030,I30,Изображение 6,True,6,korsik-06.jpg,exact_number
+MAT-R031,XLS1-R031,I31,Изображение 6,True,6,korsik-06.jpg,exact_number
+MAT-R033,XLS1-R033,I33,Изображение 10,True,10,korsik-10.jpg,exact_number
+MAT-R036,XLS1-R036,I36,Изображение 7,False,7,korsik-07.jpg,exact_number
+MAT-R044,XLS1-R044,I44,Изображение 11,False,11,korsik-11.jpg,exact_number
+MAT-R047,XLS1-R047,I47,Изображение 14,True,14,korsik-14.jpg,exact_number
+MAT-R048,XLS1-R048,I48,Изображение 10,True,10,korsik-10.jpg,exact_number
+MAT-R049,XLS1-R049,I49,Изображение 7,True,7,korsik-07.jpg,exact_number
+MAT-R050,XLS1-R050,I50,Изображение 15,False,15,korsik-15.jpg,exact_number
+MAT-R053,XLS1-R053,I53,Изображение 8,True,8,korsik-08.jpg,exact_number
+MAT-R058,XLS1-R058,I58,Изображение 9,True,9,korsik-09.jpg,exact_number
+MAT-R061,XLS1-R061,I61,Изображение 10,True,10,korsik-10.jpg,exact_number
+MAT-R068,XLS1-R068,I68,Изображение 16,True,16,korsik-16.jpg,exact_number
+MAT-R069,XLS1-R069,I69,Изображение 13,False,13,korsik-13.jpg,exact_number
+MAT-R070,XLS1-R070,I70,Изображение 12,False,12,korsik-12.jpg,exact_number
+MAT-R024,XLS1-R024,I24,Изображение Открытка №1,False,,,missing_original
+MAT-R045,XLS1-R045,I45,ФОТО,False,,,missing_original
+MAT-R060,XLS1-R060,I60,Изображение Открытка №2,True,,,missing_original

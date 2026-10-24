@@ -86,7 +86,15 @@ class MAXClient:
         )
 
     def send(self, user_id, body, attachments=None):
-        message = {"text": body["text"]}
+        from .message_presentation import as_html, units
+
+        if body.get("presentation_format") == "legacy-plain":
+            message = {"text": body["text"]}
+        else:
+            text = as_html(body["text"])
+            if units(text) > 4000:
+                raise DeliveryError("message_too_long")
+            message = {"text": text, "format": "html"}
         media = list(attachments or [])
         if body.get("buttons"):
             media.append(

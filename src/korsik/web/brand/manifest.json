@@ -1,0 +1,381 @@
+{
+  "source_zip": "Korsiki_kartinki.zip",
+  "source_xlsx": "Финал. ТЗ. Чат-бот Корсик- 15.09.xlsx",
+  "xlsx_sha256": "e1017eecc95ed3a2287e9d9c11fe2da5e275c5f0886b63c4944c636557d9e9e6",
+  "assets": [
+    {
+      "number": 1,
+      "file": "korsik-01.jpg",
+      "original_name": "1080σ1080_1.jpg",
+      "sha256": "b0da3d1423e042ffce965cd7486234745280c34c352e7c2b410298d2e4fc623b"
+    },
+    {
+      "number": 2,
+      "file": "korsik-02.jpg",
+      "original_name": "1080σ1080_2.jpg",
+      "sha256": "e62df747bed96f3a0a3453fe3b5a21fbef046299d9de032d10934281fc7cce39"
+    },
+    {
+      "number": 3,
+      "file": "korsik-03.jpg",
+      "original_name": "1080σ1080_3.jpg",
+      "sha256": "d416965e9d84c8051a7b711c3c18cdaca320f304c130fbdbbb411c0f47914c28"
+    },
+    {
+      "number": 4,
+      "file": "korsik-04.jpg",
+      "original_name": "1080σ1080_4.jpg",
+      "sha256": "d783aca69da786fdb8b866439a9efdb26a6ea0209946ba5e70407f4e3a86c223"
+    },
+    {
+      "number": 5,
+      "file": "korsik-05.jpg",
+      "original_name": "1080σ1080_5.jpg",
+      "sha256": "fe7408f0baa695679e3f40bda668bd23c5ada26078ce129f6360dc1be04a5317"
+    },
+    {
+      "number": 6,
+      "file": "korsik-06.jpg",
+      "original_name": "1080σ1080_6.jpg",
+      "sha256": "052f6d897bf9599d6f8031332ed098ae808a120a43c0ae12e1e97c02afff01a9"
+    },
+    {
+      "number": 7,
+      "file": "korsik-07.jpg",
+      "original_name": "1080σ1080_7.jpg",
+      "sha256": "ec189818532f82c47d3eb2e13803c85fb42ed7f1cec5b8eca8cd6655050a40c8"
+    },
+    {
+      "number": 8,
+      "file": "korsik-08.jpg",
+      "original_name": "1080σ1080_8.jpg",
+      "sha256": "63209ff280f7b676b44b16053feb1358b382d527360fb464c1262a3c32757e19"
+    },
+    {
+      "number": 9,
+      "file": "korsik-09.jpg",
+      "original_name": "1080σ1080_9.jpg",
+      "sha256": "b6199b2215007faf63ed27b7ebc8954ab3d659d96106946e22366a6a4e1591a7"
+    },
+    {
+      "number": 10,
+      "file": "korsik-10.jpg",
+      "original_name": "1080σ1080_10.jpg",
+      "sha256": "54cb06be7ec5622bb95336e914e630d29f8810acdc1a3abcfb95a84d63a6d56d"
+    },
+    {
+      "number": 11,
+      "file": "korsik-11.jpg",
+      "original_name": "1080σ1080_11.jpg",
+      "sha256": "484eaccf319d300c84d7f82001fcc4da6dd1cec4910d4805a3854f7cf296fee1"
+    },
+    {
+      "number": 12,
+      "file": "korsik-12.jpg",
+      "original_name": "1080σ1080_12.jpg",
+      "sha256": "ab964f5691e5b0bba6ae9d371e72e95774658856b7dd62754a4d3b54834b52bd"
+    },
+    {
+      "number": 13,
+      "file": "korsik-13.jpg",
+      "original_name": "1080σ1080_13.jpg",
+      "sha256": "1735a899f871fa1d108062519d2ae544f2f155ac1d79f2883b34757365f765d1"
+    },
+    {
+      "number": 14,
+      "file": "korsik-14.jpg",
+      "original_name": "1080σ1080_14.jpg",
+      "sha256": "e36d9267fe738b7f2734fa7ad35f22a2ec5654a67de5319d5bd69075d5cecfaa"
+    },
+    {
+      "number": 15,
+      "file": "korsik-15.jpg",
+      "original_name": "1080σ1080_15.jpg",
+      "sha256": "78b8773ed0ebb3f8ade0de0c8e58011fbdab8bf8dbc915a362733dbedf8fe52d"
+    },
+    {
+      "number": 16,
+      "file": "korsik-16.jpg",
+      "original_name": "1080σ1080_16.jpg",
+      "sha256": "8737dabeab91214caf5b2864b69f1aec19b37a1dc72905a55ef9ef570b67e0b1"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "MAT-R003",
+      "source_ref": "XLS1-R003",
+      "cell": "I3",
+      "label": "Изображение 14",
+      "mandatory": true,
+      "image_number": 14,
+      "file": "korsik-14.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R004",
+      "source_ref": "XLS1-R004",
+      "cell": "I4",
+      "label": "Изображение 2",
+      "mandatory": true,
+      "image_number": 2,
+      "file": "korsik-02.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R008",
+      "source_ref": "XLS1-R008",
+      "cell": "I8",
+      "label": "Изображение 1",
+      "mandatory": true,
+      "image_number": 1,
+      "file": "korsik-01.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R009",
+      "source_ref": "XLS1-R009",
+      "cell": "I9",
+      "label": "Изображение 3",
+      "mandatory": true,
+      "image_number": 3,
+      "file": "korsik-03.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R010",
+      "source_ref": "XLS1-R010",
+      "cell": "I10",
+      "label": "Изображение 3",
+      "mandatory": true,
+      "image_number": 3,
+      "file": "korsik-03.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R017",
+      "source_ref": "XLS1-R017",
+      "cell": "I17",
+      "label": "Изображение 3",
+      "mandatory": true,
+      "image_number": 3,
+      "file": "korsik-03.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R018",
+      "source_ref": "XLS1-R018",
+      "cell": "I18",
+      "label": "Изображение 4",
+      "mandatory": true,
+      "image_number": 4,
+      "file": "korsik-04.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R026",
+      "source_ref": "XLS1-R026",
+      "cell": "I26",
+      "label": "Изображение 5",
+      "mandatory": true,
+      "image_number": 5,
+      "file": "korsik-05.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R027",
+      "source_ref": "XLS1-R027",
+      "cell": "I27",
+      "label": "Изображение 5",
+      "mandatory": true,
+      "image_number": 5,
+      "file": "korsik-05.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R028",
+      "source_ref": "XLS1-R028",
+      "cell": "I28",
+      "label": "Изображение 5",
+      "mandatory": true,
+      "image_number": 5,
+      "file": "korsik-05.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R030",
+      "source_ref": "XLS1-R030",
+      "cell": "I30",
+      "label": "Изображение 6",
+      "mandatory": true,
+      "image_number": 6,
+      "file": "korsik-06.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R031",
+      "source_ref": "XLS1-R031",
+      "cell": "I31",
+      "label": "Изображение 6",
+      "mandatory": true,
+      "image_number": 6,
+      "file": "korsik-06.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R033",
+      "source_ref": "XLS1-R033",
+      "cell": "I33",
+      "label": "Изображение 10",
+      "mandatory": true,
+      "image_number": 10,
+      "file": "korsik-10.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R036",
+      "source_ref": "XLS1-R036",
+      "cell": "I36",
+      "label": "Изображение 7",
+      "mandatory": false,
+      "image_number": 7,
+      "file": "korsik-07.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R044",
+      "source_ref": "XLS1-R044",
+      "cell": "I44",
+      "label": "Изображение 11",
+      "mandatory": false,
+      "image_number": 11,
+      "file": "korsik-11.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R047",
+      "source_ref": "XLS1-R047",
+      "cell": "I47",
+      "label": "Изображение 14",
+      "mandatory": true,
+      "image_number": 14,
+      "file": "korsik-14.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R048",
+      "source_ref": "XLS1-R048",
+      "cell": "I48",
+      "label": "Изображение 10",
+      "mandatory": true,
+      "image_number": 10,
+      "file": "korsik-10.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R049",
+      "source_ref": "XLS1-R049",
+      "cell": "I49",
+      "label": "Изображение 7",
+      "mandatory": true,
+      "image_number": 7,
+      "file": "korsik-07.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R050",
+      "source_ref": "XLS1-R050",
+      "cell": "I50",
+      "label": "Изображение 15",
+      "mandatory": false,
+      "image_number": 15,
+      "file": "korsik-15.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R053",
+      "source_ref": "XLS1-R053",
+      "cell": "I53",
+      "label": "Изображение 8",
+      "mandatory": true,
+      "image_number": 8,
+      "file": "korsik-08.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R058",
+      "source_ref": "XLS1-R058",
+      "cell": "I58",
+      "label": "Изображение 9",
+      "mandatory": true,
+      "image_number": 9,
+      "file": "korsik-09.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R061",
+      "source_ref": "XLS1-R061",
+      "cell": "I61",
+      "label": "Изображение 10",
+      "mandatory": true,
+      "image_number": 10,
+      "file": "korsik-10.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R068",
+      "source_ref": "XLS1-R068",
+      "cell": "I68",
+      "label": "Изображение 16",
+      "mandatory": true,
+      "image_number": 16,
+      "file": "korsik-16.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R069",
+      "source_ref": "XLS1-R069",
+      "cell": "I69",
+      "label": "Изображение 13",
+      "mandatory": false,
+      "image_number": 13,
+      "file": "korsik-13.jpg",
+      "match": "exact_number"
+    },
+    {
+      "id": "MAT-R070",
+      "source_ref": "XLS1-R070",
+      "cell": "I70",
+      "label": "Изображение 12",
+      "mandatory": false,
+      "image_number": 12,
+      "file": "korsik-12.jpg",
+      "match": "exact_number"
+    }
+  ],
+  "missing": [
+    {
+      "id": "MAT-R024",
+      "source_ref": "XLS1-R024",
+      "cell": "I24",
+      "label": "Изображение Открытка №1",
+      "mandatory": false,
+      "reason": "В предоставленном архиве нет отдельного файла с этим обозначением"
+    },
+    {
+      "id": "MAT-R045",
+      "source_ref": "XLS1-R045",
+      "cell": "I45",
+      "label": "ФОТО",
+      "mandatory": false,
+      "reason": "В предоставленном архиве нет отдельного файла с этим обозначением"
+    },
+    {
+      "id": "MAT-R060",
+      "source_ref": "XLS1-R060",
+      "cell": "I60",
+      "label": "Изображение Открытка №2",
+      "mandatory": true,
+      "reason": "В предоставленном архиве нет отдельного файла с этим обозначением"
+    }
+  ]
+}

@@ -8,7 +8,7 @@ from . import analytics
 from .models import DigestSnapshot, Employee, FeedbackAnalysis, QuestionLog, SurveyAnswer, SurveyRun
 
 
-def create_snapshot(session, actor, end, request_key):
+def create_snapshot(session, actor, end, request_key, settings=None):
     existing = session.scalar(select(DigestSnapshot).where(DigestSnapshot.request_key == request_key))
     if existing:
         return existing
@@ -89,6 +89,22 @@ def create_snapshot(session, actor, end, request_key):
         "question_ids": [q.id for q in questions],
     }
     text = analytics.digest_text(report)
+    try:
+        from .improvements import build_report, policy
+
+        if policy(session).enabled:
+            from types import SimpleNamespace
+
+            with session.begin_nested():
+                improvement_report = build_report(session, actor, settings or SimpleNamespace(enable_demo=False), end=end)
+                report["improvements"] = improvement_report
+                text += "\nЧто улучшить: кандидатов, проходящих порог — " + str(len(improvement_report["items"]))
+        else:
+            report["improvements"] = {"status": "disabled"}
+            text += "\nБлок улучшений отключён: требуется согласованная политика."
+    except Exception:
+        report["improvements"] = {"status": "unavailable"}
+        text += "\nБлок улучшений не сформирован; основная сводка доступна."
     if not answers and not questions:
         text += "\nЗа этот период новых ответов и вопросов нет."
     text += (

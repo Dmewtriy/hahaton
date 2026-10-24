@@ -16,14 +16,20 @@ def employee_can_read(employee, document):
     return (
         document.active
         and document.published
+        and (document.purpose != "personal_plan" or document.owner_employee_id == employee.id)
         and ("*" in document.branch_codes or employee.branch_code in document.branch_codes)
         and (not document.categories or employee.category in document.categories)
     )
 
 
 def can_read(session, actor, document):
-    if not document.active:
+    if not actor.active or not document.active:
         return False
+    if document.purpose == "personal_plan":
+        from .access import can_view_employee
+
+        owner = session.get(Employee, document.owner_employee_id)
+        return bool(owner and can_view_employee(actor, owner))
     if set(actor.roles) & {"hr", "hr_head"}:
         # A global document is visible to scoped HR; creation of global documents requires global scope.
         return "*" in document.branch_codes or any(in_scope(actor, b) for b in document.branch_codes)
@@ -32,6 +38,10 @@ def can_read(session, actor, document):
 
 
 def can_edit(actor, document):
+    if document.purpose == "personal_plan":
+        return actor.active and bool(set(actor.roles) & {"hr", "hr_head"}) and all(
+            in_scope(actor, b) for b in document.branch_codes
+        )
     return bool(set(actor.roles) & {"hr", "hr_head"}) and all(
         in_scope(actor, b) for b in document.branch_codes
     )
@@ -41,7 +51,10 @@ def allowed_documents(session, employee):
     return [
         d
         for d in session.scalars(
-            select(Document).where(Document.active.is_(True), Document.status.in_(["ready", "ready_stub"]))
+            select(Document).where(
+                Document.active.is_(True), Document.purpose == "knowledge",
+                Document.status.in_(["ready", "ready_stub"]),
+            )
         )
         if employee_can_read(employee, d)
     ]
@@ -59,7 +72,14 @@ def store(
     *,
     previous=None,
     auto_publish=True,
+    purpose="knowledge",
+    owner_employee_id=None,
+    created_by=None,
 ):
+    if previous:
+        purpose = previous.purpose
+        owner_employee_id = previous.owner_employee_id
+        created_by = created_by or previous.created_by
     suffix = Path(filename).suffix.lower()
     if suffix not in ALLOWED_EXTENSIONS or len(content) > settings.max_upload_bytes or not content:
         raise HTTPException(422, "Недопустимый формат, размер или пустой файл")
@@ -86,10 +106,17 @@ def store(
         replaces_id=previous.id if previous else None,
         published=False,
         auto_publish=auto_publish,
+        purpose=purpose,
+        owner_employee_id=owner_employee_id,
+        created_by=created_by,
     )
     session.add(doc)
     session.flush()
-    enqueue(session, "index_document", {"document_id": doc.id}, f"index:{doc.id}", now(session))
+    if purpose == "knowledge":
+        enqueue(session, "index_document", {"document_id": doc.id}, f"index:{doc.id}", now(session))
+    else:
+        doc.status = "ready"
+        publish(session, doc)
     return doc
 
 
@@ -110,6 +137,9 @@ def public_document(document):
         "replaces_id": document.replaces_id,
         "last_error": document.last_error,
         "revision": document.revision,
+        "purpose": document.purpose,
+        "owner_employee_id": document.owner_employee_id,
+        "created_by": document.created_by,
     }
 
 

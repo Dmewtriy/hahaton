@@ -122,6 +122,8 @@ class SurveyRun(Base):
     expires_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     result: Mapped[dict | None] = mapped_column(JSON)
     optional_comment: Mapped[bool] = mapped_column(Boolean, default=False)
+    branch_code_at_start: Mapped[str | None] = mapped_column(String(64))
+    data_mode: Mapped[str] = mapped_column(String(16), default="real", server_default="real")
 
 
 class SurveyAnswer(Base):
@@ -218,6 +220,9 @@ class Document(Base):
     published: Mapped[bool] = mapped_column(Boolean, default=True)
     auto_publish: Mapped[bool] = mapped_column(Boolean, default=True)
     last_error: Mapped[str | None] = mapped_column(String(200))
+    purpose: Mapped[str] = mapped_column(String(32), default="knowledge", server_default="knowledge")
+    owner_employee_id: Mapped[str | None] = mapped_column(ForeignKey("employees.id", name="fk_documents_owner_employee"), index=True)
+    created_by: Mapped[str | None] = mapped_column(ForeignKey("identities.id", name="fk_documents_created_by"))
 
 
 class ConversationMessage(Base):
@@ -333,6 +338,10 @@ class Campaign(Base):
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
     published_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     expires_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    source_kind: Mapped[str | None] = mapped_column(String(24))
+    source_id: Mapped[str | None] = mapped_column(String(32))
+    source_revision: Mapped[int | None] = mapped_column(Integer)
+    message_type: Mapped[str] = mapped_column(String(24), default="message", server_default="message")
 
 
 class CampaignRecipient(Base):
@@ -461,3 +470,6 @@ class ExportFile(Base):
     row_count: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
     expires_at: Mapped[datetime] = mapped_column(UTCDateTime)
+
+
+from . import extension_models as extension_models  # noqa: E402, F401

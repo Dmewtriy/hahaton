@@ -5,6 +5,1171 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/optional/attachments": {
+      "post": {
+        "tags": [
+          "Optional scenarios"
+        ],
+        "summary": "Upload Attachment",
+        "operationId": "upload_attachment_api_optional_attachments_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_attachment_api_optional_attachments_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/optional/employees/{employee_id}/plan": {
+      "get": {
+        "tags": [
+          "Optional scenarios"
+        ],
+        "summary": "Employee Plan",
+        "operationId": "employee_plan_api_optional_employees__employee_id__plan_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "employee_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Employee Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/optional/planning": {
+      "get": {
+        "tags": [
+          "Optional scenarios"
+        ],
+        "summary": "List Planning",
+        "operationId": "list_planning_api_optional_planning_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "event",
+                    "meeting"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Optional scenarios"
+        ],
+        "summary": "Create Planning",
+        "operationId": "create_planning_api_optional_planning_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlannedEventInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/optional/employees/{employee_id}/plan/send": {
+      "post": {
+        "tags": [
+          "Optional scenarios"
+        ],
+        "summary": "Send Employee Plan",
+        "operationId": "send_employee_plan_api_optional_employees__employee_id__plan_send_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "employee_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Employee Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanDeliveryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/optional/planning/{event_id}": {
+      "put": {
+        "tags": [
+          "Optional scenarios"
+        ],
+        "summary": "Edit Planning",
+        "operationId": "edit_planning_api_optional_planning__event_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlannedEventInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/optional/planning/{event_id}/history": {
+      "get": {
+        "tags": [
+          "Optional scenarios"
+        ],
+        "summary": "Planning History",
+        "operationId": "planning_history_api_optional_planning__event_id__history_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Id"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "After"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/optional/planning/{event_id}/announcement": {
+      "post": {
+        "tags": [
+          "Optional scenarios"
+        ],
+        "summary": "Planning Announcement",
+        "operationId": "planning_announcement_api_optional_planning__event_id__announcement_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnouncementInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/optional/events": {
+      "get": {
+        "tags": [
+          "Optional scenarios"
+        ],
+        "summary": "My Events",
+        "operationId": "my_events_api_optional_events_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "past",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Past"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/management/capabilities": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Capabilities",
+        "operationId": "capabilities_api_management_capabilities_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/management/grants": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Grants",
+        "operationId": "grants_api_management_grants_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Save Grant",
+        "operationId": "save_grant_api_management_grants_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/management/assignees": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Allowed Assignees",
+        "operationId": "allowed_assignees_api_management_assignees_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/management/tasks": {
+      "post": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "New Task",
+        "operationId": "new_task_api_management_tasks_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Tasks",
+        "operationId": "tasks_api_management_tasks_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "After"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/management/tasks/{task_id}": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Task Detail",
+        "operationId": "task_detail_api_management_tasks__task_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/management/tasks/{task_id}/commands": {
+      "post": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Task Command",
+        "operationId": "task_command_api_management_tasks__task_id__commands_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/management/conversations": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Conversations",
+        "operationId": "conversations_api_management_conversations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/management/summary": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Summary",
+        "operationId": "summary_api_management_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/management/conversations/{conversation_id}/entries": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Entries",
+        "operationId": "entries_api_management_conversations__conversation_id__entries_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Conversation Id"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "After"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/management/conversations/{conversation_id}/read": {
+      "post": {
+        "tags": [
+          "Management"
+        ],
+        "summary": "Read Conversation",
+        "operationId": "read_conversation_api_management_conversations__conversation_id__read_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Conversation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/korsik__extension_schemas__ReadInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/management/improvements/policy": {
+      "get": {
+        "tags": [
+          "Improvements"
+        ],
+        "summary": "Get Policy",
+        "operationId": "get_policy_api_management_improvements_policy_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Improvements"
+        ],
+        "summary": "Set Policy",
+        "operationId": "set_policy_api_management_improvements_policy_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImprovementPolicy"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/management/improvements/reports": {
+      "post": {
+        "tags": [
+          "Improvements"
+        ],
+        "summary": "New Report",
+        "operationId": "new_report_api_management_improvements_reports_post",
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/management/improvements/reports/{report_id}": {
+      "get": {
+        "tags": [
+          "Improvements"
+        ],
+        "summary": "Report",
+        "operationId": "report_api_management_improvements_reports__report_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/management/improvements/insights/{insight_id}/snooze": {
+      "post": {
+        "tags": [
+          "Improvements"
+        ],
+        "summary": "Snooze",
+        "operationId": "snooze_api_management_improvements_insights__insight_id__snooze_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "insight_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Insight Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/management/improvements/tasks/{task_id}/followup": {
+      "get": {
+        "tags": [
+          "Improvements"
+        ],
+        "summary": "Followup",
+        "operationId": "followup_api_management_improvements_tasks__task_id__followup_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/policies": {
       "get": {
         "tags": [
@@ -2863,7 +4028,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReadInput"
+                "$ref": "#/components/schemas/korsik__inbox_api__ReadInput"
               }
             }
           }
@@ -3286,6 +4451,30 @@
             }
           }
         }
+      }
+    },
+    "/api/admin/materials/company-images": {
+      "post": {
+        "tags": [
+          "Route configuration"
+        ],
+        "summary": "Install Company Images",
+        "operationId": "install_company_images_api_admin_materials_company_images_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/api/admin/branches/{code}/route-v04": {
@@ -3771,6 +4960,75 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/api/menu": {
+      "get": {
+        "tags": [
+          "Navigation"
+        ],
+        "summary": "Action Menu",
+        "operationId": "action_menu_api_menu_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/menu/{action_id}": {
+      "post": {
+        "tags": [
+          "Navigation"
+        ],
+        "summary": "Menu Action",
+        "operationId": "menu_action_api_menu__action_id__post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "action_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Action Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/identities": {
@@ -5784,6 +7042,33 @@
         ],
         "title": "AnalysisResult"
       },
+      "AnnouncementInput": {
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Revision"
+          },
+          "due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "revision"
+        ],
+        "title": "AnnouncementInput"
+      },
       "AudienceInput": {
         "properties": {
           "mode": {
@@ -5844,6 +7129,54 @@
           "file"
         ],
         "title": "Body_document_version_api_admin_documents__document_id__version_post"
+      },
+      "Body_upload_attachment_api_optional_attachments_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "branch_code": {
+            "type": "string",
+            "title": "Branch Code"
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "personal_plan",
+              "card_image",
+              "event_attachment",
+              "meeting_attachment"
+            ],
+            "title": "Purpose"
+          },
+          "employee_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Employee Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "title",
+          "branch_code",
+          "purpose"
+        ],
+        "title": "Body_upload_attachment_api_optional_attachments_post"
       },
       "Body_upload_document_api_documents_post": {
         "properties": {
@@ -6202,6 +7535,16 @@
               }
             ],
             "title": "Expires At"
+          },
+          "message_type": {
+            "type": "string",
+            "enum": [
+              "message",
+              "welcome_letter",
+              "first_day_card"
+            ],
+            "title": "Message Type",
+            "default": "message"
           }
         },
         "additionalProperties": false,
@@ -6757,6 +8100,35 @@
         "type": "object",
         "title": "EscalationRules"
       },
+      "GrantInput": {
+        "properties": {
+          "issuer_id": {
+            "type": "string",
+            "title": "Issuer Id"
+          },
+          "assignee_id": {
+            "type": "string",
+            "title": "Assignee Id"
+          },
+          "branch_code": {
+            "type": "string",
+            "title": "Branch Code"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "issuer_id",
+          "assignee_id",
+          "branch_code"
+        ],
+        "title": "GrantInput"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -6888,6 +8260,72 @@
           "branch_codes"
         ],
         "title": "IdentityUpdate"
+      },
+      "ImprovementPolicy": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": false
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "demo",
+              "real"
+            ],
+            "title": "Mode",
+            "default": "demo"
+          },
+          "window_days": {
+            "type": "integer",
+            "maximum": 30.0,
+            "minimum": 1.0,
+            "title": "Window Days",
+            "default": 7
+          },
+          "min_employees": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 3.0,
+            "title": "Min Employees",
+            "default": 3
+          },
+          "approved_by": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Approved By"
+          },
+          "approved_topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Approved Topics"
+          },
+          "process_topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Process Topics"
+          },
+          "process_rules": {
+            "items": {
+              "$ref": "#/components/schemas/ProcessRule"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Process Rules"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ImprovementPolicy"
       },
       "LocalLoginInput": {
         "properties": {
@@ -7100,6 +8538,186 @@
         ],
         "title": "Option"
       },
+      "PlanDeliveryInput": {
+        "properties": {
+          "request_key": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Request Key"
+          },
+          "due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due At"
+          },
+          "third_workday": {
+            "type": "boolean",
+            "title": "Third Workday",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_key"
+        ],
+        "title": "PlanDeliveryInput"
+      },
+      "PlannedEventInput": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "event",
+              "meeting"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 12000,
+            "title": "Description",
+            "default": ""
+          },
+          "branch_code": {
+            "type": "string",
+            "title": "Branch Code"
+          },
+          "starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts At"
+          },
+          "timezone": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Timezone",
+            "default": "Europe/Moscow"
+          },
+          "location": {
+            "type": "string",
+            "maxLength": 1024,
+            "title": "Location",
+            "default": ""
+          },
+          "audience": {
+            "$ref": "#/components/schemas/AudienceInput"
+          },
+          "document_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Document Ids"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "scheduled",
+              "cancelled",
+              "held",
+              "archived"
+            ],
+            "title": "Status",
+            "default": "draft"
+          },
+          "revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "title",
+          "branch_code",
+          "audience"
+        ],
+        "title": "PlannedEventInput"
+      },
+      "ProcessRule": {
+        "properties": {
+          "survey_id": {
+            "type": "string",
+            "title": "Survey Id"
+          },
+          "survey_version": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Survey Version"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "topic": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Topic"
+          },
+          "below": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Below"
+          },
+          "negative_options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Negative Options"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "survey_id",
+          "survey_version",
+          "question_id",
+          "topic"
+        ],
+        "title": "ProcessRule"
+      },
       "PublishInput": {
         "properties": {
           "audience_hash": {
@@ -7234,21 +8852,6 @@
           "kind"
         ],
         "title": "Question"
-      },
-      "ReadInput": {
-        "properties": {
-          "last_message_id": {
-            "type": "integer",
-            "minimum": 1.0,
-            "title": "Last Message Id"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "last_message_id"
-        ],
-        "title": "ReadInput"
       },
       "ReplyInput": {
         "properties": {
@@ -7642,6 +9245,15 @@
       },
       "SurveyDefinition": {
         "properties": {
+          "data_mode": {
+            "type": "string",
+            "enum": [
+              "real",
+              "demo"
+            ],
+            "title": "Data Mode",
+            "default": "real"
+          },
           "id": {
             "type": "string",
             "pattern": "^[A-Za-z0-9_-]{1,64}$",
@@ -7711,6 +9323,15 @@
       },
       "SurveyInput": {
         "properties": {
+          "data_mode": {
+            "type": "string",
+            "enum": [
+              "real",
+              "demo"
+            ],
+            "title": "Data Mode",
+            "default": "real"
+          },
           "title": {
             "type": "string",
             "maxLength": 200,
@@ -7785,6 +9406,239 @@
           "questions"
         ],
         "title": "SurveyInput"
+      },
+      "TaskCommand": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "accept",
+              "block",
+              "resume",
+              "complete",
+              "clarify",
+              "answer_blocker",
+              "update",
+              "reopen",
+              "cancel"
+            ],
+            "title": "Action"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Revision"
+          },
+          "request_key": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Request Key"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 12000,
+            "title": "Text",
+            "default": ""
+          },
+          "result_kind": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "knowledge_updated",
+                  "process_adjusted",
+                  "no_change_needed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Kind"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "document_version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Version"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 12000,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "expected_result": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Result"
+          },
+          "due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "action",
+          "revision",
+          "request_key"
+        ],
+        "title": "TaskCommand"
+      },
+      "TaskInput": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "real",
+              "demo"
+            ],
+            "title": "Mode",
+            "default": "real"
+          },
+          "assignee_id": {
+            "type": "string",
+            "title": "Assignee Id"
+          },
+          "branch_code": {
+            "type": "string",
+            "title": "Branch Code"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 12000,
+            "minLength": 1,
+            "title": "Description"
+          },
+          "expected_result": {
+            "type": "string",
+            "maxLength": 4000,
+            "title": "Expected Result",
+            "default": ""
+          },
+          "due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due At"
+          },
+          "source_insight_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Insight Id"
+          },
+          "source_report_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Report Id"
+          },
+          "replaces_task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replaces Task Id"
+          },
+          "request_key": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Request Key"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "assignee_id",
+          "branch_code",
+          "title",
+          "description",
+          "request_key"
+        ],
+        "title": "TaskInput"
       },
       "TextInput": {
         "properties": {
@@ -7862,6 +9716,36 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "korsik__extension_schemas__ReadInput": {
+        "properties": {
+          "through_seq": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Through Seq"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "through_seq"
+        ],
+        "title": "ReadInput"
+      },
+      "korsik__inbox_api__ReadInput": {
+        "properties": {
+          "last_message_id": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Last Message Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "last_message_id"
+        ],
+        "title": "ReadInput"
       }
     },
     "securitySchemes": {

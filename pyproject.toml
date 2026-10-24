@@ -23,7 +23,7 @@ korsik = "korsik.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-korsik = ["web/*.html", "web/*.css", "web/*.js"]
+korsik = ["web/*.html", "web/*.css", "web/*.js", "web/brand/*.jpg", "web/brand/*.json"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

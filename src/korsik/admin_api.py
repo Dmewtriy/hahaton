@@ -117,6 +117,7 @@ def overview(session: Session, actor: Admin, runtime=Depends(runtime_dependency)
     data["document_count"] = sum(
         d.active
         and d.published
+        and d.purpose == "knowledge"
         and d.status in {"ready", "ready_stub"}
         and documents.can_read(session, actor, d)
         for d in session.scalars(select(Document))
@@ -173,6 +174,20 @@ def employee_detail(employee_id: str, session: Session, actor: Admin):
         )
     ]
     result["surveys"] = []
+    from .models import Job
+
+    employee_run_ids = set(session.scalars(select(SurveyRun.id).where(SurveyRun.employee_id == employee.id)))
+    result["reminders"] = [
+        {
+            "run_id": j.payload.get("run_id"),
+            "due_at": j.due_at,
+            "status": j.status,
+            "suppressed_reason": j.payload.get("suppressed_reason"),
+            "last_error": j.last_error,
+        }
+        for j in session.scalars(select(Job).where(Job.kind == "reminder").order_by(Job.due_at))
+        if j.payload.get("run_id") in employee_run_ids
+    ]
     for run in session.scalars(
         select(SurveyRun).where(SurveyRun.employee_id == employee.id).order_by(SurveyRun.started_at.desc())
     ):
@@ -417,13 +432,20 @@ def document_list(session: Session, actor: Admin, archived: bool = False):
     return [
         {**documents.public_document(d), "revision": d.revision, "created_at": d.created_at}
         for d in session.scalars(select(Document).order_by(Document.created_at.desc()))
-        if service.visible_scoped(actor, d.branch_codes) and d.active != archived
+        if service.visible_scoped(actor, d.branch_codes)
+        and d.active != archived
+        and (d.purpose != "personal_plan" or documents.can_read(session, actor, d))
     ]
 
 
 @router.put("/documents/{document_id}")
 def update_document(document_id: str, data: DocumentInput, session: Session, actor: Admin):
     document = scoped_resource(session, actor, Document, document_id)
+    if document.purpose == "personal_plan":
+        access.require(documents.can_read(session, actor, document))
+        owner = session.get(Employee, document.owner_employee_id)
+        if data.branch_codes != [owner.branch_code] or data.categories:
+            raise HTTPException(422, "Область персонального плана определяется сотрудником")
     service.check_branches(session, actor, data.branch_codes)
     service.revision_check(document, data.revision)
     document.title, document.branch_codes, document.categories = (

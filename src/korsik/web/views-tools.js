@@ -123,16 +123,24 @@ export async function processingPage(ctx) {
 
 export async function materialsPage(ctx) {
   const state = await ctx.api.get("/api/admin/route-readiness");
+  const brand = await fetch("/admin-assets/brand/manifest.json").then(r => r.json());
+  const images = Object.fromEntries(brand.bindings.map(b => [b.id, b.file]));
   return {
     html:
       heading(
         "Материалы маршрута",
         "Сценарий с обязательным отсутствующим материалом ожидает подготовки. Оригиналы файлов нужно загрузить в разделе «Документы».",
-        button("Обновить", "refresh"),
+        button("Добавить изображения Корсика", "company-images", "", "primary") + button("Обновить", "refresh"),
       ) +
-      `<div class="notice">Обязательных материалов не подготовлено: ${state.missing_required}. Реестр содержит требования из спецификации; тестовые или отсутствующие файлы не подменяют оригиналы.</div><div class="card"><div class="detail-list">${state.materials.map((m) => `<div><span><strong>${e(m.title)}</strong><small class="cell-sub">${e(m.key)} · ${e(m.branch_codes.join(", "))} · ${m.required ? "обязательный" : "дополнительный"}</small></span><span>${badge(m.ready ? "ready" : "waiting_material")}${m.can_edit ? button("Настроить", "edit", m.key) : "<small>Общий материал — настройка у HR всей области</small>"}</span></div>`).join("") || empty("Реестр ещё не установлен", "Установите исходный маршрут v0.4 в настройках.")}</div></div><h2>Требуют внимания HR</h2><div class="card">${state.blocked.map((s) => `<div class="tick-row"><div><strong>${e(s.employee_name)} · ${e(s.step)}</strong><p>${e(s.error || "Пропущенный шаг: требуется решение HR о запуске")}</p></div>${s.status === "late_review" ? button("Запустить", "trigger", s.id) : badge(s.status)}</div>`).join("") || "<p>Заблокированных шагов нет.</p>"}</div>`,
+      `<div class="notice">Обязательных материалов не подготовлено: ${state.missing_required}. Изображения Корсика привязываются по номерам из ТЗ, только в пустые назначения. В исходном архиве нет открыток №1, №2 и фото мероприятий — их нужно загрузить отдельно.</div><div class="card"><div class="detail-list brand-materials">${state.materials.map((m) => `<div class="material-row">${images[m.key.split(":")[0]] ? `<img class="material-thumb" src="/admin-assets/brand/${e(images[m.key.split(":")[0]])}" alt="Образец из ТЗ" loading="lazy">` : ""}<span><strong>${e(m.title)}</strong><small class="cell-sub">${e(m.key)} · ${e(m.branch_codes.join(", "))} · ${m.required ? "обязательный" : "дополнительный"}</small></span><span>${badge(m.ready ? "ready" : "waiting_material")}${m.can_edit ? button("Настроить", "edit", m.key) : "<small>Общий материал — настройка у HR всей области</small>"}</span></div>`).join("") || empty("Реестр ещё не установлен", "Установите исходный маршрут v0.4 в настройках.")}</div></div><h2>Требуют внимания HR</h2><div class="card">${state.blocked.map((s) => `<div class="tick-row"><div><strong>${e(s.employee_name)} · ${e(s.step)}</strong><p>${e(s.error || "Пропущенный шаг: требуется решение HR о запуске")}</p></div>${s.status === "late_review" ? button("Запустить", "trigger", s.id) : badge(s.status)}</div>`).join("") || "<p>Заблокированных шагов нет.</p>"}</div>`,
     bind(target) {
       delegate(target, async (action, id) => {
+        if (action === "company-images") {
+          const result = await ctx.api.post("/api/admin/materials/company-images");
+          notify("Изображения назначены: " + result.installed.length + ". Уже выбранные материалы сохранены.");
+          await ctx.loadRefs();
+          return ctx.navigate("materials");
+        }
         if (action === "refresh") return ctx.navigate("materials");
         if (action === "trigger") {
           await ctx.api.post(`/api/steps/${id}/trigger`);

@@ -141,6 +141,8 @@ class HTTPML:
             base_url=settings.ml_base_url.rstrip("/"),
             headers={"Authorization": f"Bearer {settings.ml_token}"},
             timeout=httpx.Timeout(settings.ml_timeout_seconds, connect=5),
+            # Локальный RAG на 127.0.0.1 не должен ходить через системный прокси.
+            trust_env=False,
         )
 
     def _post(self, path, payload, model):

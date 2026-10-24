@@ -47,6 +47,7 @@ export async function overview(ctx) {
         "Помогайте новичкам освоиться и вовремя замечайте, кому нужна поддержка.",
         button("Добавить сотрудника", "new-employee", "", "primary"),
       ) +
+      '<div class="welcome-strip"><img src="/admin-assets/brand/korsik-07.jpg" alt=""><div><strong>Корсик рядом — от первого дня до уверенного старта</strong><p>Следите за адаптацией, отвечайте на обращения и помогайте команде в одном пространстве.</p></div></div>' +
       (data.ml_mode === "stub"
         ? `<div class="notice">${icon("info")}<div><strong>Подключён демонстрационный ML-модуль.</strong> Опросы и обращения работают; ответы по документам и анализ настроения заменены учебными примерами.</div></div>`
         : "") +

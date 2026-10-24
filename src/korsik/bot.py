@@ -1,16 +1,36 @@
+from zoneinfo import ZoneInfo
+
 from sqlalchemy import select
 
 from . import documents, employees, inbox, surveys, tickets
 from .access import can_support, can_use_workspace, is_admin, is_hr
 from .calendar import now
 from .ml import MLUnavailable
-from .models import ConversationMessage, Employee, Identity, Outbox, QuestionLog, ScheduledStep, Ticket
+from .models import (
+    ConversationMessage,
+    Employee,
+    Identity,
+    Outbox,
+    QuestionLog,
+    ScheduledStep,
+    SurveyRun,
+    Ticket,
+)
 from .queue import send
 from .scenarios import drain_dialogue_queue
 
 MENU = (
-    "Я Корсик. /menu — меню, /ask вопрос — спросить по документам, /hr текст — сообщение HR, "
-    "/resume — продолжить опрос, /cases — мои обращения, /food — питание, /places запрос — места рядом с работой, /materials — материалы."
+    "Я Корсик — помогу освоиться на новом месте.\n\n"
+    "Вопросы и поддержка:\n"
+    "/ask вопрос — спросить по документам\n"
+    "/hr текст — написать HR\n"
+    "/cases — мои обращения\n\n"
+    "Адаптация и материалы:\n"
+    "/resume — продолжить опрос\n"
+    "/food — питание\n"
+    "/places запрос — места рядом с работой\n"
+    "/materials — материалы\n\n"
+    "/menu — открыть меню с кнопками"
 )
 
 
@@ -45,6 +65,14 @@ def receive(runtime, session, event):
     if not identity.active:
         return
     employee = session.scalar(select(Employee).where(Employee.identity_id == identity.id).with_for_update())
+    from . import menu
+
+    handled, command_text = menu.resolve(runtime, session, identity, employee, event, key)
+    if handled:
+        return
+    if command_text:
+        text = command_text
+        event = {**event, "kind": "message", "payload": None}
     if employee:
         from .onboarding import sync
 
@@ -65,6 +93,7 @@ def receive(runtime, session, event):
             else []
         )
         buttons.extend(admin_buttons(runtime, identity))
+        buttons.append({"text": "☰ Меню", "payload": "nav:page:0"})
         send(
             session,
             identity.id,
@@ -111,6 +140,27 @@ def receive(runtime, session, event):
     if callback == "hr":
         text = "/hr"
         callback = None
+    if callback and callback.startswith("event:"):
+        from . import optional
+
+        allowed = (optional.employee_events(session, employee) + optional.employee_events(session, employee, past=True)) if runtime.settings.enable_optional else []
+        selected = next((e for e in allowed if e.id == callback.split(":", 1)[1]), None)
+        if not selected:
+            send(session, identity.id, "Мероприятие сейчас недоступно.", "event-unavailable:" + key, at)
+        else:
+            item = send(session, identity.id, selected.title + "\n" + selected.description + "\n" + selected.location,
+                        "event-detail:" + key, at, document_ids=selected.document_ids)
+            item.body = {**item.body, "required_document_ids": selected.document_ids,
+                         "planning_id": selected.id, "planning_revision": selected.revision,
+                         "planning_author_id": selected.organizer_id}
+        return
+    if callback and callback.startswith("resume:"):
+        selected = session.get(SurveyRun, callback.split(":", 1)[1])
+        if selected and selected.employee_id == employee.id and selected.status == "active":
+            surveys.prompt(session, employee, selected, "resume:" + key)
+        else:
+            send(session, identity.id, "Этот опрос уже недоступен.", "resume-stale:" + key, at)
+        return
     run = surveys.active_run(session, employee)
     if callback:
         if run:
@@ -120,6 +170,23 @@ def receive(runtime, session, event):
             send(session, identity.id, "Эта кнопка больше не активна.", f"inactive-button:{key}", at)
         return
     command = text.split(maxsplit=1)[0].lower() if text else ""
+    if command in {"/plan", "/events"} and not runtime.settings.enable_optional:
+        send(session, identity.id, "Этот раздел сейчас отключён.", "optional-disabled:" + key, at)
+        return
+    if command in {"/plan", "/events"} and runtime.settings.enable_optional:
+        from . import optional
+
+        if command == "/plan":
+            optional.send_plan(session, employee, key)
+        else:
+            rows = optional.employee_events(session, employee, past=text.partition(" ")[2].strip() == "past")
+            parts = []
+            for item in rows:
+                when = item.starts_at.astimezone(ZoneInfo(item.timezone)).strftime("%d.%m.%Y %H:%M") if item.starts_at else "Дата уточняется"
+                parts.append(f"{item.title}\n{when} ({item.timezone})\n{item.location}\n{item.description}")
+            send(session, identity.id, "\n\n".join(parts) or "Корпоративных мероприятий пока нет.", "events:" + key, at,
+                 buttons=[{"text": item.title[:60], "payload": "event:" + item.id} for item in rows[:20]])
+        return
     if command in {"/ask", "/hr", "/cancel", "/resume", "/cases"}:
         employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "pending_intent"}
     if command == "/ask":
@@ -395,9 +462,14 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
         else:
             text, status = result.answer, result.status
             if status == "not_found":
-                text = "В доступных документах я не нашёл подтверждённого ответа."
-                if runtime.settings.ml_mode == "stub":
-                    text += " Сейчас подключён демонстрационный ML-модуль."
+                # Если ML явно просит HR и прислал текст (зарплата, увольнение и т.п.),
+                # сохраняем формулировку сервиса вместо общей заглушки.
+                if result.needs_hr and (result.answer or "").strip():
+                    text = result.answer.strip()
+                else:
+                    text = "В доступных документах я не нашёл подтверждённого ответа."
+                    if runtime.settings.ml_mode == "stub":
+                        text += " Сейчас подключён демонстрационный ML-модуль."
             if result.status == "answered":
                 text += "\nИсточники:\n" + "\n".join(
                     f"{by_id[s.document_id].title}, версия {s.version}"
@@ -455,6 +527,8 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
     )
     if run:
         surveys.prompt(session, employee, run, "return:" + key)
+    help.context = {**help.context, "topics": topics,
+                    "mode": "demo" if runtime.settings.ml_mode == "stub" else "real"}
     helpflow.finish(session, employee, help, status, text, version)
 
 

@@ -1,0 +1,22 @@
+{
+  "tests_full": {
+    "passed": 250,
+    "skipped": 1,
+    "reason": "PostgreSQL connection not configured"
+  },
+  "new_test_cases": 13,
+  "ruff": "passed",
+  "javascript_syntax": "passed",
+  "visual_checks": [
+    "desktop overview",
+    "material previews and 25 bindings",
+    "idempotent asset installation",
+    "mobile form footer",
+    "navigation search",
+    "390px viewport: no horizontal page overflow"
+  ],
+  "real_max": "not run",
+  "ml": "not run",
+  "working_database": "unchanged",
+  "source_xlsx": "preserved cell snapshot, original temporary file no longer available"
+}

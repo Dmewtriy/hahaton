@@ -1,0 +1,2302 @@
+{
+  "generated_at": "2026-10-25T01:10:40.520309+06:00",
+  "baseline_commit": "183cd4a",
+  "meaning": "Наличие кода, частичные доказательства и полная приёмка разделены. Статус не означает прохождение всех 112 критериев.",
+  "criteria": [
+    {
+      "id": "OPT-AC01",
+      "scenario_id": "OPT-01",
+      "source_refs": [
+        "XLS1-R019"
+      ],
+      "task_id": "OPT-BE01",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "HR выбирает сотрудника, текст, отправку сейчас и публикует.",
+      "expected": "В MAX приходит выбранное письмо; в кабинете видны автор, получатель и фактический результат доставки.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/campaigns.py",
+        "src/korsik/web/views-campaigns.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC02",
+      "scenario_id": "OPT-01",
+      "source_refs": [
+        "XLS1-R019"
+      ],
+      "task_id": "OPT-BE01",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "HR выбирает будущее время с часовым поясом.",
+      "expected": "До времени сообщение не уходит; выбранное время хранится однозначно и показывается HR.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/campaigns.py",
+        "src/korsik/web/views-campaigns.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC03",
+      "scenario_id": "OPT-02",
+      "source_refs": [
+        "XLS1-R024"
+      ],
+      "task_id": "OPT-BE01",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Отправить открытку с изображением из шаблона и затем с новым изображением.",
+      "expected": "В каждом случае предпросмотр и сообщение содержат выбранную версию изображения.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/campaigns.py",
+        "src/korsik/web/views-campaigns.js"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_card_requires_image_and_delivers_the_selected_file"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC04",
+      "scenario_id": "OPT-02",
+      "source_refs": [
+        "XLS1-R024"
+      ],
+      "task_id": "OPT-BE01",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Удалить обязательное изображение перед публикацией/фактической отправкой.",
+      "expected": "Ошибка видна HR; операция не отмечается успешной открыткой и не теряет вложение молча.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/campaigns.py",
+        "src/korsik/web/views-campaigns.js"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_card_requires_image_and_delivers_the_selected_file"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC05",
+      "scenario_id": "OPT-01",
+      "source_refs": [
+        "XLS1-R019"
+      ],
+      "task_id": "OPT-BE01",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Повторить тот же запрос публикации, затем явно создать копию.",
+      "expected": "Повтор не создаёт вторую операцию; намеренная копия имеет отдельный ID и историю.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/campaigns.py",
+        "src/korsik/web/views-campaigns.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC06",
+      "scenario_id": "OPT-01",
+      "source_refs": [
+        "XLS1-R019"
+      ],
+      "task_id": "OPT-BE01",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Запросить отправку сотруднику вне области HR.",
+      "expected": "Отказ без создания рассылки/доставки и без раскрытия данных получателя.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/campaigns.py",
+        "src/korsik/web/views-campaigns.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC07",
+      "scenario_id": "OPT-04",
+      "source_refs": [
+        "XLS1-R035",
+        "XLS1-R036"
+      ],
+      "task_id": "OPT-BE02",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "HR прикрепляет файл к сотруднику A; A запрашивает /plan.",
+      "expected": "Бот выдаёт текущую версию плана A; сохраняются автор, версия, получатель и результат.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_personal_plan_versions_access_and_exclusion_from_index"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC08",
+      "scenario_id": "OPT-04",
+      "source_refs": [
+        "XLS1-R035",
+        "XLS1-R036"
+      ],
+      "task_id": "OPT-BE02",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Открыть план без прикреплённого файла.",
+      "expected": "Бот сообщает: «Файл адаптационного плана пока не загружен»; успешная выдача не фиксируется.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_missing_plan_is_truthful_and_menu_preserves_survey"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC09",
+      "scenario_id": "OPT-04",
+      "source_refs": [
+        "XLS1-R035",
+        "XLS1-R036"
+      ],
+      "task_id": "OPT-BE02",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Проверить файл от лица сотрудника, его руководителя, HR и hr_head.",
+      "expected": "Каждый читает план только в своей персональной/организационной области; GET по ID проверяет те же правила.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_personal_plan_versions_access_and_exclusion_from_index"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC10",
+      "scenario_id": "OPT-04",
+      "source_refs": [
+        "XLS1-R035",
+        "XLS1-R036"
+      ],
+      "task_id": "OPT-BE02",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Попытаться получить чужой план через прямой URL, MAX и список общих документов.",
+      "expected": "Файл недоступен; в общих материалах/разрешённых источниках RAG персональный план не появляется.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_personal_plan_versions_access_and_exclusion_from_index"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC11",
+      "scenario_id": "OPT-04",
+      "source_refs": [
+        "XLS1-R035",
+        "XLS1-R036"
+      ],
+      "task_id": "OPT-BE02",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Заменить план новой версией, затем повторно получить его.",
+      "expected": "Выдаётся новая версия; сведения о предыдущей выдаче не изменены.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_personal_plan_versions_access_and_exclusion_from_index"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC12",
+      "scenario_id": "OPT-04",
+      "source_refs": [
+        "XLS1-R035",
+        "XLS1-R036"
+      ],
+      "task_id": "OPT-BE02",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Проверить обязательный R049 при отсутствии плана.",
+      "expected": "R049 не исчезает; HR видит, что файл не подготовлен; отсутствие не трактуется как отказ сотрудника.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC13",
+      "scenario_id": "OPT-05",
+      "source_refs": [
+        "XLS1-R043",
+        "XLS1-R044",
+        "XLS1-R045",
+        "XLS1-R046"
+      ],
+      "task_id": "OPT-BE03",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "HR создаёт черновик и публикует мероприятие для площадки A.",
+      "expected": "Черновик не виден сотрудникам; публикация видна только допустимой аудитории.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py",
+        "src/korsik/web/views-extensions.js"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_event_catalog_scope_and_history"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC14",
+      "scenario_id": "OPT-05",
+      "source_refs": [
+        "XLS1-R043",
+        "XLS1-R044",
+        "XLS1-R045",
+        "XLS1-R046"
+      ],
+      "task_id": "OPT-BE03",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Запросить /events при наличии предстоящих/прошедших событий и при пустом каталоге.",
+      "expected": "Возвращается разрешённая подборка с датами; пустой результат обозначен понятно.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py",
+        "src/korsik/web/views-extensions.js"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_event_catalog_scope_and_history"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC15",
+      "scenario_id": "OPT-05",
+      "source_refs": [
+        "XLS1-R043",
+        "XLS1-R044",
+        "XLS1-R045",
+        "XLS1-R046"
+      ],
+      "task_id": "OPT-BE03",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Нажать «Создать оповещение» в карточке события.",
+      "expected": "Создаётся связанный черновик существующей рассылки с текстом, материалами и аудиторией; отправки ещё нет.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py",
+        "src/korsik/web/views-extensions.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC16",
+      "scenario_id": "OPT-05",
+      "source_refs": [
+        "XLS1-R043",
+        "XLS1-R044",
+        "XLS1-R045",
+        "XLS1-R046"
+      ],
+      "task_id": "OPT-BE03",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Изменить событие после создания черновика оповещения и попытаться публиковать.",
+      "expected": "Обнаруживается устаревшая редакция источника; HR видит обновлённый предпросмотр и повторно подтверждает.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py",
+        "src/korsik/web/views-extensions.js"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_reschedule_invalidates_draft_and_pending_delivery"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC17",
+      "scenario_id": "OPT-05",
+      "source_refs": [
+        "XLS1-R043",
+        "XLS1-R044",
+        "XLS1-R045",
+        "XLS1-R046"
+      ],
+      "task_id": "OPT-BE03",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Архивировать событие после отправленной рассылки.",
+      "expected": "Событие исключено из активного каталога; история рассылки сохраняет отправленный снимок.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py",
+        "src/korsik/web/views-extensions.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC18",
+      "scenario_id": "OPT-05",
+      "source_refs": [
+        "XLS1-R043",
+        "XLS1-R044",
+        "XLS1-R045",
+        "XLS1-R046"
+      ],
+      "task_id": "OPT-BE03",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Проверить вложения события для сотрудника вне аудитории.",
+      "expected": "Нет выдачи файла через обходной URL или повторный запрос; общие права документа не расширяют аудиторию события.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/optional.py",
+        "src/korsik/web/views-extensions.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC19",
+      "scenario_id": "OPT-06",
+      "source_refs": [
+        "XLS1-R050"
+      ],
+      "task_id": "OPT-BE04",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "HR и hr_head создают встречи в своей области.",
+      "expected": "Сохранены тема, время с зоной, организатор, участники, место/ссылка и редакция.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/optional.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC20",
+      "scenario_id": "OPT-06",
+      "source_refs": [
+        "XLS1-R050"
+      ],
+      "task_id": "OPT-BE04",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Пользователь manager без нового разрешения пытается создать встречу.",
+      "expected": "Создание запрещено; право не появляется из названия должности или доступа к чужому HR-разделу.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/optional.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_reschedule_invalidates_draft_and_pending_delivery"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC21",
+      "scenario_id": "OPT-06",
+      "source_refs": [
+        "XLS1-R050"
+      ],
+      "task_id": "OPT-BE04",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Создать из встречи оповещение стажёрам с явным выбором участников.",
+      "expected": "HR видит точный список разрешённых получателей; используется существующая рассылка.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/optional.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_reschedule_invalidates_draft_and_pending_delivery"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC22",
+      "scenario_id": "OPT-06",
+      "source_refs": [
+        "XLS1-R050"
+      ],
+      "task_id": "OPT-BE04",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "HR переносит встречу до отправки запланированного уведомления.",
+      "expected": "Встреча получает новую редакцию; старая очередь инвалидирована, подготовлен новый черновик, история сохранена.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/optional.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC23",
+      "scenario_id": "OPT-06",
+      "source_refs": [
+        "XLS1-R050"
+      ],
+      "task_id": "OPT-BE04",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Отменить встречу и повторить отмену.",
+      "expected": "Будущие связанные приглашения не отправляются; повтор не создаёт дубликат перехода или уведомления.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/optional.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC24",
+      "scenario_id": "OPT-06",
+      "source_refs": [
+        "XLS1-R050"
+      ],
+      "task_id": "OPT-BE04",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Проверить очередь непосредственно перед отправкой после переноса/отмены.",
+      "expected": "Проверяется актуальность meeting_id/revision/status; устаревшее сообщение не передаётся транспорту.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/optional.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC25",
+      "scenario_id": "OPT-06",
+      "source_refs": [
+        "XLS1-R050"
+      ],
+      "task_id": "OPT-BE04",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Два HR одновременно изменяют одну редакцию встречи.",
+      "expected": "Устаревшая запись получает конфликт; действующее изменение не затирается, обе попытки различимы.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/optional.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_reminder_defaults_and_normalization"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC26",
+      "scenario_id": "OPT-06",
+      "source_refs": [
+        "XLS1-R050"
+      ],
+      "task_id": "OPT-BE04",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Перенести встречу после уже отправленного приглашения.",
+      "expected": "Старое сообщение остаётся в истории; HR видит получателей и черновик корректирующего оповещения.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/optional.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_reminder_defaults_and_normalization"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC27",
+      "scenario_id": "OPT-09",
+      "source_refs": [
+        "XLS1-R070"
+      ],
+      "task_id": "OPT-BE05",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Создать опрос с reminder_days=[] и с [1,3,7], открыть повторно.",
+      "expected": "Настройки сохраняются; пустой список не создаёт заданий, второе расписание создаёт только выбранные смещения.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/surveys.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_reminder_defaults_and_normalization"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC28",
+      "scenario_id": "OPT-09",
+      "source_refs": [
+        "XLS1-R070"
+      ],
+      "task_id": "OPT-BE05",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Ввести 0, отрицательное/дробное/текстовое значение, 31 или более 10 значений.",
+      "expected": "Понятная ошибка поля без частичного сохранения; положительные повторы нормализуются до уникальных отсортированных значений.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/surveys.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_reminder_defaults_and_normalization"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC29",
+      "scenario_id": "OPT-09",
+      "source_refs": [
+        "XLS1-R070"
+      ],
+      "task_id": "OPT-BE05",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Создать шаблон сегодня, назначить и запустить позже.",
+      "expected": "Сроки считаются от started_at конкретного прохождения; дата создания шаблона не влияет.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/surveys.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC30",
+      "scenario_id": "OPT-09",
+      "source_refs": [
+        "XLS1-R070"
+      ],
+      "task_id": "OPT-BE05",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Завершить/отменить опрос до задания и после задания, но до фактической доставки напоминания.",
+      "expected": "В обоих случаях напоминание не отправляется; проверка есть и в обработчике, и перед отправкой.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/surveys.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_reminder_outbox_rechecks_completed_run"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC31",
+      "scenario_id": "OPT-09",
+      "source_refs": [
+        "XLS1-R070"
+      ],
+      "task_id": "OPT-BE05",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Нажать кнопку напоминания старого run_id при другом активном опросе.",
+      "expected": "Чужая позиция не подменяется; сотрудник получает корректный текущий статус, нет нового назначения.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/surveys.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC32",
+      "scenario_id": "OPT-09",
+      "source_refs": [
+        "XLS1-R070"
+      ],
+      "task_id": "OPT-BE05",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Перезапустить worker и повторно обработать одно задание.",
+      "expected": "Нет второго напоминания для того же run_id и смещения; история результата сохраняется.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/surveys.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC33",
+      "scenario_id": "OPT-09",
+      "source_refs": [
+        "XLS1-R070"
+      ],
+      "task_id": "OPT-BE05",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Изменить шаблон после назначения опроса.",
+      "expected": "Настройки ранее назначенного прохождения не изменяются незаметно; новые назначения получают новую редакцию.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/surveys.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC34",
+      "scenario_id": "OPT-09",
+      "source_refs": [
+        "XLS1-R070"
+      ],
+      "task_id": "OPT-BE05",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Первое сообщение опроса не доставлено; наступило напоминание.",
+      "expected": "Напоминание не сообщает о полученном опросе; причина подавления видна HR, ложный sent не возникает.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/surveys.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_suppression_reason_survives_worker_and_is_visible_to_hr"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC35",
+      "scenario_id": "OPT-09",
+      "source_refs": [
+        "XLS1-R070"
+      ],
+      "task_id": "OPT-BE05",
+      "change_type": "Код + конфигурация",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Завершить адаптацию при ранее назначенном незавершённом опросе.",
+      "expected": "Прохождение остаётся доступным; уже выбранные напоминания не исчезают только из-за конца адаптации; новые онбординговые опросы не назначаются.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/admin_schemas.py",
+        "src/korsik/surveys.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC36",
+      "scenario_id": "OPT-08",
+      "source_refs": [
+        "XLS1-R069"
+      ],
+      "task_id": "OPT-INT01",
+      "change_type": "Интеграционная проверка существующего",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "После подключения модуля коллеги задать вопрос через /ask из MAX во время опроса.",
+      "expected": "Внешний сервис получает допустимый контекст; ответ возвращается; позиция и ответы опроса сохранены.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/bot.py",
+        "src/korsik/ml.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC37",
+      "scenario_id": "OPT-08",
+      "source_refs": [
+        "XLS1-R069"
+      ],
+      "task_id": "OPT-INT01",
+      "change_type": "Интеграционная проверка существующего",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Проверить предусмотренную ветку ошибки/нет ответа внешнего сервиса и прямой /hr.",
+      "expected": "Действует контракт v0.4; прямой HR доступен независимо от ИИ. Реализация /ask повторно не создаётся.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/bot.py",
+        "src/korsik/ml.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC38",
+      "scenario_id": "OPT-02",
+      "source_refs": [
+        "XLS1-R024"
+      ],
+      "task_id": "OPT-BE06",
+      "change_type": "Миграция + регрессия",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Применить совместимую миграцию к копии существующих данных; новые функции выключены.",
+      "expected": "Старые сотрудники, ответы, обращения, очереди и версии сохранены; базовые 55 строк и выключенные опции не изменены.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/models.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC39",
+      "scenario_id": "OPT-04",
+      "source_refs": [
+        "XLS1-R035",
+        "XLS1-R036"
+      ],
+      "task_id": "OPT-BE06",
+      "change_type": "Конфигурация + регрессия",
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Убедиться, что команды /plan и /events зарегистрированы после включения соответствующих блоков.",
+      "expected": "Команды указывают на работающие разрешённые функции; до включения нет обещания несуществующего каталога/плана.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/models.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_flags_and_menu_authorization"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC40",
+      "scenario_id": "OPT-05",
+      "source_refs": [
+        "XLS1-R043",
+        "XLS1-R044",
+        "XLS1-R045",
+        "XLS1-R046"
+      ],
+      "task_id": "OPT-BE06",
+      "change_type": "Эксплуатационная проверка",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Проверить конечные статусы доставки и ручной разбор uncertain для нового оповещения.",
+      "expected": "Используется существующий журнал MAX; sent означает передачу API, не прочтение; uncertain не повторяется вслепую.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/models.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC41",
+      "scenario_id": "OPT-06",
+      "source_refs": [
+        "XLS1-R050"
+      ],
+      "task_id": "OPT-BE06",
+      "change_type": "Регрессия",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Повторить отмену/перенос при перезапуске процесса и сохранённой очереди.",
+      "expected": "Старая редакция не оживает; история и новые черновики восстанавливаются из БД.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/models.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "OPT-AC42",
+      "scenario_id": "OPT-01",
+      "source_refs": [
+        "XLS1-R019"
+      ],
+      "task_id": "OPT-BE06",
+      "change_type": "Конфигурация + регрессия",
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Проверить профиль основного маршрута после включения отдельного дополнительного блока.",
+      "expected": "Не активировались представление коллегам, R064, фиксированные R050/R070 и иные выключенные строки.",
+      "evidence": "Требуется проверка реализации; этот комплект содержит постановку",
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/models.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC01",
+      "task_ids": [
+        "MG-BE01",
+        "MG-UI01"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "HR открывает коммуникации",
+      "expected": "Два разных окна; данные и счётчики не смешаны",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/extension_models.py",
+        "src/korsik/web/app.js",
+        "src/korsik/web/views-extensions.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC02",
+      "task_ids": [
+        "MG-BE01"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "manager/employee/manage_access без бизнес-права вызывает новый API",
+      "expected": "Нет нового доступа по роли/техническому полномочию",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/extension_models.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_grant_required_and_role_not_equivalent"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC03",
+      "task_ids": [
+        "MG-BE02"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Первое поручение паре",
+      "expected": "Один новый диалог и одна задача",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_idempotency_conversation_and_read_state"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC04",
+      "task_ids": [
+        "MG-BE02"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Второе поручение той же паре",
+      "expected": "Тот же диалог; разные карточки задач",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_idempotency_conversation_and_read_state"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC05",
+      "task_ids": [
+        "MG-BE02"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Одинаковая площадка, но нет grant",
+      "expected": "Создание не разрешено",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_grant_required_and_role_not_equivalent"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC06",
+      "task_ids": [
+        "MG-BE02"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Подставлен чужой автор/участник",
+      "expected": "Сервер не принимает произвольную идентичность",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_grant_required_and_role_not_equivalent"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC07",
+      "task_ids": [
+        "MG-BE02"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Задачи одной пары в разных областях; одна недоступна",
+      "expected": "Скрытая задача не попадает в ленту, preview и счётчики",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_scope_loss_hides_detail_and_unread"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC08",
+      "task_ids": [
+        "MG-BE02"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Потеря роли или области",
+      "expected": "Прямые ссылки и списки не раскрывают данные",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_models.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_scope_loss_hides_detail_and_unread"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC09",
+      "task_ids": [
+        "MG-BE03"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Повтор создания с тем же ключом",
+      "expected": "Один номер, одно событие, одна логическая доставка",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_transitions_blocker_response_does_not_resume"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC10",
+      "task_ids": [
+        "MG-BE03"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Тот же ключ с другим телом",
+      "expected": "Конфликт, исходная задача не изменена",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_transitions_blocker_response_does_not_resume"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC11",
+      "task_ids": [
+        "MG-BE03"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "HR отправляет свободное сообщение без команды",
+      "expected": "Отклонено; существующий employee inbox не ограничен этим правилом",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_transitions_blocker_response_does_not_resume"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC12",
+      "task_ids": [
+        "MG-BE03"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "HR сразу завершает простую assigned-задачу",
+      "expected": "Допустимый результат сохранён без обязательного дополнительного клика accept",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_transitions_blocker_response_does_not_resume"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC13",
+      "task_ids": [
+        "MG-BE03"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Препятствие и ответ руководителя",
+      "expected": "События связаны с task_id; задача остаётся blocked до resume/complete",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_transitions_blocker_response_does_not_resume"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC14",
+      "task_ids": [
+        "MG-BE03"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Повтор одинакового препятствия без новых условий",
+      "expected": "Нет лавины новых уведомлений",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_transitions_blocker_response_does_not_resume"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC15",
+      "task_ids": [
+        "MG-BE03"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Одновременно cancel и complete",
+      "expected": "Применён один переход; вторая команда получает конфликт редакции",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_stale_revision_and_payload_key_conflict"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC16",
+      "task_ids": [
+        "MG-BE03"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Руководитель возвращает completed",
+      "expected": "Причина сохранена, старая редакция результата остаётся в истории",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_transitions_blocker_response_does_not_resume"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC17",
+      "task_ids": [
+        "MG-BE03"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "MAX недоступен после commit",
+      "expected": "Задача доступна в UI; доставка не выдаётся за прочтение",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_stale_revision_and_payload_key_conflict"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC18",
+      "task_ids": [
+        "MG-BE04",
+        "MG-UI01"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Непрочитанное в management-диалоге",
+      "expected": "Не меняет employee-счётчики; собственные события не считаются входящими",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py",
+        "src/korsik/web/app.js",
+        "src/korsik/web/views-extensions.js"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_idempotency_conversation_and_read_state"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC19",
+      "task_ids": [
+        "MG-BE04"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Во время чтения пришло новое событие",
+      "expected": "Read по last_seen_seq не помечает непоказанное событие прочитанным",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_idempotency_conversation_and_read_state"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC20",
+      "task_ids": [
+        "MG-BE04"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Чужой conversation_id/task_id",
+      "expected": "Нет утечки факта, контента и количества",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_scope_loss_hides_detail_and_unread"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC21",
+      "task_ids": [
+        "MG-BE04"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Большая история",
+      "expected": "Пагинация стабильна, нет полной безлимитной выдачи",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC22",
+      "task_ids": [
+        "MG-BE04"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Исполнитель деактивирован",
+      "expected": "Нет автоматического выполнения/случайной переадресации",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/extension_api.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC23",
+      "task_ids": [
+        "MG-UI01"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Одновременно несколько задач в диалоге",
+      "expected": "Результат и препятствие относятся к выбранной задаче",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/web/app.js",
+        "src/korsik/web/views-extensions.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC24",
+      "task_ids": [
+        "MG-BE05"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "knowledge_updated с processing/failed",
+      "expected": "Завершение не принято, причина показана",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_personal_plan_or_stub_cannot_complete_real_knowledge_task"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC25",
+      "task_ids": [
+        "MG-BE05"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "knowledge_updated с чужим/неактивным документом",
+      "expected": "Отказ; права через поручение не расширились",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_personal_plan_or_stub_cannot_complete_real_knowledge_task"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC26",
+      "task_ids": [
+        "MG-BE05"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "ready_stub в real",
+      "expected": "Не считается реальным обновлением",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_personal_plan_or_stub_cannot_complete_real_knowledge_task"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC27",
+      "task_ids": [
+        "MG-BE05"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Готовая доступная версия выбрана HR",
+      "expected": "Результат с точной версией сохранён без повторной загрузки",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_personal_plan_or_stub_cannot_complete_real_knowledge_task"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC28",
+      "task_ids": [
+        "MG-BE06"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Retry одного вопроса / уточнение",
+      "expected": "Один логический случай, не новый сотрудник/вопрос",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/helpflow.py",
+        "src/korsik/improvements.py",
+        "src/korsik/surveys.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_report_threshold_retry_and_no_raw_content"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC29",
+      "task_ids": [
+        "MG-BE06"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Старый source_revision пришёл позже нового",
+      "expected": "Проекция не откатывается",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/helpflow.py",
+        "src/korsik/improvements.py",
+        "src/korsik/surveys.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_projection_older_revision_cannot_rollback"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC30",
+      "task_ids": [
+        "MG-BE06"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "answered без оценки полезности",
+      "expected": "helpful=null, не false",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/helpflow.py",
+        "src/korsik/improvements.py",
+        "src/korsik/surveys.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_technical_errors_and_missing_feedback_are_not_gaps"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC31",
+      "task_ids": [
+        "MG-BE06"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "timeout / запрещённый источник / clarification",
+      "expected": "Не создаёт knowledge_no_answer автоматически",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/helpflow.py",
+        "src/korsik/improvements.py",
+        "src/korsik/surveys.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_technical_errors_and_missing_feedback_are_not_gaps"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC32",
+      "task_ids": [
+        "MG-BE06"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Полезность ещё не внедрена",
+      "expected": "Источник явно недоступен, не «0 неполезных ответов»",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/helpflow.py",
+        "src/korsik/improvements.py",
+        "src/korsik/surveys.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC33",
+      "task_ids": [
+        "MG-BE06"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Ошибка аналитической записи после принятого ответа",
+      "expected": "Опрос и исходный ответ не откатываются",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/helpflow.py",
+        "src/korsik/improvements.py",
+        "src/korsik/surveys.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC34",
+      "task_ids": [
+        "MG-BE07"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Один сотрудник задаёт 5 вопросов",
+      "expected": "5 случаев и 1 сотрудник; порог группы не пройден",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/improvements.py",
+        "src/korsik/improvements_api.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_report_threshold_retry_and_no_raw_content"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC35",
+      "task_ids": [
+        "MG-BE07"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Тема меньше принятого минимума",
+      "expected": "Не раскрывается через список, summary и detail",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/improvements.py",
+        "src/korsik/improvements_api.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_report_threshold_retry_and_no_raw_content"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC36",
+      "task_ids": [
+        "MG-BE07"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Нет знаменателя / несопоставимые темы успешных ответов",
+      "expected": "Доля null и объяснение; не 0%",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/improvements.py",
+        "src/korsik/improvements_api.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_report_threshold_retry_and_no_raw_content"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC37",
+      "task_ids": [
+        "MG-BE07"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Несколько тем у одного ответа",
+      "expected": "Учитывается в нужных карточках без ложного суммарного числа людей",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/improvements.py",
+        "src/korsik/improvements_api.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC38",
+      "task_ids": [
+        "MG-BE07"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Real и demo",
+      "expected": "Данные, показатели и результаты не смешиваются",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/improvements.py",
+        "src/korsik/improvements_api.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_report_modes_do_not_mix_and_revoked_policy_hides_snapshot"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC39",
+      "task_ids": [
+        "MG-BE07"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Повтор scheduler одного окна",
+      "expected": "Один снимок и одна рассылка",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/improvements.py",
+        "src/korsik/improvements_api.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC40",
+      "task_ids": [
+        "MG-BE07"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Отключённый анализ или часть failed",
+      "expected": "Покрытие видно; благополучие не утверждается",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/improvements.py",
+        "src/korsik/improvements_api.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC41",
+      "task_ids": [
+        "MG-BE08"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Две конкурентные задачи по одному insight",
+      "expected": "Не более одной активной задачи",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/digests.py",
+        "src/korsik/improvements.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_improvement_snooze_and_single_active_task"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC42",
+      "task_ids": [
+        "MG-BE08"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Та же тема на следующей неделе",
+      "expected": "Стабильный кандидат и ссылка на существующую задачу",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/digests.py",
+        "src/korsik/improvements.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_report_threshold_retry_and_no_raw_content"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC43",
+      "task_ids": [
+        "MG-BE08"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Отложить",
+      "expected": "Нет задачи и повторного уведомления до snoozed_until",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/digests.py",
+        "src/korsik/improvements.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_improvement_snooze_and_single_active_task"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC44",
+      "task_ids": [
+        "MG-BE08"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Блок улучшений не сформирован",
+      "expected": "Базовый дайджест не отменён, неполнота объяснена",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/digests.py",
+        "src/korsik/improvements.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC45",
+      "task_ids": [
+        "MG-BE09"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "HR завершил обновление",
+      "expected": "Показывается факт изменения, не «проблема решена у всех»",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/improvements.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_improvement_snooze_and_single_active_task"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC46",
+      "task_ids": [
+        "MG-BE09"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "После изменения нет новых данных",
+      "expected": "«Недостаточно данных», не 100% улучшения",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/improvements.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC47",
+      "task_ids": [
+        "MG-BE09"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "no_change_needed / cancelled",
+      "expected": "Не увеличивает число выполненных изменений",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/improvements.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC48",
+      "task_ids": [
+        "MG-BE10"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Завершение management-задачи",
+      "expected": "Не закрывает employee Ticket, не завершает SurveyRun",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/config.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC49",
+      "task_ids": [
+        "MG-BE10"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Старые сценарии и прямой HR при выключенных новых флагах",
+      "expected": "Работают по v0.4",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/config.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_flags_and_menu_authorization"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC50",
+      "task_ids": [
+        "MG-BE10"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Результат выпуска",
+      "expected": "Есть миграции, обновлённый OpenAPI, настройки, тесты и честное описание ограничения источников",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/config.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC51",
+      "task_ids": [
+        "MG-BE01"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Начало этапа после v0.5",
+      "expected": "Зафиксированы актуальный post-v0.5 commit и применимые результаты OPT-AC; архив не выдан за доказательство реализации",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/extension_models.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC52",
+      "task_ids": [
+        "MG-BE05"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Персональный план передан как knowledge_updated",
+      "expected": "Отказ по назначению файла; ни публикации в базу знаний, ни индексации плана нет",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_personal_plan_or_stub_cannot_complete_real_knowledge_task"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC53",
+      "task_ids": [
+        "MG-BE05"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Карточка результата содержит ссылку на план сотрудника",
+      "expected": "Проверяются ADD-D01/07; доступ к поручению не открывает чужой файл",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC54",
+      "task_ids": [
+        "MG-BE05"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "В поручении упомянута встреча/мероприятие",
+      "expected": "Нет автоматического создания, переноса, публикации и изменения прав v0.5",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/documents.py",
+        "src/korsik/management.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC55",
+      "task_ids": [
+        "MG-BE10"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Миграция применяется к копии post-v0.5 БД",
+      "expected": "Сохранены версии планов, встречи, мероприятия, Campaign, очереди, run_id и история отмены",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/config.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC56",
+      "task_ids": [
+        "MG-BE10"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "Management-задаче задан due_at",
+      "expected": "Не меняется reminder_days и не появляется новое напоминание опроса",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/config.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC57",
+      "task_ids": [
+        "MG-BE10"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Задача отменена/права отозваны до фактической доставки",
+      "expected": "Проверка повторяется в доставщике, устаревшее уведомление подавлено; история остаётся",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/config.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_task_cancel_suppresses_old_notice_but_delivers_cancellation"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC58",
+      "task_ids": [
+        "MG-BE10"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "MAX вернул uncertain после management-уведомления",
+      "expected": "Нет ложного sent/прочтения и слепого гарантированного повтора; используется существующий разбор",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/config.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_uncertain_management_notification_does_not_accept_or_retry"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC59",
+      "task_ids": [
+        "MG-BE10"
+      ],
+      "status": "mechanism_requires_individual_acceptance",
+      "check": "После этапа работают /plan, /events и адресный run_id",
+      "expected": "Поведение v0.5 сохранено; новые объекты не меняют исходные назначения и ограничения",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/config.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "MG-AC60",
+      "task_ids": [
+        "MG-BE10"
+      ],
+      "status": "mechanism_with_partial_automated_evidence",
+      "check": "Новые функции выключены после внедрения",
+      "expected": "Ленты/данные сохранены, v0.4/v0.5 работают, старые отменённые сообщения не возрождаются",
+      "source": "specification.md, раздел 17",
+      "implementation_accepted": false,
+      "source_status": "Не проверено в приложении",
+      "code": [
+        "src/korsik/config.py",
+        "src/korsik/extension_api.py",
+        "src/korsik/worker.py"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_flags_and_menu_authorization"
+      ],
+      "acceptance_note": "Тест доказывает только проверяемую часть; не заменяет полный прогон критерия. MAX/Mac/ML и PostgreSQL в данном цикле не подтверждены."
+    },
+    {
+      "id": "NAV-CHECK01",
+      "source": "Производная проверка по требованиям меню из истории; не точная строка отсутствующего ZIP v0.6.1",
+      "check": "Меню доступно кнопкой после подключения",
+      "expected": "Меню доступно кнопкой после подключения",
+      "status": "mechanism_requires_individual_acceptance",
+      "code": [
+        "src/korsik/menu.py",
+        "src/korsik/commands.py",
+        "src/korsik/bot.py",
+        "src/korsik/web/app.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Локальная проверка механизма; внешняя приёмка отдельно"
+    },
+    {
+      "id": "NAV-CHECK02",
+      "source": "Производная проверка по требованиям меню из истории; не точная строка отсутствующего ZIP v0.6.1",
+      "check": "Действия вызывают существующие обработчики",
+      "expected": "Действия вызывают существующие обработчики",
+      "status": "mechanism_requires_individual_acceptance",
+      "code": [
+        "src/korsik/menu.py",
+        "src/korsik/commands.py",
+        "src/korsik/bot.py",
+        "src/korsik/web/app.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Локальная проверка механизма; внешняя приёмка отдельно"
+    },
+    {
+      "id": "NAV-CHECK03",
+      "source": "Производная проверка по требованиям меню из истории; не точная строка отсутствующего ZIP v0.6.1",
+      "check": "Права роли и области проверены",
+      "expected": "Права роли и области проверены",
+      "status": "mechanism_with_partial_automated_evidence",
+      "code": [
+        "src/korsik/menu.py",
+        "src/korsik/commands.py",
+        "src/korsik/bot.py",
+        "src/korsik/web/app.js"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_flags_and_menu_authorization"
+      ],
+      "acceptance_note": "Локальная проверка механизма; внешняя приёмка отдельно"
+    },
+    {
+      "id": "NAV-CHECK04",
+      "source": "Производная проверка по требованиям меню из истории; не точная строка отсутствующего ZIP v0.6.1",
+      "check": "Отключённые функции скрыты",
+      "expected": "Отключённые функции скрыты",
+      "status": "mechanism_with_partial_automated_evidence",
+      "code": [
+        "src/korsik/menu.py",
+        "src/korsik/commands.py",
+        "src/korsik/bot.py",
+        "src/korsik/web/app.js"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_flags_and_menu_authorization"
+      ],
+      "acceptance_note": "Локальная проверка механизма; внешняя приёмка отдельно"
+    },
+    {
+      "id": "NAV-CHECK05",
+      "source": "Производная проверка по требованиям меню из истории; не точная строка отсутствующего ZIP v0.6.1",
+      "check": "Меню не отвечает за сотрудника",
+      "expected": "Меню не отвечает за сотрудника",
+      "status": "mechanism_with_partial_automated_evidence",
+      "code": [
+        "src/korsik/menu.py",
+        "src/korsik/commands.py",
+        "src/korsik/bot.py",
+        "src/korsik/web/app.js"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_missing_plan_is_truthful_and_menu_preserves_survey"
+      ],
+      "acceptance_note": "Локальная проверка механизма; внешняя приёмка отдельно"
+    },
+    {
+      "id": "NAV-CHECK06",
+      "source": "Производная проверка по требованиям меню из истории; не точная строка отсутствующего ZIP v0.6.1",
+      "check": "Прогресс и комментарий сохранены",
+      "expected": "Прогресс и комментарий сохранены",
+      "status": "mechanism_with_partial_automated_evidence",
+      "code": [
+        "src/korsik/menu.py",
+        "src/korsik/commands.py",
+        "src/korsik/bot.py",
+        "src/korsik/web/app.js"
+      ],
+      "tests": [
+        "tests/test_extensions.py::test_missing_plan_is_truthful_and_menu_preserves_survey"
+      ],
+      "acceptance_note": "Локальная проверка механизма; внешняя приёмка отдельно"
+    },
+    {
+      "id": "NAV-CHECK07",
+      "source": "Производная проверка по требованиям меню из истории; не точная строка отсутствующего ZIP v0.6.1",
+      "check": "Навигация не вытесняет ответы",
+      "expected": "Навигация не вытесняет ответы",
+      "status": "mechanism_requires_individual_acceptance",
+      "code": [
+        "src/korsik/menu.py",
+        "src/korsik/commands.py",
+        "src/korsik/bot.py",
+        "src/korsik/web/app.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Локальная проверка механизма; внешняя приёмка отдельно"
+    },
+    {
+      "id": "NAV-CHECK08",
+      "source": "Производная проверка по требованиям меню из истории; не точная строка отсутствующего ZIP v0.6.1",
+      "check": "Пагинация, назад и главная",
+      "expected": "Пагинация, назад и главная",
+      "status": "mechanism_requires_individual_acceptance",
+      "code": [
+        "src/korsik/menu.py",
+        "src/korsik/commands.py",
+        "src/korsik/bot.py",
+        "src/korsik/web/app.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Локальная проверка механизма; внешняя приёмка отдельно"
+    },
+    {
+      "id": "NAV-CHECK09",
+      "source": "Производная проверка по требованиям меню из истории; не точная строка отсутствующего ZIP v0.6.1",
+      "check": "Slash-команды сохраняются",
+      "expected": "Slash-команды сохраняются",
+      "status": "mechanism_requires_individual_acceptance",
+      "code": [
+        "src/korsik/menu.py",
+        "src/korsik/commands.py",
+        "src/korsik/bot.py",
+        "src/korsik/web/app.js"
+      ],
+      "tests": [],
+      "acceptance_note": "Локальная проверка механизма; внешняя приёмка отдельно"
+    },
+    {
+      "id": "NAV-CHECK10",
+      "source": "Производная проверка по требованиям меню из истории; не точная строка отсутствующего ZIP v0.6.1",
+      "check": "Реальная проверка MAX на Mac",
+      "expected": "Реальная проверка MAX на Mac",
+      "status": "mechanism_requires_individual_acceptance",
+      "code": [
+        "src/korsik/menu.py",
+        "src/korsik/commands.py",
+        "src/korsik/bot.py",
+        "src/korsik/web/app.js"
+      ],
+      "tests": [],
+      "acceptance_note": "MAX/Mac не проверен"
+    }
+  ]
+}

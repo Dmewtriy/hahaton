@@ -39,7 +39,7 @@ export async function documentsPage(ctx) {
   const render = () => {
     const rows = data.filter(
       (d) =>
-        (!state.branch ||
+        d.purpose === "knowledge" && (!state.branch ||
           d.branch_codes.includes("*") ||
           d.branch_codes.includes(state.branch)) &&
         d.title.toLowerCase().includes(state.search.toLowerCase()),
@@ -415,7 +415,7 @@ export async function surveyEditor(ctx, id) {
       input(
         "reminder_days",
         "Напомнить через, дней",
-        (item.definition?.reminder_days || [1, 2]).join(", "),
+        (item.definition?.reminder_days || []).join(", "),
         "text",
         "",
         "Например: 1, 2. Пусто — без напоминаний.",
@@ -557,6 +557,7 @@ export async function surveyEditor(ctx, id) {
             comment_below: q.kind === "rating" ? q.comment_below : null,
           })),
           reminder_days: csv(form.elements.reminder_days.value).map(Number),
+          data_mode: item.definition?.data_mode || "real",
           revision: item.revision || null,
         };
         if (id) await ctx.api.put(`/api/admin/surveys/${id}`, body);
