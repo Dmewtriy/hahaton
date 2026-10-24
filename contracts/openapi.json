@@ -423,6 +423,225 @@
         }
       }
     },
+    "/api/admin/employees/{employee_id}/onboarding": {
+      "post": {
+        "tags": [
+          "HR Workspace"
+        ],
+        "summary": "Employee Onboarding",
+        "operationId": "employee_onboarding_api_admin_employees__employee_id__onboarding_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "employee_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Employee Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnboardingAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/manager-rules": {
+      "get": {
+        "tags": [
+          "HR Workspace"
+        ],
+        "summary": "Manager Rules",
+        "operationId": "manager_rules_api_admin_manager_rules_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "HR Workspace"
+        ],
+        "summary": "Save Manager Rule",
+        "operationId": "save_manager_rule_api_admin_manager_rules_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagerRuleInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/manager-rules/{rule_id}": {
+      "delete": {
+        "tags": [
+          "HR Workspace"
+        ],
+        "summary": "Delete Manager Rule",
+        "operationId": "delete_manager_rule_api_admin_manager_rules__rule_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "rule_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rule Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "HR Workspace"
+        ],
+        "summary": "Update Manager Rule",
+        "operationId": "update_manager_rule_api_admin_manager_rules__rule_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "rule_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rule Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagerRuleInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/employees/{employee_id}/restore": {
       "post": {
         "tags": [
@@ -1157,6 +1376,116 @@
         },
         "responses": {
           "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/documents/{document_id}/publish": {
+      "post": {
+        "tags": [
+          "HR Workspace"
+        ],
+        "summary": "Publish Document",
+        "operationId": "publish_document_api_admin_documents__document_id__publish_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevisionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/documents/{document_id}/publication": {
+      "put": {
+        "tags": [
+          "HR Workspace"
+        ],
+        "summary": "Document Publication",
+        "operationId": "document_publication_api_admin_documents__document_id__publication_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentPublication"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
@@ -2600,7 +2929,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TextInput"
+                "$ref": "#/components/schemas/ReplyInput"
               }
             }
           }
@@ -2647,6 +2976,716 @@
             "schema": {
               "type": "string",
               "title": "Employee Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspace/team": {
+      "get": {
+        "tags": [
+          "Role workspace"
+        ],
+        "summary": "Team",
+        "operationId": "team_api_workspace_team_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/workspace/meetings": {
+      "get": {
+        "tags": [
+          "Role workspace"
+        ],
+        "summary": "Meeting List",
+        "operationId": "meeting_list_api_workspace_meetings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/workspace/digests": {
+      "get": {
+        "tags": [
+          "Role workspace"
+        ],
+        "summary": "Digest List",
+        "operationId": "digest_list_api_workspace_digests_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/workspace/digests/{digest_id}": {
+      "get": {
+        "tags": [
+          "Role workspace"
+        ],
+        "summary": "Digest Detail",
+        "operationId": "digest_detail_api_workspace_digests__digest_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "digest_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Digest Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reports/surveys": {
+      "get": {
+        "tags": [
+          "Survey reports"
+        ],
+        "summary": "Surveys",
+        "operationId": "surveys_api_reports_surveys_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/reports/preview": {
+      "post": {
+        "tags": [
+          "Survey reports"
+        ],
+        "summary": "Preview",
+        "operationId": "preview_api_reports_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/reports/files": {
+      "post": {
+        "tags": [
+          "Survey reports"
+        ],
+        "summary": "Create",
+        "operationId": "create_api_reports_files_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/reports/files/{file_id}": {
+      "get": {
+        "tags": [
+          "Survey reports"
+        ],
+        "summary": "Download",
+        "operationId": "download_api_reports_files__file_id__get",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "File Id"
+            }
+          },
+          {
+            "name": "expires",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Expires"
+            }
+          },
+          {
+            "name": "ticket",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ticket"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/branches/{code}/route-v04": {
+      "post": {
+        "tags": [
+          "Route configuration"
+        ],
+        "summary": "Branch Route",
+        "description": "Derive a self-contained configuration for a new site without changing Python code.",
+        "operationId": "branch_route_api_admin_branches__code__route_v04_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchRouteInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/reference-data": {
+      "get": {
+        "tags": [
+          "Route configuration"
+        ],
+        "summary": "Reference Data",
+        "operationId": "reference_data_api_admin_reference_data_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/route-v04/install": {
+      "post": {
+        "tags": [
+          "Route configuration"
+        ],
+        "summary": "Install",
+        "operationId": "install_api_admin_route_v04_install_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/materials": {
+      "get": {
+        "tags": [
+          "Route configuration"
+        ],
+        "summary": "List Materials",
+        "operationId": "list_materials_api_admin_materials_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/materials/{key}": {
+      "put": {
+        "tags": [
+          "Route configuration"
+        ],
+        "summary": "Save Material",
+        "operationId": "save_material_api_admin_materials__key__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaterialInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/route-readiness": {
+      "get": {
+        "tags": [
+          "Route configuration"
+        ],
+        "summary": "Readiness",
+        "operationId": "readiness_api_admin_route_readiness_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/support/retained-cases": {
+      "get": {
+        "tags": [
+          "Case resolutions"
+        ],
+        "summary": "Retained",
+        "operationId": "retained_api_support_retained_cases_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/support/{ticket_id}/resolution": {
+      "post": {
+        "tags": [
+          "Case resolutions"
+        ],
+        "summary": "Resolve",
+        "operationId": "resolve_api_support__ticket_id__resolution_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ticket_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ticket Id"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/nlp/events": {
+      "post": {
+        "tags": [
+          "NLP event adapter"
+        ],
+        "summary": "Receive",
+        "operationId": "receive_api_integrations_nlp_events_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/feedback": {
+      "get": {
+        "tags": [
+          "Feedback processing"
+        ],
+        "summary": "Status",
+        "operationId": "status_api_admin_feedback_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/feedback/{answer_id}/retry": {
+      "post": {
+        "tags": [
+          "Feedback processing"
+        ],
+        "summary": "Retry",
+        "operationId": "retry_api_admin_feedback__answer_id__retry_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "answer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Answer Id"
             }
           }
         ],
@@ -4649,6 +5688,102 @@
   },
   "components": {
     "schemas": {
+      "AnalysisEvent": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version",
+            "default": "1"
+          },
+          "event_id": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Event Id"
+          },
+          "answer_id": {
+            "type": "string",
+            "title": "Answer Id"
+          },
+          "result": {
+            "$ref": "#/components/schemas/AnalysisResult"
+          },
+          "manager_signal": {
+            "type": "string",
+            "enum": [
+              "none",
+              "meeting_recommended"
+            ],
+            "title": "Manager Signal",
+            "default": "none"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "event_id",
+          "answer_id",
+          "result"
+        ],
+        "title": "AnalysisEvent"
+      },
+      "AnalysisResult": {
+        "properties": {
+          "sentiment": {
+            "type": "string",
+            "enum": [
+              "positive",
+              "neutral",
+              "negative"
+            ],
+            "title": "Sentiment"
+          },
+          "risk": {
+            "type": "string",
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Risk"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Topics"
+          },
+          "explanation": {
+            "type": "string",
+            "maxLength": 3000,
+            "title": "Explanation"
+          },
+          "needs_hr": {
+            "type": "boolean",
+            "title": "Needs Hr",
+            "default": false
+          },
+          "processor_version": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Processor Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sentiment",
+          "risk",
+          "explanation",
+          "processor_version"
+        ],
+        "title": "AnalysisResult"
+      },
       "AudienceInput": {
         "properties": {
           "mode": {
@@ -4737,6 +5872,12 @@
             "minimum": 1.0,
             "title": "Version",
             "default": 1
+          },
+          "auto_publish": {
+            "type": "string",
+            "pattern": "^(true|false)$",
+            "title": "Auto Publish",
+            "default": "true"
           }
         },
         "type": "object",
@@ -4810,6 +5951,31 @@
             "type": "boolean",
             "title": "Active",
             "default": true
+          },
+          "workplace": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Workplace"
+          },
+          "late_join_policy": {
+            "type": "string",
+            "enum": [
+              "catch_up",
+              "skip_past",
+              "review"
+            ],
+            "title": "Late Join Policy",
+            "default": "review"
+          },
+          "support_recipient_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Support Recipient Ids"
           },
           "revision": {
             "anyOf": [
@@ -4902,6 +6068,31 @@
             "type": "boolean",
             "title": "Active",
             "default": true
+          },
+          "workplace": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Workplace"
+          },
+          "late_join_policy": {
+            "type": "string",
+            "enum": [
+              "catch_up",
+              "skip_past",
+              "review"
+            ],
+            "title": "Late Join Policy",
+            "default": "review"
+          },
+          "support_recipient_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Support Recipient Ids"
           }
         },
         "additionalProperties": false,
@@ -4911,6 +6102,26 @@
           "name"
         ],
         "title": "BranchInput"
+      },
+      "BranchRouteInput": {
+        "properties": {
+          "variant": {
+            "type": "string",
+            "title": "Variant"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Revision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "variant",
+          "revision"
+        ],
+        "title": "BranchRouteInput"
       },
       "CampaignInput": {
         "properties": {
@@ -4979,6 +6190,18 @@
               }
             ],
             "title": "Revision"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
           }
         },
         "additionalProperties": false,
@@ -5207,6 +6430,26 @@
         ],
         "title": "DocumentInput"
       },
+      "DocumentPublication": {
+        "properties": {
+          "auto_publish": {
+            "type": "boolean",
+            "title": "Auto Publish"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Revision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "auto_publish",
+          "revision"
+        ],
+        "title": "DocumentPublication"
+      },
       "EmployeeCreate": {
         "properties": {
           "name": {
@@ -5247,6 +6490,11 @@
             ],
             "title": "Manager Id"
           },
+          "auto_assign_manager": {
+            "type": "boolean",
+            "title": "Auto Assign Manager",
+            "default": true
+          },
           "hire_date": {
             "type": "string",
             "format": "date",
@@ -5274,6 +6522,30 @@
               }
             ],
             "title": "Timezone"
+          },
+          "adaptation_plan_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adaptation Plan Url"
+          },
+          "it_access_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "It Access Url"
           }
         },
         "additionalProperties": false,
@@ -5354,6 +6626,11 @@
             ],
             "title": "Manager Id"
           },
+          "auto_assign_manager": {
+            "type": "boolean",
+            "title": "Auto Assign Manager",
+            "default": true
+          },
           "hire_date": {
             "type": "string",
             "format": "date",
@@ -5381,6 +6658,30 @@
               }
             ],
             "title": "Timezone"
+          },
+          "adaptation_plan_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adaptation Plan Url"
+          },
+          "it_access_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "It Access Url"
           },
           "department_id": {
             "anyOf": [
@@ -5445,6 +6746,11 @@
             },
             "type": "array",
             "title": "Topics"
+          },
+          "recommend_meeting": {
+            "type": "boolean",
+            "title": "Recommend Meeting",
+            "default": true
           }
         },
         "additionalProperties": false,
@@ -5496,6 +6802,18 @@
             },
             "type": "array",
             "title": "Branch Codes"
+          },
+          "contact_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Url"
           }
         },
         "additionalProperties": false,
@@ -5549,6 +6867,18 @@
             "type": "boolean",
             "title": "Active",
             "default": true
+          },
+          "contact_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Url"
           }
         },
         "additionalProperties": false,
@@ -5574,6 +6904,30 @@
           "api_key"
         ],
         "title": "LocalLoginInput"
+      },
+      "ManagerRuleInput": {
+        "properties": {
+          "recruiter_id": {
+            "type": "string",
+            "title": "Recruiter Id"
+          },
+          "branch_code": {
+            "type": "string",
+            "title": "Branch Code"
+          },
+          "manager_id": {
+            "type": "string",
+            "title": "Manager Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "recruiter_id",
+          "branch_code",
+          "manager_id"
+        ],
+        "title": "ManagerRuleInput"
       },
       "ManualTicketInput": {
         "properties": {
@@ -5602,6 +6956,56 @@
         ],
         "title": "ManualTicketInput"
       },
+      "MaterialInput": {
+        "properties": {
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Revision"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "revision"
+        ],
+        "title": "MaterialInput"
+      },
       "MaxLaunchInput": {
         "properties": {
           "init_data": {
@@ -5617,6 +7021,25 @@
           "init_data"
         ],
         "title": "MaxLaunchInput"
+      },
+      "OnboardingAction": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "stop",
+              "resume"
+            ],
+            "title": "Action"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "title": "OnboardingAction"
       },
       "Option": {
         "properties": {
@@ -5645,13 +7068,28 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 2000
+                "maxLength": 12000
               },
               {
                 "type": "null"
               }
             ],
             "title": "Reply"
+          },
+          "exclusive": {
+            "type": "boolean",
+            "title": "Exclusive",
+            "default": false
+          },
+          "support_actions": {
+            "type": "boolean",
+            "title": "Support Actions",
+            "default": false
+          },
+          "reply_after_survey": {
+            "type": "boolean",
+            "title": "Reply After Survey",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -5739,6 +7177,53 @@
             "type": "string",
             "title": "Comment Prompt",
             "default": "Расскажите, пожалуйста, подробнее."
+          },
+          "correct_options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Correct Options"
+          },
+          "points": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Points",
+            "default": 1
+          },
+          "optional_comment_on_positive": {
+            "type": "boolean",
+            "title": "Optional Comment On Positive",
+            "default": false
+          },
+          "comment_contact_alternative": {
+            "type": "boolean",
+            "title": "Comment Contact Alternative",
+            "default": false
+          },
+          "minimum_label": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Minimum Label",
+            "default": ""
+          },
+          "maximum_label": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Maximum Label",
+            "default": ""
+          },
+          "source_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Ref"
           }
         },
         "additionalProperties": false,
@@ -5764,6 +7249,124 @@
           "last_message_id"
         ],
         "title": "ReadInput"
+      },
+      "ReplyInput": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 15000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "ticket_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ticket Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "ReplyInput"
+      },
+      "ReportInput": {
+        "properties": {
+          "survey_key": {
+            "type": "string",
+            "title": "Survey Key"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "from_date": {
+            "type": "string",
+            "format": "date",
+            "title": "From Date"
+          },
+          "to_date": {
+            "type": "string",
+            "format": "date",
+            "title": "To Date"
+          },
+          "timezone": {
+            "type": "string",
+            "title": "Timezone",
+            "default": "Europe/Moscow"
+          },
+          "branch_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Branch Codes"
+          },
+          "departments": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Departments"
+          },
+          "include_archived": {
+            "type": "boolean",
+            "title": "Include Archived",
+            "default": false
+          },
+          "format": {
+            "type": "string",
+            "title": "Format",
+            "default": "xlsx"
+          },
+          "preview_hash": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preview Hash"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "survey_key",
+          "version",
+          "from_date",
+          "to_date"
+        ],
+        "title": "ReportInput"
+      },
+      "RevisionInput": {
+        "properties": {
+          "revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "RevisionInput"
       },
       "ScenarioDefinition": {
         "properties": {
@@ -5935,7 +7538,8 @@
             "enum": [
               "message",
               "survey",
-              "manager_reminder"
+              "manager_reminder",
+              "flow"
             ],
             "title": "Kind",
             "default": "message"
@@ -6010,6 +7614,22 @@
             ],
             "title": "Reply To",
             "default": "none"
+          },
+          "source_refs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Source Refs"
+          },
+          "actions": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Actions"
           }
         },
         "additionalProperties": false,
@@ -6049,6 +7669,35 @@
             "type": "array",
             "maxItems": 10,
             "title": "Reminder Days"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "survey",
+              "quiz"
+            ],
+            "title": "Kind",
+            "default": "survey"
+          },
+          "pass_percent": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Pass Percent",
+            "default": 70
+          },
+          "completion_text": {
+            "type": "string",
+            "maxLength": 12000,
+            "title": "Completion Text",
+            "default": "Спасибо за обратную связь! Опрос завершён."
+          },
+          "source_refs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Source Refs"
           }
         },
         "additionalProperties": false,
@@ -6096,6 +7745,7 @@
               "type": "integer"
             },
             "type": "array",
+            "maxItems": 10,
             "title": "Reminder Days"
           },
           "revision": {
@@ -6109,6 +7759,22 @@
               }
             ],
             "title": "Revision"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "survey",
+              "quiz"
+            ],
+            "title": "Kind",
+            "default": "survey"
+          },
+          "pass_percent": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Pass Percent",
+            "default": 70
           }
         },
         "additionalProperties": false,

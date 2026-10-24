@@ -44,7 +44,7 @@ def open_ticket(session, employee, reason, context, dedupe_key, human=True):
         return existing
     ticket = Ticket(
         employee_id=employee.id,
-        recruiter_id=employee.recruiter_id,
+        recruiter_id=context.get("recruiter_id", employee.recruiter_id),
         reason=reason,
         context=context,
         dedupe_key=dedupe_key,
@@ -53,6 +53,10 @@ def open_ticket(session, employee, reason, context, dedupe_key, human=True):
     )
     session.add(ticket)
     session.flush()
+    from .support import participant
+
+    participant(session, ticket, employee.recruiter_id, "original")
+    participant(session, ticket, ticket.recruiter_id, "assigned")
     details = ticket_context(session, ticket)
     description = details.get("message") or details.get("question") or ""
     if context.get("initiated_by_hr"):
@@ -77,14 +81,19 @@ def open_ticket(session, employee, reason, context, dedupe_key, human=True):
             dedupe_key if dedupe_key.startswith("hr-in:") else "ticket-open:" + ticket.id,
             employee.identity_id if kind == "employee" else None,
         )
-    send(
+    notification = send(
         session,
-        employee.recruiter_id,
+        ticket.recruiter_id,
         f"Новое обращение {ticket.id}\nСотрудник: {employee.name}\nПричина: {reason}\n"
         f"{description[:1800]}\nОтвет: /reply {ticket.id} текст ответа\nЗакрытие: /close {ticket.id}",
         f"ticket:{ticket.id}:notify",
         now(session),
     )
+    notification.body = {
+        **notification.body,
+        "support_employee_id": employee.id,
+        "support_ticket_id": ticket.id,
+    }
     return ticket
 
 
@@ -93,13 +102,18 @@ def employee_message(session, employee, ticket, text, event_key):
     session.add(
         TicketMessage(ticket_id=ticket.id, author_id=employee.identity_id, text=text, created_at=now(session))
     )
-    send(
+    notification = send(
         session,
         ticket.recruiter_id,
         f"Обращение {ticket.id}\n{employee.name}: {text}",
         f"ticket-message:{event_key}",
         now(session),
     )
+    notification.body = {
+        **notification.body,
+        "support_employee_id": employee.id,
+        "support_ticket_id": ticket.id,
+    }
 
 
 def reply_question(session, employee, ticket, *, entire_thread=False):
@@ -117,9 +131,10 @@ def reply_question(session, employee, ticket, *, entire_thread=False):
 
 
 def reply(session, actor, employee, ticket, text, key, *, question=None):
-    from .access import can_support, require
+    from .access import require
+    from .support import can_write
 
-    require(can_support(actor, employee))
+    require(can_write(session, actor, ticket))
     require(ticket.status != "closed", "Обращение уже закрыто")
     question = question if question is not None else reply_question(session, employee, ticket)
     ticket.human_mode = False
@@ -133,35 +148,22 @@ def reply(session, actor, employee, ticket, text, key, *, question=None):
         (f"Ваш вопрос: {question}\n" if question else "") + f"Ответ HR: {text}",
         f"hr-reply:{key}",
         now(session),
-        buttons=[{"text": "Ответить HR", "payload": "hr"}],
+        buttons=[{"text": "Ответить HR", "payload": "case-reply:" + ticket.id}],
     )
 
 
 def close(session, actor, employee, ticket, key):
-    from .access import can_support, require
+    from fastapi import HTTPException
 
-    require(can_support(actor, employee))
-    if ticket.status == "closed":
+    from .support import resolution
+
+    if ticket.status in {"closed", "awaiting_confirmation"}:
         return
-    ticket.status = "closed"
-    ticket.human_mode = False
-    ticket.closed_at = now(session)
-    inbox.append(
-        session,
-        employee,
-        ticket,
-        "system",
-        "HR отметил обращение решённым.",
-        "ticket-close:" + ticket.id,
-        actor.id,
-    )
-    send(
-        session,
-        employee.identity_id,
-        "HR отметил обращение решённым. История переписки сохранена.",
-        f"close:{key}",
-        now(session),
-    )
+    if not ticket.resolution:
+        raise HTTPException(
+            409, "Сначала опишите решение. Обращение закрывает сотрудник своим подтверждением"
+        )
+    resolution(session, actor, ticket, ticket.resolution, key)
 
 
 def signal_text(reason, context):

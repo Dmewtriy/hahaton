@@ -73,6 +73,17 @@ def create_app(runtime=None):
     from .inbox_api import router as inbox_router
 
     app.include_router(inbox_router)
+    from .workspace_api import router as workspace_router
+
+    app.include_router(workspace_router)
+    from .feedback_api import router as feedback_router
+    from .nlp_api import router as nlp_router
+    from .report_api import router as report_router
+    from .route_api import router as route_router
+    from .support_api import router as support_router
+
+    for router in (report_router, route_router, support_router, nlp_router, feedback_router):
+        app.include_router(router)
     app.mount("/admin-assets", StaticFiles(directory=Path(__file__).parent / "web"), name="admin-assets")
 
     @app.middleware("http")
@@ -117,7 +128,11 @@ def create_app(runtime=None):
         if not ticket:
             raise HTTPException(404, "Обращение не найдено")
         employee = session.scalar(select(Employee).where(Employee.id == ticket.employee_id).with_for_update())
-        allowed = access.can_support(actor, employee) or (not write and employee.identity_id == actor.id)
+        from . import support
+
+        allowed = (
+            support.can_write(session, actor, ticket) if write else support.can_read(session, actor, ticket)
+        )
         access.require(allowed)
         return ticket, employee
 
@@ -144,10 +159,12 @@ def create_app(runtime=None):
             "manage_access": actor.manage_access,
             "branch_codes": actor.branch_codes,
             "is_admin": access.is_admin(actor),
+            "can_use_workspace": access.can_use_workspace(actor),
             "capabilities": {
                 "manage_hr": access.is_hr(actor),
                 "manage_people": access.can_manage_people(actor),
                 "manage_access": actor.manage_access,
+                "view_team": "manager" in actor.roles,
                 "demo": runtime.settings.enable_demo
                 and actor.manage_access
                 and runtime.settings.environment != "production",
@@ -166,6 +183,7 @@ def create_app(runtime=None):
                 "manage_access": i.manage_access,
                 "branch_codes": i.branch_codes,
                 "max_bound": bool(i.max_user_id),
+                "contact_url": i.contact_url,
             }
             for i in session.scalars(select(Identity))
             if access.can_manage_identity(actor, i)
@@ -195,6 +213,8 @@ def create_app(runtime=None):
         employee = session.scalar(select(Employee).where(Employee.identity_id == identity_id))
         if employee and "*" not in data.branch_codes and employee.branch_code not in data.branch_codes:
             raise HTTPException(422, "Площадку сотрудника меняйте в его анкете")
+        if "contact_url" in data.model_fields_set:
+            identity.contact_url = data.contact_url
         for key, value in data.model_dump(exclude_none=True).items():
             setattr(identity, key, value)
         employee = session.scalar(select(Employee).where(Employee.identity_id == identity_id))
@@ -406,7 +426,15 @@ def create_app(runtime=None):
         if not step:
             raise HTTPException(404)
         access.employee_for(session, actor, step.employee_id, support=True)
-        if step.status != "manual":
+        from .onboarding import available
+
+        if (
+            not step.campaign_id
+            and not available(session, session.get(Employee, step.employee_id))
+            and step.status != "late_review"
+        ):
+            raise HTTPException(409, "Адаптация сотрудника завершена или остановлена")
+        if step.status not in {"manual", "late_review"}:
             raise HTTPException(409, "Шаг уже запущен или не требует ручного запуска")
         step.status = "enqueued"
         enqueue(session, "step", {"step_id": step.id}, f"step:{step.id}", now(session))
@@ -425,8 +453,10 @@ def create_app(runtime=None):
                 "status": run.status,
                 "position": run.position,
                 "questions": len(run.definition["questions"]),
+                "expires_at": run.expires_at,
             }
             if raw_allowed:
+                entry["result"] = run.result
                 entry["answers"] = [
                     {"id": a.id, "question_id": a.question_id, "value": a.value, "comment": a.comment}
                     for a in session.scalars(select(SurveyAnswer).where(SurveyAnswer.run_id == run.id))
@@ -457,11 +487,16 @@ def create_app(runtime=None):
     @app.get("/api/tickets/{ticket_id}", tags=["Tickets"])
     def get_ticket(ticket_id: str, session: Session, actor: Actor):
         ticket, employee = ticket_for(session, actor, ticket_id)
+        from .support import can_write
+
         return {
             "id": ticket.id,
             "employee_id": employee.id,
             "status": ticket.status,
             "reason": ticket.reason,
+            "can_reply": can_write(session, actor, ticket),
+            "resolution": ticket.resolution,
+            "outcome": ticket.outcome,
             "context": tickets.ticket_context(session, ticket),
             "human_mode": ticket.human_mode,
             "messages": [
@@ -520,6 +555,7 @@ def create_app(runtime=None):
         branch_codes: Annotated[str, Form()],
         categories: Annotated[str, Form()] = "[]",
         version: Annotated[int, Form(ge=1)] = 1,
+        auto_publish: Annotated[str, Form(pattern="^(true|false)$")] = "true",
     ):
         try:
             codes, cats = json.loads(branch_codes), json.loads(categories)
@@ -537,7 +573,15 @@ def create_app(runtime=None):
                 raise HTTPException(422, "Неизвестная площадка")
         content = file.file.read(runtime.settings.max_upload_bytes + 1)
         doc = documents.store(
-            session, runtime.settings, title, file.filename or "file", content, codes, cats, version
+            session,
+            runtime.settings,
+            title,
+            file.filename or "file",
+            content,
+            codes,
+            cats,
+            version,
+            auto_publish=auto_publish == "true",
         )
         audit(session, actor, "document.upload", doc.id)
         return documents.public_document(doc)
@@ -609,6 +653,7 @@ def create_app(runtime=None):
             raise HTTPException(404)
         access.require(doc.active and documents.can_edit(actor, doc))
         doc.status = "pending"
+        doc.last_error = None
         enqueue(session, "index_document", {"document_id": doc.id}, f"reindex:{doc.id}:{uid()}", now(session))
         audit(session, actor, "document.reindex", doc.id)
         return {"status": doc.status}

@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
 from . import documents, employees, inbox, surveys, tickets
-from .access import can_support, is_admin, is_hr
+from .access import can_support, can_use_workspace, is_admin, is_hr
 from .calendar import now
 from .ml import MLUnavailable
 from .models import ConversationMessage, Employee, Identity, Outbox, QuestionLog, ScheduledStep, Ticket
@@ -10,7 +10,7 @@ from .scenarios import drain_dialogue_queue
 
 MENU = (
     "Я Корсик. /menu — меню, /ask вопрос — спросить по документам, /hr текст — сообщение HR, "
-    "/resume — продолжить опрос, /food — питание, /materials — материалы."
+    "/resume — продолжить опрос, /cases — мои обращения, /food — питание, /places запрос — места рядом с работой, /materials — материалы."
 )
 
 
@@ -45,6 +45,10 @@ def receive(runtime, session, event):
     if not identity.active:
         return
     employee = session.scalar(select(Employee).where(Employee.identity_id == identity.id).with_for_update())
+    if employee:
+        from .onboarding import sync
+
+        sync(session, employee)
     if event["kind"] == "stop":
         if employee:
             employee.status = "stopped"
@@ -84,6 +88,20 @@ def receive(runtime, session, event):
         )
         return
     callback = event.get("payload") if event["kind"] == "callback" else None
+    from . import helpflow, intent, routes, support
+
+    if callback and (
+        intent.callback(runtime, session, employee, callback, key)
+        or support.callback(session, employee, callback, key)
+        or helpflow.callback(runtime, session, employee, callback, key)
+    ):
+        return
+    if callback and callback.startswith("r:"):
+        if not routes.consume(session, employee, "", key, callback):
+            send(
+                session, identity.id, "Это действие устарело. Продолжить: /resume.", "route-stale:" + key, at
+            )
+        return
     if callback and callback.startswith("style:"):
         style = callback.split(":", 1)[1]
         if style in {"formal", "informal"}:
@@ -102,33 +120,42 @@ def receive(runtime, session, event):
             send(session, identity.id, "Эта кнопка больше не активна.", f"inactive-button:{key}", at)
         return
     command = text.split(maxsplit=1)[0].lower() if text else ""
-    if command == "/hr":
+    if command in {"/ask", "/hr", "/cancel", "/resume", "/cases"}:
+        employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "pending_intent"}
+    if command == "/ask":
+        employee.dialogue = {
+            k: v for k, v in employee.dialogue.items() if k not in {"support_compose", "active_help"}
+        }
+    if command == "/cases":
+        support.list_cases(session, employee, key)
+    elif command == "/hr":
         detail = text.partition(" ")[2].strip()
+        pending = employee.dialogue.get("support_compose", {})
         if detail:
-            route_hr_message(session, employee, detail, key, run)
-        else:
-            pending = employee.dialogue.get("awaiting_hr_message", {})
-            employee.dialogue = {
-                **employee.dialogue,
-                "awaiting_ai_question": False,
-                "awaiting_hr_message": {
-                    "step_id": pending.get("step_id"),
-                    "survey_run_id": run.id if run else None,
-                },
-            }
-            send(
-                session,
-                identity.id,
-                "Напишите одно сообщение для HR. Оно не попадёт в ИИ или ответы опроса. "
-                "Для отмены: /cancel. После отправки бот вернётся к обычной работе.",
-                "hr-compose:" + key,
-                at,
+            opened = list(
+                session.scalars(
+                    select(Ticket).where(Ticket.employee_id == employee.id, Ticket.status != "closed")
+                )
             )
+            if not pending.get("ticket_id") and not pending.get("force_new") and len(opened) > 1:
+                support.list_cases(session, employee, key, detail)
+            else:
+                if len(opened) == 1 and not pending.get("ticket_id") and not pending.get("force_new"):
+                    employee.dialogue = {
+                        **employee.dialogue,
+                        "support_compose": {
+                            "ticket_id": opened[0].id,
+                            "recipient_id": opened[0].recruiter_id,
+                        },
+                    }
+                support.submit(session, employee, detail, key)
+        else:
+            support.choose_recipient(session, employee, key)
     elif command == "/cancel":
         employee.dialogue = {
             k: v
             for k, v in employee.dialogue.items()
-            if k not in {"awaiting_hr_message", "awaiting_ai_question"}
+            if k not in {"awaiting_hr_message", "awaiting_ai_question", "support_compose", "active_help"}
         }
         send(session, identity.id, "Ввод сообщения отменён.", "cancel-compose:" + key, at)
         if run:
@@ -136,9 +163,45 @@ def receive(runtime, session, event):
     elif command in {"/menu", "/help", "/"}:
         send(session, identity.id, MENU, f"menu:{key}", at, buttons=admin_buttons(runtime, identity))
     elif command in {"/food", "/materials"}:
-        from .models import Branch
+        from fastapi import HTTPException
+
+        from .models import Branch, Material
 
         branch = session.get(Branch, employee.branch_code)
+        if command == "/food":
+            keys = [f"RES-R{r:03}:{branch.code}" for r in [26, 27, 28]] + [
+                f"RES-R{r:03}" for r in [26, 27, 28]
+            ]
+            selected = next(
+                (
+                    m
+                    for k in keys
+                    if (m := session.get(Material, k))
+                    and ("*" in m.branch_codes or branch.code in m.branch_codes)
+                ),
+                None,
+            )
+            if selected:
+                try:
+                    value = routes.resolve_material(session, employee, selected.key)
+                    item = send(
+                        session,
+                        identity.id,
+                        "Питание на вашей площадке" + ("\n" + value["text"] if value["text"] else ""),
+                        f"food:{key}",
+                        at,
+                        document_ids=value["document_ids"],
+                    )
+                    item.body = {**item.body, "required_document_ids": value["document_ids"]}
+                except HTTPException:
+                    send(
+                        session,
+                        identity.id,
+                        "PDF с информацией о питании пока не подготовлен. Обратитесь к рекрутеру.",
+                        f"food-missing:{key}",
+                        at,
+                    )
+                return
         material = (
             branch.resources.get("food") if command == "/food" else "\n".join(branch.resources.values())
         )
@@ -149,13 +212,52 @@ def receive(runtime, session, event):
             f"material:{key}",
             at,
         )
+    elif command == "/places":
+        from .models import Branch
+        from .places import search_link
+
+        result = search_link(
+            session.get(Branch, employee.branch_code), text.partition(" ")[2].strip() or "кафе"
+        )
+        send(
+            session,
+            identity.id,
+            result["message"],
+            "places:" + key,
+            at,
+            buttons=[{"type": "link", "text": "Открыть поиск на карте", "url": result["url"]}]
+            if result["url"]
+            else [],
+        )
     elif command == "/resume":
+        employee.dialogue = {
+            k: v
+            for k, v in employee.dialogue.items()
+            if k not in {"support_compose", "active_help", "awaiting_ai_question"}
+        }
         if run:
             employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "awaiting_hr_message"}
             surveys.prompt(session, employee, run, key)
         else:
             drain_dialogue_queue(session, employee)
-            send(session, identity.id, "Активного опроса нет.", f"resume:{key}", at)
+            if routes.active(session, employee):
+                routes.consume(session, employee, "", key)
+            elif not surveys.active_run(session, employee):
+                blocked = session.scalar(
+                    select(ScheduledStep).where(
+                        ScheduledStep.employee_id == employee.id,
+                        ScheduledStep.status.in_(["waiting_material", "late_review"]),
+                    )
+                )
+                send(
+                    session,
+                    identity.id,
+                    "Продолжение ожидает подготовки материалов или запуска HR."
+                    if blocked
+                    else "Активного опроса нет.",
+                    f"resume:{key}",
+                    at,
+                )
     elif command == "/ask":
         employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "awaiting_hr_message"}
         employee.dialogue = {**employee.dialogue, "awaiting_ai_question": False}
@@ -171,6 +273,21 @@ def receive(runtime, session, event):
                 f"ask-prompt:{key}",
                 at,
             )
+    elif not command.startswith("/") and employee.dialogue.get("support_compose"):
+        pending = employee.dialogue["support_compose"]
+        if pending.get("recipient_id"):
+            support.submit(session, employee, text, key)
+        else:
+            support.choose_recipient(
+                session,
+                employee,
+                key,
+                text=text,
+                context=pending.get("context"),
+                ticket_id=pending.get("ticket_id"),
+            )
+    elif not command.startswith("/") and helpflow.consume(runtime, session, employee, text, key):
+        pass
     elif employee.dialogue.get("awaiting_hr_message") and not command.startswith("/"):
         pending = employee.dialogue["awaiting_hr_message"]
         if not run or pending.get("survey_run_id") == run.id:
@@ -182,7 +299,12 @@ def receive(runtime, session, event):
         employee.dialogue = {**employee.dialogue, "awaiting_ai_question": False}
         ask(runtime, session, employee, text, key, run)
     elif run:
-        surveys.consume_answer(session, employee, run, text, key)
+        if not intent.offer(session, employee, text, key, run=run):
+            surveys.consume_answer(session, employee, run, text, key)
+    elif intent.offer(session, employee, text, key, route=routes.active(session, employee)):
+        pass
+    elif routes.consume(session, employee, text, key):
+        pass
     elif command.startswith("/"):
         send(
             session,
@@ -200,7 +322,9 @@ def route_hr_message(session, employee, text, key, run):
         return
     pending = employee.dialogue.get("awaiting_hr_message", {})
     employee.dialogue = {
-        k: v for k, v in employee.dialogue.items() if k not in {"awaiting_hr_message", "awaiting_ai_question"}
+        k: v
+        for k, v in employee.dialogue.items()
+        if k not in {"awaiting_hr_message", "awaiting_ai_question", "support_compose", "active_help"}
     }
     step = session.get(ScheduledStep, pending.get("step_id")) if pending.get("step_id") else None
     if step and step.employee_id == employee.id and step.status == "dispatched":
@@ -220,7 +344,10 @@ def route_hr_message(session, employee, text, key, run):
         surveys.prompt(session, employee, run, "after-hr:" + key)
 
 
-def ask(runtime, session, employee, question, key, run):
+def ask(runtime, session, employee, question, key, run, *, help_id=None):
+    from . import helpflow
+
+    help = helpflow.begin(session, employee, question, run, help_id)
     allowed = documents.allowed_documents(session, employee)
     history = list(
         session.scalars(
@@ -278,7 +405,7 @@ def ask(runtime, session, employee, question, key, run):
                     for s in result.sources
                 )
         version, topics = result.processor_version, result.topics
-        automatic_hr = result.needs_hr or status in {"not_found", "blocked"}
+        automatic_hr = status in {"not_found", "blocked"}
     except MLUnavailable:
         text, status, version, topics = (
             "Сервис ответов временно недоступен. Я не могу дать подтверждённый ответ.",
@@ -288,7 +415,7 @@ def ask(runtime, session, employee, question, key, run):
         )
         automatic_hr = True
     if automatic_hr:
-        tickets.open_ticket(
+        ticket = tickets.open_ticket(
             session,
             employee,
             "Вопрос без подтверждённого ответа",
@@ -299,9 +426,10 @@ def ask(runtime, session, employee, question, key, run):
                 "history": [{"role": m.role, "text": m.text} for m in reversed(history)],
                 "survey_run_id": run.id if run else None,
             },
-            "rag:" + key,
+            "help:" + help.id,
             human=True,
         )
+        help.ticket_id = ticket.id
         text += (
             "\nПередал ваш вопрос закреплённому HR. Дополнить: /hr ваше сообщение. "
             "Опросы и рассылки продолжат приходить."
@@ -327,16 +455,17 @@ def ask(runtime, session, employee, question, key, run):
     )
     if run:
         surveys.prompt(session, employee, run, "return:" + key)
+    helpflow.finish(session, employee, help, status, text, version)
 
 
 def admin_buttons(runtime, actor):
     settings = runtime.settings
-    if not is_admin(actor) or not settings.webapp_public_url or not settings.max_bot_name:
+    if not can_use_workspace(actor) or not settings.webapp_public_url or not settings.max_bot_name:
         return []
     return [
         {
             "type": "link",
-            "text": "Кабинет HR",
+            "text": "Кабинет HR" if is_admin(actor) else "Моя команда",
             "url": f"https://max.ru/{settings.max_bot_name.lstrip('@')}?startapp=admin",
         }
     ]
@@ -363,12 +492,15 @@ def staff_command(runtime, session, actor, text, key):
             )
             send(session, actor.id, text, "admin:" + key, now(session), buttons=buttons)
         return True
-    if command in {"/menu", "/help"} and is_admin(actor):
+    if command in {"/menu", "/help", "/"} and can_use_workspace(actor):
         send(
             session,
             actor.id,
-            "Команды HR: /admin — кабинет, /dashboard — сводка, "
-            "/reply ID текст — ответ, /close ID — закрыть обращение.",
+            (
+                "Команды HR: /admin — кабинет, /dashboard — сводка, /reply ID текст — ответ, /close ID решение — предложить решение сотруднику."
+                if is_admin(actor)
+                else "Моя команда: /dashboard — статус подчинённых и рекомендации личных встреч."
+            ),
             "staff-menu:" + key,
             now(session),
             buttons=admin_buttons(runtime, actor),
@@ -380,10 +512,15 @@ def staff_command(runtime, session, actor, text, key):
         data = dashboard(session, actor)
         report = digest_text(data)
         if "manager" in actor.roles and not is_hr(actor):
-            report += "\nСтатус сотрудников:\n" + "\n".join(
-                f"{e['name']} — {e['stage']}; выход: {e['hire_date']}" for e in data["employees"]
+            report = (
+                f"Моя команда\nСотрудников: {data['totals']['employees']}\n"
+                f"Незавершённых опросов: {data['totals']['active_surveys']}\nСтатус сотрудников:\n"
+            ) + "\n".join(
+                f"{e['name']} — {e['stage_label']}; выход: {e['hire_date']}" for e in data["employees"]
             )
-        send(session, actor.id, report, f"dashboard:{key}", now(session))
+        send(
+            session, actor.id, report, f"dashboard:{key}", now(session), buttons=admin_buttons(runtime, actor)
+        )
         return True
     if command not in {"/reply", "/close"} or not is_hr(actor):
         return False
@@ -397,7 +534,20 @@ def staff_command(runtime, session, actor, text, key):
     elif command == "/reply" and answer.strip():
         tickets.reply(session, actor, employee, ticket, answer.strip(), key)
     elif command == "/close":
-        tickets.close(session, actor, employee, ticket, key)
+        if answer.strip():
+            from .support import resolution
+
+            resolution(session, actor, ticket, answer.strip(), key)
+        elif ticket.resolution:
+            tickets.close(session, actor, employee, ticket, key)
+        else:
+            send(
+                session,
+                actor.id,
+                "Укажите решение: /close ID текст решения. Обращение закроется после подтверждения сотрудником.",
+                "close-help:" + key,
+                now(session),
+            )
     else:
         send(session, actor.id, "Формат: /reply ID текст ответа", f"reply-help:{key}", now(session))
     return True

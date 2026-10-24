@@ -49,6 +49,12 @@ def deactivate_employee(session, employee):
     """Stop all pending dialogue work while retaining answers and history."""
     employee.active, employee.status = False, "stopped"
     employee.dialogue = {}
+    from .models import RouteRun
+
+    for route in session.scalars(
+        select(RouteRun).where(RouteRun.employee_id == employee.id, RouteRun.status != "completed")
+    ):
+        route.status = "cancelled"
     session.get(Identity, employee.identity_id).active = False
     for step in session.scalars(
         select(ScheduledStep).where(
@@ -123,6 +129,7 @@ def save_employee(session, actor, data, employee_id=None):
     if not branch or not branch.active:
         raise HTTPException(422, "Площадка не найдена или находится в архиве")
     identity_reference(session, data.recruiter_id, ["hr", "hr_head"], branch.code)
+    data = data.model_copy(update={"manager_id": employees.resolve_manager(session, data)})
     identity_reference(session, data.manager_id, ["manager"], branch.code)
     department = ensure_department(session, data.department, branch.code, data.department_id)
     end = data.probation_end or add_months(data.hire_date, 3)
@@ -130,6 +137,7 @@ def save_employee(session, actor, data, employee_id=None):
         raise HTTPException(422, "Окончание адаптации должно быть не раньше даты выхода")
     if employee_id:
         employee = access.employee_for(session, actor, employee_id, support=True)
+        old_assignment = employees.assignment(employee)
         revision_check(employee, data.revision)
         was_active = employee.active
         old_plan = (
@@ -139,7 +147,16 @@ def save_employee(session, actor, data, employee_id=None):
             employee.category,
             employee.timezone,
         )
-        for key in ("name", "branch_code", "category", "manager_id", "recruiter_id", "hire_date"):
+        for key in (
+            "name",
+            "branch_code",
+            "category",
+            "manager_id",
+            "recruiter_id",
+            "hire_date",
+            "adaptation_plan_url",
+            "it_access_url",
+        ):
             setattr(employee, key, getattr(data, key))
         employee.timezone = data.timezone or branch.timezone
         employee.probation_end = end
@@ -166,6 +183,17 @@ def save_employee(session, actor, data, employee_id=None):
         scenarios.rebuild_schedule(session, employee)
     employee.department = department.name
     employee.department_id = department.id
+    if employee_id:
+        employees.record_assignment(session, actor, employee, old_assignment)
+        if old_assignment != employees.assignment(employee):
+            for ticket in session.scalars(
+                select(Ticket).where(Ticket.employee_id == employee.id, Ticket.status != "closed")
+            ):
+                from .support import participant
+
+                participant(session, ticket, ticket.recruiter_id, "former")
+                ticket.recruiter_id = employee.recruiter_id
+                participant(session, ticket, employee.recruiter_id, "assigned")
     employee.active = data.active
     identity.active = data.active
     if not data.active:
@@ -192,7 +220,13 @@ def employee_dto(session, employee):
         branch_name=branch.name,
         max_bound=bool(identity.max_user_id),
         address_style=employee.address_style,
+        adaptation_plan_url=employee.adaptation_plan_url,
+        it_access_url=employee.it_access_url,
     )
+    from .onboarding import phase
+
+    data["onboarding_phase"] = phase(session, employee)
+    data["stage_label"] = scenarios.stage_label(session, employee)
     return data
 
 
@@ -217,6 +251,9 @@ def branch_dto(session, branch):
         "active": branch.active,
         "revision": branch.revision,
         "employee_count": count,
+        "workplace": branch.workplace,
+        "late_join_policy": branch.late_join_policy,
+        "support_recipient_ids": branch.support_recipient_ids,
     }
 
 
@@ -312,7 +349,12 @@ def save_survey(session, actor, data, template_id=None):
         template = SurveyTemplate(id=uid(), created_by=actor.id)
         session.add(template)
     definition = SurveyDefinition(
-        id=template.id, title=data.title, questions=data.questions, reminder_days=data.reminder_days
+        id=template.id,
+        title=data.title,
+        questions=data.questions,
+        reminder_days=data.reminder_days,
+        kind=data.kind,
+        pass_percent=data.pass_percent,
     )
     template.title, template.description = data.title, data.description
     template.branch_codes = data.branch_codes

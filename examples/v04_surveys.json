@@ -1,0 +1,181 @@
+{
+  "version": "0.4",
+  "M15": [
+    {
+      "id": "W2Q01",
+      "source_cell": "F47",
+      "raw_segment": "Вам понятны поставленные задачи? (да/нет) \nПри отрицательном варианте в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+      "display_label_summary": "Вам понятны поставленные задачи?",
+      "type": "yes_no",
+      "min": null,
+      "max": null,
+      "required": true,
+      "required_basis": "К: SC-K06",
+      "comment_when": "no",
+      "comment_required_when_triggered": true,
+      "optional_comment_on_positive": false,
+      "next": "W2Q02"
+    },
+    {
+      "id": "W2Q02",
+      "source_cell": "F47",
+      "raw_segment": "Вам достаточно информации для качественного выполнения вашей работы (да/нет)\nПри отрицательном варианте в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+      "display_label_summary": "Вам достаточно информации для качественного выполнения вашей работы?",
+      "type": "yes_no",
+      "min": null,
+      "max": null,
+      "required": true,
+      "required_basis": "К: SC-K06",
+      "comment_when": "no",
+      "comment_required_when_triggered": true,
+      "optional_comment_on_positive": false,
+      "next": "W2Q03"
+    },
+    {
+      "id": "W2Q03",
+      "source_cell": "F47",
+      "raw_segment": "Насколько доступен ваш руководитель для вопросов и обратной связи? (шкала 1 - недоступен, 10 - всегда доступен) + поле для комментария. В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+      "display_label_summary": "Насколько доступен ваш руководитель для вопросов и обратной связи?",
+      "type": "rating",
+      "min": 1,
+      "max": 10,
+      "required": true,
+      "required_basis": "К: SC-K06",
+      "comment_when": "below_8",
+      "comment_required_when_triggered": true,
+      "optional_comment_on_positive": true,
+      "next": "W2Q04"
+    },
+    {
+      "id": "W2Q04",
+      "source_cell": "F47",
+      "raw_segment": "Оцените качество обратной связи от руководителя. (шкала 1 - отсутствует, 10 – исчерпывающая) + поле для комментария. В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+      "display_label_summary": "Оцените качество обратной связи от руководителя",
+      "type": "rating",
+      "min": 1,
+      "max": 10,
+      "required": true,
+      "required_basis": "К: SC-K06",
+      "comment_when": "below_8",
+      "comment_required_when_triggered": true,
+      "optional_comment_on_positive": true,
+      "next": "W2Q05"
+    },
+    {
+      "id": "W2Q05",
+      "source_cell": "F47",
+      "raw_segment": "Насколько ваши коллеги оказывают поддержку при появлении вопросов или сложностей в работе (Шкала 1 - нет взаимодействия, 10 - отличное взаимодействие) + поле для комментария. В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+      "display_label_summary": "Насколько ваши коллеги оказывают поддержку при появлении вопросов или сложностей в работе?",
+      "type": "rating",
+      "min": 1,
+      "max": 10,
+      "required": true,
+      "required_basis": "К: SC-K06",
+      "comment_when": "below_8",
+      "comment_required_when_triggered": true,
+      "optional_comment_on_positive": true,
+      "next": "W2Q06"
+    },
+    {
+      "id": "W2Q06",
+      "source_cell": "F47",
+      "raw_segment": "Оцените уровень поддержки по вопросам связанным с настройкой и предоставлением доступов/техники/рабочего пространства. (шкала 1 - низкий, 10 – высокий)  + поле для комментария. В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+      "display_label_summary": "Оцените уровень поддержки по вопросам настройки и предоставления доступов, техники и рабочего пространства",
+      "type": "rating",
+      "min": 1,
+      "max": 10,
+      "required": true,
+      "required_basis": "К: SC-K06",
+      "comment_when": "below_8",
+      "comment_required_when_triggered": true,
+      "optional_comment_on_positive": true,
+      "next": "W2Q07"
+    },
+    {
+      "id": "W2Q07",
+      "source_cell": "F47",
+      "raw_segment": "Насколько своевременно были предоставлены необходимые доступы. Обязательное поле (1 - были задержки, 10 - без задержек) + поле для комментария. В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+      "display_label_summary": "Насколько своевременно были предоставлены необходимые доступы?",
+      "type": "rating",
+      "min": 1,
+      "max": 10,
+      "required": true,
+      "required_basis": "ТЗ: явное поле",
+      "comment_when": "below_8",
+      "comment_required_when_triggered": true,
+      "optional_comment_on_positive": true,
+      "next": "W2Q08"
+    },
+    {
+      "id": "W2Q08",
+      "source_cell": "F47",
+      "raw_segment": "Как вы оцениваете качество поддержки от HR по возникающим вопросам? 1 - низкое, 10 - очень высокое + поле для комментария (В случае ответа ниже 8). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+      "display_label_summary": "Как вы оцениваете качество поддержки от HR по возникающим вопросам?",
+      "type": "rating",
+      "min": 1,
+      "max": 10,
+      "required": true,
+      "required_basis": "К: SC-K06",
+      "comment_when": "below_8",
+      "comment_required_when_triggered": true,
+      "optional_comment_on_positive": false,
+      "next": "W2Q09"
+    },
+    {
+      "id": "W2Q09",
+      "source_cell": "F47",
+      "raw_segment": "Оцените, пожалуйста, качество поддержки HR в подготовке к трудоустройству? 1 - низкое, 10 - очень высокое + поле для комментария (В случае ответа ниже 8). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+      "display_label_summary": "Оцените качество поддержки HR в подготовке к трудоустройству",
+      "type": "rating",
+      "min": 1,
+      "max": 10,
+      "required": true,
+      "required_basis": "К: SC-K06",
+      "comment_when": "below_8",
+      "comment_required_when_triggered": true,
+      "optional_comment_on_positive": false,
+      "next": "completed"
+    }
+  ],
+  "M14": {
+    "source_cells": [
+      "F39",
+      "F40",
+      "F41"
+    ],
+    "next_after": [
+      "F40",
+      "F41",
+      "F42"
+    ],
+    "human_route": "P07"
+  },
+  "M16": {
+    "source_cells": [
+      "F49"
+    ],
+    "human_route": "P07"
+  },
+  "M18": {
+    "source_cells": [
+      "F55",
+      "F56",
+      "F57"
+    ],
+    "nobody_exclusive": true,
+    "remote_option_branches": [
+      "GrPP",
+      "Luzhniki"
+    ],
+    "human_route": "P07"
+  },
+  "M21": {
+    "source_cells": [
+      "F62",
+      "F63",
+      "F65"
+    ],
+    "excluded_optional_cell": "F64",
+    "human_route": "P07"
+  }
+}

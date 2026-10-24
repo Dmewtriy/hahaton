@@ -7,6 +7,7 @@ import {
   empty,
   dateTime,
   textarea,
+  select,
   drawer,
   notify,
   toolbar,
@@ -30,6 +31,7 @@ export async function ticketsPage(ctx) {
     scope: "mine",
     unreadOnly: false,
   });
+  const retained = await ctx.api.get("/api/support/retained-cases");
   let rows = await ctx.api.get(
       `/api/admin/inbox?scope=${state.scope}&archived=${state.archived}`,
     ),
@@ -95,7 +97,10 @@ export async function ticketsPage(ctx) {
       ) +
       `<div class="inbox-controls"><div class="segmented" aria-label="Область переписки"><button data-action="scope" data-id="mine" class="${state.scope === "mine" ? "active" : ""}">Мои сотрудники</button><button data-action="scope" data-id="all" class="${state.scope === "all" ? "active" : ""}">Вся моя область</button></div><label class="check"><input type="checkbox" data-unread-only ${state.unreadOnly ? "checked" : ""}>Только новые</label></div>` +
       toolbar("Имя или подразделение", ctx.refs.branches, state) +
-      "<div data-list></div>",
+      "<div data-list></div>" +
+      (retained.length
+        ? `<div class="card"><h2>Сохранённый доступ к обращениям</h2><p class="muted">История ранее закреплённых за вами обращений. Другие данные сотрудника за пределами вашей текущей области недоступны.</p>${retained.map((t) => `<div class="tick-row"><div><strong>${e(t.employee_name)}</strong><p>${e(t.reason)} · ${badge(t.status)}</p></div>${button("История обращения", "retained", t.id)}</div>`).join("")}</div>`
+        : ""),
     bind: (target) => {
       container = target;
       render();
@@ -106,6 +111,7 @@ export async function ticketsPage(ctx) {
         render();
       };
       delegate(target, async (action, id) => {
+        if (action === "retained") return ticketDetail(ctx, id);
         if (action === "thread") return threadDetail(ctx, id);
         if (action === "scope") {
           state.scope = id;
@@ -124,6 +130,13 @@ export async function ticketsPage(ctx) {
 
 export async function ticketDetail(ctx, ticketId) {
   const ticket = await ctx.api.get(`/api/tickets/${ticketId}`);
+  if (!ticket.can_reply) {
+    drawer(
+      "История обращения №" + ticket.id.slice(0, 8),
+      `<div class="notice">Сохранён доступ только к этому обращению. Для работы с другими данными нужна действующая область HR.</div><h3>${e(ticket.reason)}</h3><p>${badge(ticket.status)}</p><div class="code">${e(ticket.context.question || ticket.context.message || "")}</div>${ticket.messages.map((m) => `<article class="bubble"><small>${dateTime(m.at)}</small><div>${e(m.text)}</div></article>`).join("")}${ticket.resolution ? `<h3>Предложенное решение</h3><p>${e(ticket.resolution)}</p>` : ""}`,
+    );
+    return;
+  }
   return threadDetail(ctx, ticket.employee_id);
 }
 
@@ -201,7 +214,20 @@ export async function threadDetail(ctx, employeeId) {
   };
   form = drawer(
     initial.name,
-    `<p class="muted">${e(initial.department)} · вся история общения с HR</p><div class="inbox-thread-actions">${button("Обновить переписку", "refresh-thread")}${button("Загрузить предыдущие", "older")}<span data-new-messages hidden>${button("Новые сообщения ↓", "bottom")}</span>${button("Отметить обращения решёнными", "resolve")}</div><div class="inbox-history chat" data-history></div>${initial.active ? textarea("reply", "Сообщение сотруднику", "", 'required placeholder="Напишите ответ…"') : '<div class="notice">Сотрудник в архиве. История доступна для просмотра.</div>'}<p class="draft-note">Ответ отправится в MAX. Сотрудник сможет ответить через /hr. Его опросы продолжатся независимо от переписки.</p>`,
+    `<p class="muted">${e(initial.department)} · вся история общения с HR</p><div class="inbox-thread-actions">${button("Обновить переписку", "refresh-thread")}${button("Загрузить предыдущие", "older")}<span data-new-messages hidden>${button("Новые сообщения ↓", "bottom")}</span>${initial.active ? button("Предложить решение", "resolve") : ""}</div>${select(
+      "ticket_id",
+      "Обращение для ответа",
+      initial.cases
+        .filter((t) => t.status !== "closed")
+        .map((t) => ({
+          value: t.id,
+          label: `№${t.id.slice(0, 8)} · ${t.reason} · ${t.status === "awaiting_confirmation" ? "ожидает подтверждения" : "в работе"}`,
+        })),
+      initial.cases.filter((t) => t.status !== "closed").length === 1
+        ? initial.cases.find((t) => t.status !== "closed").id
+        : "",
+      "Выберите обращение",
+    )}<div class="inbox-history chat" data-history></div>${initial.active ? textarea("reply", "Сообщение сотруднику", "", 'required placeholder="Напишите ответ…"') : '<div class="notice">Сотрудник в архиве. История доступна для просмотра.</div>'}<p class="draft-note">Ответ отправится в MAX. Сотрудник сможет ответить через /hr. Его опросы продолжатся независимо от переписки.</p>`,
     {
       submitLabel: "Отправить",
       closeOnSubmit: false,
@@ -215,7 +241,7 @@ export async function threadDetail(ctx, employeeId) {
             }
             await ctx.api.post(
               `/api/admin/inbox/${employeeId}/messages`,
-              { text },
+              { text, ticket_id: currentForm.elements.ticket_id.value || null },
               { "Idempotency-Key": requestKey },
             );
             currentForm.elements.reply.value = "";
@@ -250,10 +276,19 @@ export async function threadDetail(ctx, employeeId) {
             await markSeen();
           }
           if (action === "resolve") {
-            await ctx.api.post(`/api/admin/inbox/${employeeId}/resolve`);
+            const ticketId = currentForm.elements.ticket_id.value;
+            if (!ticketId) throw new Error("Выберите одно обращение");
+            const text = currentForm.elements.reply.value.trim();
+            if (!text) throw new Error("Напишите решение в поле ответа");
+            await ctx.api.post(
+              `/api/support/${ticketId}/resolution`,
+              { text },
+              { "Idempotency-Key": crypto.randomUUID() },
+            );
+            currentForm.elements.reply.value = "";
             await fetchNew();
             await ctx.syncInbox();
-            notify("Обращения отмечены решёнными");
+            notify("Решение отправлено. Закрытие подтвердит сотрудник");
           }
         });
         currentForm.querySelector("[data-history]").onscroll = () => {

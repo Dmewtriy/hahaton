@@ -21,6 +21,7 @@ class Identity(Base):
     token_hash: Mapped[str | None] = mapped_column(String(64), unique=True)
     max_user_id: Mapped[str | None] = mapped_column(String(64), unique=True)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
+    contact_url: Mapped[str | None] = mapped_column(String(1024))
 
 
 class Scenario(Base):
@@ -49,6 +50,9 @@ class Branch(Base):
     scenario_id: Mapped[str | None] = mapped_column(ForeignKey("scenarios.id"))
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     revision: Mapped[int] = mapped_column(Integer, default=1)
+    workplace: Mapped[dict] = mapped_column(JSON, default=dict)
+    late_join_policy: Mapped[str] = mapped_column(String(24), default="review")
+    support_recipient_ids: Mapped[list] = mapped_column(JSON, default=list)
 
 
 class Employee(Base):
@@ -72,6 +76,10 @@ class Employee(Base):
     schedule_revision: Mapped[int] = mapped_column(Integer, default=1)
     revision: Mapped[int] = mapped_column(Integer, default=1)
     department_id: Mapped[str | None] = mapped_column(ForeignKey("departments.id"), index=True)
+    onboarding_status: Mapped[str] = mapped_column(String(24), default="active")
+    onboarding_ended_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    adaptation_plan_url: Mapped[str | None] = mapped_column(String(1024))
+    it_access_url: Mapped[str | None] = mapped_column(String(1024))
 
 
 class Invitation(Base):
@@ -94,6 +102,8 @@ class ScheduledStep(Base):
     status: Mapped[str] = mapped_column(String(24), default="pending")
     payload: Mapped[dict] = mapped_column(JSON)
     campaign_id: Mapped[str | None] = mapped_column(ForeignKey("campaigns.id"), index=True)
+    order_index: Mapped[int] = mapped_column(Integer, default=0)
+    last_error: Mapped[str | None] = mapped_column(String(300))
     __table_args__ = (UniqueConstraint("employee_id", "step_key", "revision"),)
 
 
@@ -109,6 +119,9 @@ class SurveyRun(Base):
     status: Mapped[str] = mapped_column(String(24), default="active")
     started_at: Mapped[datetime] = mapped_column(UTCDateTime)
     completed_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    expires_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    result: Mapped[dict | None] = mapped_column(JSON)
+    optional_comment: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class SurveyAnswer(Base):
@@ -118,6 +131,7 @@ class SurveyAnswer(Base):
     question_id: Mapped[str] = mapped_column(String(100))
     value: Mapped[dict] = mapped_column(JSON)
     comment: Mapped[str | None] = mapped_column(Text)
+    comment_created_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime)
     __table_args__ = (UniqueConstraint("run_id", "question_id"),)
 
@@ -144,6 +158,13 @@ class Ticket(Base):
     human_mode: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime)
     closed_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    resolution: Mapped[str | None] = mapped_column(Text)
+    resolution_revision: Mapped[int] = mapped_column(Integer, default=0)
+    confirmed_by: Mapped[str | None] = mapped_column(
+        ForeignKey("identities.id", name="fk_ticket_confirmed_by")
+    )
+    confirmed_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    outcome: Mapped[str | None] = mapped_column(String(32))
 
 
 class TicketMessage(Base):
@@ -192,6 +213,11 @@ class Document(Base):
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime)
     revision: Mapped[int] = mapped_column(Integer, default=1)
+    family_id: Mapped[str | None] = mapped_column(String(32), index=True)
+    replaces_id: Mapped[str | None] = mapped_column(String(32))
+    published: Mapped[bool] = mapped_column(Boolean, default=True)
+    auto_publish: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_error: Mapped[str | None] = mapped_column(String(200))
 
 
 class ConversationMessage(Base):
@@ -306,6 +332,7 @@ class Campaign(Base):
     created_by: Mapped[str] = mapped_column(ForeignKey("identities.id"))
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
     published_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    expires_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
 
 
 class CampaignRecipient(Base):
@@ -325,3 +352,112 @@ class WebSession(Base):
     source: Mapped[str] = mapped_column(String(16))
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
     expires_at: Mapped[datetime] = mapped_column(UTCDateTime, index=True)
+
+
+class ManagerRule(Base):
+    __tablename__ = "manager_rules"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=uid)
+    recruiter_id: Mapped[str] = mapped_column(ForeignKey("identities.id"))
+    branch_code: Mapped[str] = mapped_column(ForeignKey("branches.code"))
+    manager_id: Mapped[str] = mapped_column(ForeignKey("identities.id"))
+    __table_args__ = (UniqueConstraint("recruiter_id", "branch_code"),)
+
+
+class AssignmentHistory(Base):
+    __tablename__ = "assignment_history"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=uid)
+    employee_id: Mapped[str] = mapped_column(ForeignKey("employees.id"), index=True)
+    actor_id: Mapped[str] = mapped_column(ForeignKey("identities.id"))
+    previous: Mapped[dict] = mapped_column(JSON)
+    current: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
+
+
+class MeetingSignal(Base):
+    __tablename__ = "meeting_signals"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=uid)
+    employee_id: Mapped[str] = mapped_column(ForeignKey("employees.id"), index=True)
+    analysis_id: Mapped[str] = mapped_column(ForeignKey("feedback_analyses.id"), unique=True)
+    manager_id: Mapped[str | None] = mapped_column(ForeignKey("identities.id"))
+    status: Mapped[str] = mapped_column(String(24), default="pending")
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
+
+
+class DigestSnapshot(Base):
+    __tablename__ = "digest_snapshots"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=uid)
+    recipient_id: Mapped[str] = mapped_column(ForeignKey("identities.id"), index=True)
+    request_key: Mapped[str] = mapped_column(String(240), unique=True)
+    report: Mapped[dict] = mapped_column(JSON)
+    provenance: Mapped[dict] = mapped_column(JSON)
+    text: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
+
+
+class RouteRun(Base):
+    __tablename__ = "route_runs"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=uid)
+    employee_id: Mapped[str] = mapped_column(ForeignKey("employees.id"), index=True)
+    scheduled_step_id: Mapped[str] = mapped_column(ForeignKey("scheduled_steps.id"), unique=True)
+    definition: Mapped[list] = mapped_column(JSON)
+    position: Mapped[int] = mapped_column(Integer, default=0)
+    answers: Mapped[dict] = mapped_column(JSON, default=dict)
+    trace: Mapped[list] = mapped_column(JSON, default=list)
+    status: Mapped[str] = mapped_column(String(32), default="active")
+    last_error: Mapped[str | None] = mapped_column(String(300))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
+
+
+class Material(Base):
+    __tablename__ = "materials"
+    key: Mapped[str] = mapped_column(String(100), primary_key=True)
+    title: Mapped[str] = mapped_column(String(300))
+    source_ref: Mapped[str] = mapped_column(String(100))
+    branch_codes: Mapped[list] = mapped_column(JSON)
+    required: Mapped[bool] = mapped_column(Boolean, default=True)
+    document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"))
+    url: Mapped[str | None] = mapped_column(String(1024))
+    owner: Mapped[str] = mapped_column(String(200), default="HR")
+    revision: Mapped[int] = mapped_column(Integer, default=1)
+
+
+class TicketParticipant(Base):
+    __tablename__ = "ticket_participants"
+    ticket_id: Mapped[str] = mapped_column(ForeignKey("tickets.id"), primary_key=True)
+    identity_id: Mapped[str] = mapped_column(ForeignKey("identities.id"), primary_key=True)
+    kind: Mapped[str] = mapped_column(String(24))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
+
+
+class HelpSession(Base):
+    __tablename__ = "help_sessions"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=uid)
+    employee_id: Mapped[str] = mapped_column(ForeignKey("employees.id"), index=True)
+    context: Mapped[dict] = mapped_column(JSON, default=dict)
+    question: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(32), default="question")
+    answer: Mapped[str | None] = mapped_column(Text)
+    ticket_id: Mapped[str | None] = mapped_column(ForeignKey("tickets.id"))
+    processor_version: Mapped[str | None] = mapped_column(String(100))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
+
+
+class NlpEvent(Base):
+    __tablename__ = "nlp_events"
+    event_id: Mapped[str] = mapped_column(String(150), primary_key=True)
+    answer_id: Mapped[str] = mapped_column(ForeignKey("survey_answers.id"), index=True)
+    payload: Mapped[dict] = mapped_column(JSON)
+    payload_hash: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
+
+
+class ExportFile(Base):
+    __tablename__ = "export_files"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=uid)
+    actor_id: Mapped[str] = mapped_column(ForeignKey("identities.id"), index=True)
+    filters: Mapped[dict] = mapped_column(JSON)
+    employee_ids: Mapped[list] = mapped_column(JSON)
+    filename: Mapped[str] = mapped_column(String(200))
+    row_count: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime)

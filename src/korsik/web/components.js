@@ -76,6 +76,10 @@ export const dateTime = (value) =>
       }).format(new Date(value))
     : "—";
 const statuses = {
+  expired: ["Срок истёк", "orange"],
+  waiting_material: ["Нужен материал", "red"],
+  late_review: ["Решение HR", "orange"],
+  awaiting_confirmation: ["Подтверждение сотрудника", "purple"],
   active: ["Активен", "green"],
   invited: ["Ждёт подключения", "orange"],
   stopped: ["Отключён", ""],

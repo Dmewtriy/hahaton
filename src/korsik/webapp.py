@@ -10,7 +10,7 @@ from urllib.parse import parse_qsl
 from fastapi import HTTPException
 from sqlalchemy import select
 
-from .access import is_admin, new_token, token_hash
+from .access import can_use_workspace, new_token, token_hash
 from .db import utcnow
 from .models import Identity, WebSession
 
@@ -60,13 +60,13 @@ def validate_init_data(raw, bot_token, max_age_seconds=3600, current_time=None):
 def launch_session(session, settings, raw):
     user_id, expires_at = validate_init_data(raw, settings.max_token, settings.webapp_auth_max_age_seconds)
     actor = session.scalar(select(Identity).where(Identity.max_user_id == user_id))
-    if not actor or not is_admin(actor):
+    if not actor or not can_use_workspace(actor):
         raise HTTPException(403, "Для вашего аккаунта MAX нет доступа к кабинету HR")
     return issue_session(session, actor, "max", expires_at)
 
 
 def issue_session(session, actor, source, expires_at=None):
-    if not is_admin(actor):
+    if not can_use_workspace(actor):
         raise HTTPException(403, "Кабинет доступен только администраторам и HR")
     token = new_token()
     expires_at = expires_at or utcnow() + timedelta(hours=1)

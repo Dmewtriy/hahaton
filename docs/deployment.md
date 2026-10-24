@@ -35,7 +35,7 @@ docker compose exec api python -m korsik.cli seed-demo
 docker compose ps
 ```
 
-`seed-demo` выполняется только для новой учебной БД. Миграции запускаются автоматически перед API/worker; текущая последняя — `0003`. БД и файлы сохраняются в volumes `korsik_postgres_data` и `korsik_app_data`.
+`seed-demo` выполняется только для новой учебной БД. Миграции запускаются автоматически перед API/worker; текущая последняя — `0004`. БД и файлы сохраняются в volumes `korsik_postgres_data` и `korsik_app_data`.
 
 - Кабинет HR: http://127.0.0.1:8000/dashboard
 - Swagger/API: http://127.0.0.1:8000/docs
@@ -83,7 +83,7 @@ docker compose logs --tail 50 api worker
 docker compose exec api python -m pytest -q -p no:cacheprovider --basetemp=/tmp/korsik-check
 ```
 
-Тесты используют временные БД и mock MAX/ML. Последний полный прогон: **95 passed, 1 skipped**; PostgreSQL-тест запускается отдельно. Для собственного изолированного development-стенда: `docker compose exec api python scripts/check_postgres.py` — создаст схему `korsik_validation`, проверит миграции и очередь. Не запускать этот скрипт на production.
+Тесты используют временные БД и mock MAX/ML. Последний полный прогон: **118 passed, 1 skipped**; PostgreSQL-тест запускается отдельно. Для собственного изолированного development-стенда: `docker compose exec api python scripts/check_postgres.py` — создаст схему `korsik_validation`, проверит миграции и очередь. Не запускать этот скрипт на production.
 
 Обновить существующий стенд:
 
@@ -134,8 +134,16 @@ docker run --rm --network none --mount type=volume,source=korsik_app_data,target
 
 ML-контракт: `docs/ml-contract.md`, `contracts/ml-v1.schema.json`; ожидаются `/v1/answer`, `/v1/analyze`, `/v1/documents`, `/v1/documents/{id}`. В `.env`: `KORSIK_ML_MODE=http`, URL и ключ. В контейнере `localhost` — сам контейнер; сервис на Windows/macOS-хосте обычно доступен через `http://host.docker.internal:9000`, в одной Docker-сети — по имени сервиса. Linux требует соответствующей сетевой настройки. При недоступности ML бот честно отказывает и передаёт вопрос HR.
 
-Для Mini App нужен публичный доверенный HTTPS: зарегистрировать `/app` в настройках бота и задать `KORSIK_WEBAPP_PUBLIC_URL=https://ваш-домен/app`. Пока работает локальный кабинет. Вход в Mini App разрешается только привязанному администратору/HR после проверки подписи; одной ссылки недостаточно.
+Для Mini App нужен публичный доверенный HTTPS: зарегистрировать `/app` в настройках бота и задать `KORSIK_WEBAPP_PUBLIC_URL=https://ваш-домен/app`. Пока работает локальный кабинет. Вход в Mini App разрешается привязанным HR/администраторам и руководителям после проверки подписи. Руководитель получает только просмотр своей команды и встреч; одной ссылки недостаточно.
 
 Production overlay требует реальных MAX/HTTP ML, PostgreSQL, сильного webhook-секрета, ML-токена и отключённого demo. Сначала настроить HTTPS reverse proxy, затем `python -m korsik.cli subscribe https://ваш-домен/webhooks/max`. В production polling запрещён. Текущий локальный стенд с заглушкой не следует объявлять production.
 
 Python без Docker: инструкция в корневом README. Детали HR-процессов — `docs/hr-guide.md`; архитектура — `docs/architecture-v2.md`. Сверки с кейсом и системным анализом передаются отдельно и не хранятся в Git.
+
+## Обновление до миграции 0004
+
+Перед обновлением существующего стенда остановите `api`, `worker`, `poll`, сохраните дамп PostgreSQL и архив тома `app_data` по инструкциям этого файла. `.env` с текущим паролем БД/ключами сохраняется. Затем запустите `docker compose --profile max-poll up -d --build`: сервис `migrate` должен успешно завершиться до запуска приложения. Проверка: `docker compose exec api python -m alembic current` показывает `0005`, API healthy, worker и polling работают.
+
+Для обновления подсказок команд, включая `/places`, выполните `docker compose exec api python -m korsik.cli sync-commands`. Предыдущий список сохранится в `app_data/backups`. Одновременно допускается только один poller этого MAX-токена.
+
+До публичного HTTPS кабинет остаётся локальным. Вход руководителя даёт только просмотр команды/встреч; административные операции продолжают требовать HR-права. Настоящая ML-служба по-прежнему подключается отдельно по существующему контракту.

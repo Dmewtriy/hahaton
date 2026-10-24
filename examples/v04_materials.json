@@ -1,0 +1,459 @@
+{
+  "version": "0.4",
+  "items": [
+    {
+      "id": "MAT-R003",
+      "source_ref": "XLS1-R003",
+      "cell": "I3",
+      "label": "Изображение 14",
+      "mandatory": true,
+      "scope_source": {
+        "B": "За 2-3 дня до выхода на работу",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R004",
+      "source_ref": "XLS1-R004",
+      "cell": "I4",
+      "label": "Изображение 2",
+      "mandatory": true,
+      "scope_source": {
+        "B": "За 2-3 дня до выхода на работу",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R008",
+      "source_ref": "XLS1-R008",
+      "cell": "I8",
+      "label": "Изображение 1",
+      "mandatory": true,
+      "scope_source": {
+        "B": "За 2-3 дня до выхода на работу",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R009",
+      "source_ref": "XLS1-R009",
+      "cell": "I9",
+      "label": "Изображение 3",
+      "mandatory": true,
+      "scope_source": {
+        "B": "За 2-3 дня до выхода на работу",
+        "D": "GrPP, Luzhniki"
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R010",
+      "source_ref": "XLS1-R010",
+      "cell": "I10",
+      "label": "Изображение 3",
+      "mandatory": true,
+      "scope_source": {
+        "B": "За 2-3 дня до выхода на работу",
+        "D": "GTP"
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R017",
+      "source_ref": "XLS1-R017",
+      "cell": "I17",
+      "label": "Изображение 3",
+      "mandatory": true,
+      "scope_source": {
+        "B": "За день до выхода на работу",
+        "D": "Напомнить кандидату о списке документов, необходимых для оформления"
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R018",
+      "source_ref": "XLS1-R018",
+      "cell": "I18",
+      "label": "Изображение 4",
+      "mandatory": true,
+      "scope_source": {
+        "B": "В первый рабочий день в 10:00",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R024",
+      "source_ref": "XLS1-R024",
+      "cell": "I24",
+      "label": "Изображение Открытка №1",
+      "mandatory": false,
+      "scope_source": {
+        "B": "В первый рабочий день в 12:01",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R026",
+      "source_ref": "XLS1-R026",
+      "cell": "I26",
+      "label": "Изображение 5",
+      "mandatory": true,
+      "scope_source": {
+        "B": "В случае варианта ответа\n «Да»",
+        "D": "GrPP"
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R027",
+      "source_ref": "XLS1-R027",
+      "cell": "I27",
+      "label": "Изображение 5",
+      "mandatory": true,
+      "scope_source": {
+        "B": "В случае варианта ответа\n «Да»",
+        "D": "Luzhniki"
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R028",
+      "source_ref": "XLS1-R028",
+      "cell": "I28",
+      "label": "Изображение 5",
+      "mandatory": true,
+      "scope_source": {
+        "B": "В случае варианта ответа\n «Да»",
+        "D": "GTP"
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R030",
+      "source_ref": "XLS1-R030",
+      "cell": "I30",
+      "label": "Изображение 6",
+      "mandatory": true,
+      "scope_source": {
+        "B": "В первый рабочий день 13.00",
+        "D": "GrPP, Luzhniki"
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R031",
+      "source_ref": "XLS1-R031",
+      "cell": "I31",
+      "label": "Изображение 6",
+      "mandatory": true,
+      "scope_source": {
+        "B": "В первый рабочий день 13.00",
+        "D": "GTP"
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R033",
+      "source_ref": "XLS1-R033",
+      "cell": "I33",
+      "label": "Изображение 10",
+      "mandatory": true,
+      "scope_source": {
+        "B": "В первый рабочий день В 18:00 для сотрудников офиса",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R036",
+      "source_ref": "XLS1-R036",
+      "cell": "I36",
+      "label": "Изображение 7",
+      "mandatory": false,
+      "scope_source": {
+        "B": null,
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R044",
+      "source_ref": "XLS1-R044",
+      "cell": "I44",
+      "label": "Изображение 11",
+      "mandatory": false,
+      "scope_source": {
+        "B": "Через 10 дней после выхода на работу",
+        "D": "GrPP, Luzhniki"
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R045",
+      "source_ref": "XLS1-R045",
+      "cell": "I45",
+      "label": "ФОТО",
+      "mandatory": false,
+      "scope_source": {
+        "B": "Через 10 дней после выхода на работу",
+        "D": "GrPP, Luzhniki"
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R047",
+      "source_ref": "XLS1-R047",
+      "cell": "I47",
+      "label": "Изображение 14",
+      "mandatory": true,
+      "scope_source": {
+        "B": "Через 2 недели после выхода на работу",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R048",
+      "source_ref": "XLS1-R048",
+      "cell": "I48",
+      "label": "Изображение 10",
+      "mandatory": true,
+      "scope_source": {
+        "B": "Первый день второго месяца работы в 09.00. ",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R049",
+      "source_ref": "XLS1-R049",
+      "cell": "I49",
+      "label": "Изображение 7",
+      "mandatory": true,
+      "scope_source": {
+        "B": "Первый день второго месяца работы в 09.00. ",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R050",
+      "source_ref": "XLS1-R050",
+      "cell": "I50",
+      "label": "Изображение 15",
+      "mandatory": false,
+      "scope_source": {
+        "B": "Через 1 месяц и  2 недели",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R053",
+      "source_ref": "XLS1-R053",
+      "cell": "I53",
+      "label": "Изображение 8",
+      "mandatory": true,
+      "scope_source": {
+        "B": "Через 1 месяц и  3 недели",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R058",
+      "source_ref": "XLS1-R058",
+      "cell": "I58",
+      "label": "Изображение 9",
+      "mandatory": true,
+      "scope_source": {
+        "B": "Первый день третьего месяца в 09.00",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R060",
+      "source_ref": "XLS1-R060",
+      "cell": "I60",
+      "label": "Изображение Открытка №2",
+      "mandatory": true,
+      "scope_source": {
+        "B": "Через 2 месяца и 2 недели",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R061",
+      "source_ref": "XLS1-R061",
+      "cell": "I61",
+      "label": "Изображение 10",
+      "mandatory": true,
+      "scope_source": {
+        "B": "Последний день испытат. срока в 09.00",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R068",
+      "source_ref": "XLS1-R068",
+      "cell": "I68",
+      "label": "Изображение 16",
+      "mandatory": true,
+      "scope_source": {
+        "B": null,
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R069",
+      "source_ref": "XLS1-R069",
+      "cell": "I69",
+      "label": "Изображение 13",
+      "mandatory": false,
+      "scope_source": {
+        "B": "Если сотрудник задаст вопрос Корсику (просто так) ",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "MAT-R070",
+      "source_ref": "XLS1-R070",
+      "cell": "I70",
+      "label": "Изображение 12",
+      "mandatory": false,
+      "scope_source": {
+        "B": "Если Корсик запустил опрос, а сотрудник НЕ прошел его в течение 1 дня (напомнить на завтра + на послезавтра)",
+        "D": null
+      },
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "RES-R011",
+      "source_ref": "XLS1-R011",
+      "cell": "F11/E11",
+      "label": "Маршрут и расписание GrPP",
+      "mandatory": true,
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "RES-R012",
+      "source_ref": "XLS1-R012",
+      "cell": "F12/E12",
+      "label": "Маршрут и расписание GTP",
+      "mandatory": true,
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "RES-R013",
+      "source_ref": "XLS1-R013",
+      "cell": "F13/E13",
+      "label": "Как добраться Luzhniki",
+      "mandatory": true,
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "RES-R020",
+      "source_ref": "XLS1-R020",
+      "cell": "F20/E20",
+      "label": "Карта территории GTP",
+      "mandatory": true,
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "RES-R021",
+      "source_ref": "XLS1-R021",
+      "cell": "F21/E21",
+      "label": "Карта этажей Luzhniki",
+      "mandatory": true,
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "RES-R026",
+      "source_ref": "XLS1-R026",
+      "cell": "F26/E26",
+      "label": "PDF питания GrPP",
+      "mandatory": true,
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "RES-R027",
+      "source_ref": "XLS1-R027",
+      "cell": "F27/E27",
+      "label": "PDF питания Luzhniki",
+      "mandatory": true,
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "RES-R028",
+      "source_ref": "XLS1-R028",
+      "cell": "F28/E28",
+      "label": "PDF питания GTP",
+      "mandatory": true,
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "RES-R032",
+      "source_ref": "XLS1-R032",
+      "cell": "F32/E32",
+      "label": "Корпоративная презентация",
+      "mandatory": true,
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    },
+    {
+      "id": "RES-R037",
+      "source_ref": "XLS1-R037",
+      "cell": "F37/E37",
+      "label": "Расписание и оснащение спортивного комплекса GTP",
+      "mandatory": true,
+      "availability": "not_provided_in_xlsx",
+      "owner_role": "владелец контента / HR"
+    }
+  ]
+}

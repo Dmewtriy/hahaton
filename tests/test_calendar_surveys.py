@@ -104,6 +104,10 @@ def test_ai_detour_preserves_comment_and_question_position(runtime):
         assert run.awaiting_comment and run.position == 0
     event(runtime, "Нужен доступ к системе")
     with runtime.db.transaction() as session:
+        assert session.scalar(select(SurveyRun)).awaiting_comment
+    event(runtime, "/resume")
+    event(runtime, "Причина оценки относится к опросу")
+    with runtime.db.transaction() as session:
         assert session.scalar(select(SurveyRun)).status == "completed"
 
 

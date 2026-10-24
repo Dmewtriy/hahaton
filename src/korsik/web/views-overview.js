@@ -34,12 +34,12 @@ export async function overview(ctx) {
     };
   const totals = data.totals;
   const cards = [
-    ["users", "Сотрудников в адаптации", totals.active_employees, ""],
+    ["users", "Сотрудников в адаптации", totals.onboarding_employees, ""],
     ["survey", "Незавершённых опросов", totals.active_surveys, "purple"],
     ["ticket", "Открытых обращений", totals.open_tickets, "orange"],
     ["check", "Опросов за 7 дней", totals.completed_surveys, "green"],
   ];
-  const phases = Object.entries(totals.stages);
+  const phases = Object.entries(totals.stage_titles || totals.stages);
   return {
     html:
       heading(
@@ -113,6 +113,12 @@ export async function accessPage(ctx) {
             "required",
           ) +
             `<div class="field"><span class="field-label">Рабочие роли</span>${["employee", "hr", "manager", "hr_head"].map((r) => checkbox("roles", roleName(r), item?.roles.includes(r), r)).join("")}</div>` +
+            input(
+              "contact_url",
+              "Личный контакт HR (ссылка)",
+              item?.contact_url || "",
+              "url",
+            ) +
             scopeFields +
             (trusted
               ? checkbox(
@@ -146,6 +152,7 @@ export async function accessPage(ctx) {
               const fields = formObject(form);
               const body = {
                 name: fields.name,
+                contact_url: fields.contact_url || null,
                 roles: new FormData(form).getAll("roles"),
                 branch_codes: ctx.refs.branches
                   ? readScopes(form)
@@ -186,10 +193,21 @@ export async function settingsPage(ctx) {
         "Подключение MAX, диагностика и демонстрационный календарь.",
       ) +
       `<div class="grid-2"><div class="card"><h2>Мини-приложение MAX</h2><p class="muted">${config.max_configured ? "Публичный адрес настроен. Администраторы получают кнопку кабинета в боте." : "Пока работает локальный кабинет. Для открытия внутри MAX нужен публичный HTTPS-адрес и регистрация URL у владельца бота."}</p><div class="notice">${icon("lock")}Подпись MAX и административные права проверяются на сервере. Аккаунт сотрудника не получает доступ по одной ссылке.</div></div><div class="card"><h2>Область управления</h2><p>${e(ctx.me.branch_codes.includes("*") ? "Все площадки компании" : ctx.me.branch_codes.join(", "))}</p><p class="muted">Назначенные роли: ${e(ctx.me.roles.map(roleName).join(", "))}.</p></div></div>${operations ? `<div class="card form-section"><h2>Фоновые процессы</h2><div class="grid-2"><div><span class="field-label">Задания</span><div class="code">${e(JSON.stringify(operations.jobs, null, 2))}</div></div><div><span class="field-label">Доставка</span><div class="code">${e(JSON.stringify(operations.outbox, null, 2))}</div></div></div><p class="muted">Последний сигнал worker: ${dateTime(operations.worker_heartbeat?.at)}</p></div>` : ""}${ctx.me.capabilities.demo ? `<div class="card form-section"><h2>Демонстрационный календарь</h2><p class="muted">Меняет время только этого тестового стенда. Не используйте на рабочей базе.</p><div class="field-grid">${input("test-time", "Время с часовым поясом", "", "text", 'placeholder="2026-11-06T10:00:00+03:00"')}<div class="actions">${button("Установить время", "clock")}${button("Вернуть реальное", "clock-reset")}${button("Обработать очередь", "tick")}</div></div></div>` : ""}` +
+      (ctx.me.capabilities.manage_hr
+        ? `<div class="card"><h2>Подстановки в сообщениях</h2><div class="detail-list">${ctx.refs.reference.placeholders.map((p) => `<div><code>${e(p.key)}</code><span>${e(p.description)}</span></div>`).join("")}</div><p class="muted">Значения берутся из анкеты сотрудника, площадки и назначенных HR/руководителя. Менять их можно в соответствующих карточках. Набор ключей фиксирует backend.</p>${ctx.me.branch_codes.includes("*") ? button("Установить исходный маршрут v0.4", "install-v04") : ""}</div>`
+        : "") +
       policies.html,
     bind: (container) =>
       delegate(container, async (action) => {
         if (policies.handle(action)) return;
+        if (action === "install-v04") {
+          await ctx.api.post("/api/admin/route-v04/install");
+          notify(
+            "Маршрут и реестр установлены. Назначьте сценарий площадке и загрузите материалы",
+          );
+          await ctx.refresh();
+          return;
+        }
         if (action === "tick") {
           await ctx.api.post("/api/demo/tick");
           notify("Очередь обработана");

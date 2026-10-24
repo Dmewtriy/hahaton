@@ -33,6 +33,10 @@ def is_admin(actor: Identity):
     return actor.active and (is_hr(actor) or actor.manage_access)
 
 
+def can_use_workspace(actor: Identity):
+    return actor.active and (is_admin(actor) or "manager" in actor.roles)
+
+
 def can_manage_people(actor: Identity):
     return actor.manage_access or is_hr(actor)
 

@@ -150,7 +150,15 @@ export async function employeeEditor(ctx, id) {
   )
     .toISOString()
     .slice(0, 10);
-  const body = `<div class="field-grid">${input("name", "Имя и фамилия", item.name || "", "text", 'required autocomplete="name"')}${select("branch_code", "Площадка", named(ctx.refs.branches, "code"), branch, null)}${input("department", "Подразделение", item.department || "", "text", 'required list="department-names"', "Можно выбрать существующее или ввести новое название.")}${select("category", "Категория сотрудника", [{ value: "office", label: "Офисный сотрудник" }, { value: "production", label: "Производство" }, ...(!["office", "production", undefined].includes(item.category) ? [{ value: item.category, label: item.category }] : [])], item.category || "office", null)}${select("recruiter_id", "Закреплённый рекрутер", [], "", "Выберите HR")}${select("manager_id", "Руководитель", [], "", "Не назначен")}${input("hire_date", "Дата выхода", item.hire_date || localToday, "date", "required")}${input("probation_end", "Окончание адаптации", item.probation_end || "", "date", "", "Пусто — три календарных месяца после выхода.")}${input("timezone", "Часовой пояс сотрудника", item.timezone || ctx.refs.branches.find((b) => b.code === branch)?.timezone || "Europe/Moscow", "text", 'required list="timezone-list"')}</div><datalist id="department-names"></datalist>${timezoneList}<div class="notice">${icon("info")}После изменения даты выхода или площадки будут пересчитаны только будущие шаги адаптации. Начатые опросы сохранятся.</div>`;
+  const body = `<div class="field-grid">${input("name", "Имя и фамилия", item.name || "", "text", 'required autocomplete="name"')}${select("branch_code", "Площадка", named(ctx.refs.branches, "code"), branch, null)}${select("department", "Подразделение", [], "", "Выберите подразделение")}${select("category", "Категория сотрудника", [{ value: "office", label: "Офисный сотрудник" }, { value: "production", label: "Производство" }, ...(!["office", "production", undefined].includes(item.category) ? [{ value: item.category, label: item.category }] : [])], item.category || "office", null)}${select("recruiter_id", "Закреплённый рекрутер", [], "", "Выберите HR")}${select("manager_id", "Руководитель", [], "", "Не назначен")}${input("hire_date", "Дата выхода", item.hire_date || localToday, "date", "required")}${input("probation_end", "Окончание адаптации", item.probation_end || "", "date", "", "Пусто — три календарных месяца после выхода.")}${select(
+    "timezone",
+    "Часовой пояс сотрудника",
+    ctx.refs.reference.timezones.map((t) => ({ value: t, label: t })),
+    item.timezone ||
+      ctx.refs.branches.find((b) => b.code === branch)?.timezone ||
+      "Europe/Moscow",
+    null,
+  )}${input("adaptation_plan_url", "Персональный адаптационный план", item.adaptation_plan_url || "", "url")}${input("it_access_url", "Подготовленные ИТ-доступы", item.it_access_url || "", "url")}</div><p class="draft-note">Подразделения создаются в разделе «Подразделения». Ссылки на персональные материалы предоставляются ответственным HR.</p><div class="notice">${icon("info")}После изменения даты выхода или площадки будут пересчитаны только будущие шаги адаптации. Начатые опросы сохранятся.</div>`;
   drawer(id ? "Редактировать сотрудника" : "Новый сотрудник", body, {
     subtitle: id ? item.name : "Пригласите человека в адаптацию",
     submitLabel: id ? "Сохранить изменения" : "Создать сотрудника",
@@ -165,7 +173,7 @@ export async function employeeEditor(ctx, id) {
             s.roles.some((r) => role.includes(r)),
           );
           form.elements[name].innerHTML =
-            `<option value="">${name === "manager_id" ? "Не назначен" : "Выберите рекрутера"}</option>` +
+            `<option value="">${name === "manager_id" ? "По правилу HR или подразделения" : "Выберите рекрутера"}</option>${name === "manager_id" ? '<option value="__none__">Оставить без руководителя</option>' : ""}` +
             list
               .map(
                 (s) =>
@@ -178,11 +186,40 @@ export async function employeeEditor(ctx, id) {
           ["hr", "hr_head"],
           initial ? item.recruiter_id || ctx.me.id : ctx.me.id,
         );
-        replace("manager_id", ["manager"], initial ? item.manager_id : "");
-        form.querySelector("#department-names").innerHTML = ctx.refs.departments
-          .filter((d) => d.branch_code === code)
-          .map((d) => `<option value="${e(d.name)}"></option>`)
-          .join("");
+        replace(
+          "manager_id",
+          ["manager"],
+          initial
+            ? id && !item.manager_id
+              ? "__none__"
+              : item.manager_id
+            : "",
+        );
+        if (initial && id && !item.manager_id)
+          form.elements.manager_id.value = "__none__";
+        form.elements.department.innerHTML =
+          '<option value="">Выберите подразделение</option>' +
+          ctx.refs.departments
+            .filter((d) => d.branch_code === code)
+            .map(
+              (d) =>
+                `<option value="${e(d.name)}" ${initial && d.name === item.department ? "selected" : ""}>${e(d.name)}</option>`,
+            )
+            .join("");
+        if (
+          initial &&
+          item.department &&
+          ![...form.elements.department.options].some(
+            (o) => o.value === item.department,
+          )
+        ) {
+          const option = document.createElement("option");
+          option.value = item.department;
+          option.textContent = item.department + " (текущее)";
+          option.selected = true;
+          form.elements.department.append(option);
+        }
+        form.elements.department.required = true;
         if (!initial) {
           form.elements.department.value = "";
           form.elements.timezone.value =
@@ -201,8 +238,12 @@ export async function employeeEditor(ctx, id) {
         );
       const body = {
         ...data,
-        manager_id: data.manager_id || null,
+        manager_id:
+          data.manager_id === "__none__" ? null : data.manager_id || null,
+        auto_assign_manager: data.manager_id !== "__none__",
         probation_end: data.probation_end || null,
+        adaptation_plan_url: data.adaptation_plan_url || null,
+        it_access_url: data.it_access_url || null,
         department_id: department?.id || null,
         revision: item.revision || null,
         active: item.active ?? true,
@@ -229,12 +270,22 @@ export async function employeeDetail(ctx, id) {
     ["Руководитель", item.manager_name],
     ["Выход", date(item.hire_date)],
     ["Окончание адаптации", date(item.probation_end)],
+    [
+      "Состояние адаптации",
+      {
+        active: "Адаптация",
+        preboarding: "До выхода",
+        completed: "Завершена",
+        stopped: "Остановлена",
+        invited: "Ожидает подключения",
+      }[item.onboarding_phase] || item.onboarding_phase,
+    ],
   ];
   const schedule = item.schedule.filter((s) => s.status !== "cancelled");
   const answersHtml = item.surveys
     .map(
       (run) =>
-        `<div class="form-section"><div class="card-header"><h3>${e(run.definition.title)}</h3>${badge(run.status)}</div>${
+        `<div class="form-section"><div class="card-header"><h3>${e(run.definition.title)}</h3>${badge(run.status)}</div>${run.result ? `<p>Результат теста: ${run.result.points} / ${run.result.maximum} (${run.result.percent}%). ${run.result.passed ? "Пройден" : "Порог не достигнут"}.</p>` : ""}${run.expires_at ? `<p>Срок: ${dateTime(run.expires_at)}</p>` : ""}${
           run.answers.length
             ? run.answers
                 .map((a) => {
@@ -258,7 +309,7 @@ export async function employeeDetail(ctx, id) {
     .join("");
   drawer(
     item.name,
-    `<div class="actions">${badge(item.status)}${button("Редактировать", "edit", id)}${item.active ? button("Пригласить в MAX", "invite", id) : ""}</div><div class="spacer"></div><div class="detail-list">${fields.map(([key, value]) => `<div><span>${key}</span><strong>${e(value)}</strong></div>`).join("")}</div><div class="detail-tab"><button type="button" data-tab="timeline" class="active">План адаптации</button><button type="button" data-tab="answers">Ответы на опросы</button></div><div data-panel="timeline">${schedule.length ? schedule.map((s) => `<div class="tick-row"><span class="tick-dot"></span><div style="flex:1"><strong>${e(s.text.slice(0, 120))}</strong><p>${dateTime(s.due_at)} · ${s.campaign_id ? "Рассылка HR" : "Адаптация"}</p></div><div>${badge(s.status)}${s.status === "manual" ? button("Запустить", "trigger", s.id) : ""}</div></div>`).join("") : empty("План пока не назначен", "Выберите сценарий для площадки сотрудника.")}</div><div data-panel="answers" hidden>${answersHtml || empty("Опросов пока нет", "Здесь появятся ответы сотрудника и прогресс прохождения.")}</div>`,
+    `<div class="actions">${badge(item.status)}${button("Редактировать", "edit", id)}${item.onboarding_status === "active" ? button("Завершить адаптацию", "onboarding-complete", id) + button("Остановить адаптацию", "onboarding-stop", id) : button("Возобновить адаптацию", "onboarding-resume", id)}${item.active ? button("Пригласить в MAX", "invite", id) : ""}</div><div class="spacer"></div><div class="detail-list">${fields.map(([key, value]) => `<div><span>${key}</span><strong>${e(value)}</strong></div>`).join("")}</div><div class="detail-tab"><button type="button" data-tab="timeline" class="active">План адаптации</button><button type="button" data-tab="answers">Ответы на опросы</button></div><div data-panel="timeline">${schedule.length ? schedule.map((s) => `<div class="tick-row"><span class="tick-dot"></span><div style="flex:1"><strong>${e(s.text.slice(0, 120))}</strong><p>${dateTime(s.due_at)} · ${s.campaign_id ? "Рассылка HR" : "Адаптация"}</p></div><div>${badge(s.status)}${["manual", "late_review"].includes(s.status) ? button("Запустить", "trigger", s.id) : ""}</div></div>`).join("") : empty("План пока не назначен", "Выберите сценарий для площадки сотрудника.")}</div><div data-panel="answers" hidden>${answersHtml || empty("Опросов пока нет", "Здесь появятся ответы сотрудника и прогресс прохождения.")}</div>`,
     {
       bind: (form) => {
         form.querySelectorAll("[data-tab]").forEach(
@@ -275,6 +326,22 @@ export async function employeeDetail(ctx, id) {
         delegate(form, async (action, key) => {
           if (action === "edit") return employeeEditor(ctx, id);
           if (action === "invite") return invitation(ctx, id);
+          if (action.startsWith("onboarding-")) {
+            if (
+              !(await confirmAction(
+                "Изменить состояние адаптации?",
+                "Общий доступ, переписка HR и общие рассылки сохраняются. Начатые ответы остаются в истории.",
+                "Подтвердить",
+              ))
+            )
+              return;
+            await ctx.api.post(`/api/admin/employees/${id}/onboarding`, {
+              action: action.slice(11),
+            });
+            notify("Состояние адаптации изменено");
+            await employeeDetail(ctx, id);
+            return;
+          }
           if (action === "trigger") {
             await ctx.api.post(`/api/steps/${key}/trigger`);
             notify("Шаг поставлен в очередь");
@@ -286,8 +353,6 @@ export async function employeeDetail(ctx, id) {
   );
 }
 
-export const timezoneList =
-  '<datalist id="timezone-list"><option value="Europe/Moscow"><option value="Europe/Samara"><option value="Asia/Yekaterinburg"><option value="Asia/Novosibirsk"><option value="Asia/Krasnoyarsk"><option value="Asia/Irkutsk"><option value="Asia/Vladivostok"></datalist>';
 const resourceNames = {
   food: "Питание",
   map: "Карта",
@@ -391,7 +456,13 @@ function branchEditor(ctx, item = {}) {
     }));
   drawer(
     item.code ? "Настройки площадки" : "Новая площадка",
-    `<div class="field-grid">${input("name", "Название", item.name || "", "text", "required")}${input("code", "Короткий код", item.code || "", "text", `required pattern="[A-Za-z0-9_-]{1,64}" ${item.code ? "readonly" : ""}`, "Латинские буквы, цифры, дефис. После создания не меняется.")}${input("timezone", "Часовой пояс", item.timezone || "Europe/Moscow", "text", 'required list="timezone-list"')}${select(
+    `<div class="field-grid">${input("name", "Название", item.name || "", "text", "required")}${input("code", "Короткий код", item.code || "", "text", `required pattern="[A-Za-z0-9_-]{1,64}" ${item.code ? "readonly" : ""}`, "Латинские буквы, цифры, дефис. После создания не меняется.")}${select(
+      "timezone",
+      "Часовой пояс",
+      ctx.refs.reference.timezones.map((t) => ({ value: t, label: t })),
+      item.timezone || "Europe/Moscow",
+      null,
+    )}${select(
       "scenario_id",
       "Сценарий адаптации",
       latest.map((s) => ({
@@ -400,7 +471,45 @@ function branchEditor(ctx, item = {}) {
       })),
       item.scenario_id || "",
       "Пока не назначен",
-    )}</div>${timezoneList}<div class="form-section"><h3>Рабочий календарь</h3><div class="weekday-row">${["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((name, i) => checkbox("workdays", name, (item.workdays || [0, 1, 2, 3, 4]).includes(i), String(i))).join("")}</div><div class="spacer"></div><div class="field-grid">${input("holidays", "Нерабочие даты", (item.holidays || []).join(", "), "text", 'placeholder="2026-11-04, 2027-01-01"')}${input("working_dates", "Дополнительные рабочие даты", (item.working_dates || []).join(", "), "text", 'placeholder="2026-12-26"')}</div></div><div class="form-section"><div class="card-header"><h3>Материалы площадки</h3>${button("Добавить материал", "add-resource")}</div><div data-resource-editor></div></div>`,
+    )}</div>${select(
+      "route_variant",
+      "Создать исходный маршрут v0.4 по образцу",
+      [
+        { value: "", label: "Оставить выбранный сценарий" },
+        { value: "GrPP", label: "ГрПП" },
+        { value: "GTP", label: "ГТП" },
+        { value: "Luzhniki", label: "Лужники" },
+      ],
+      "",
+      null,
+    )}<p class="draft-note">Для новой площадки можно создать собственную конфигурацию по образцу. Все материалы будут настраиваться отдельно; программирование не требуется.</p><div class="form-section"><h3>Рабочий адрес</h3><p class="muted">Используется для команды /places. Домашний адрес сотрудника не запрашивается.</p><div class="field-grid">${input("work_city", "Город", item.workplace?.city || "")}${input("work_street", "Улица", item.workplace?.street || "")}${input("work_building", "Дом / корпус", item.workplace?.building || "")}</div>${select(
+      "late_join_policy",
+      "Позднее подключение сотрудника",
+      [
+        {
+          value: "review",
+          label: "Пропущенные шаги запускает HR вручную",
+        },
+        {
+          value: "catch_up",
+          label: "Отправлять пропущенные шаги до конца адаптации",
+        },
+        {
+          value: "skip_past",
+          label: "Пропустить прошедшие шаги, оставить будущие",
+        },
+      ],
+      item.late_join_policy || "review",
+      null,
+    )}</div><div class="form-section"><h3>Другие разрешённые получатели обращений</h3><p class="muted">Помимо закреплённого рекрутера. HR должен иметь доступ к этой площадке.</p>${ctx.refs.staff
+      .filter((s) => s.roles.some((r) => ["hr", "hr_head"].includes(r)))
+      .map(
+        (s) =>
+          `<label class="check"><input type="checkbox" data-support-recipient value="${e(s.id)}" ${(item.support_recipient_ids || []).includes(s.id) ? "checked" : ""}>${e(s.name)}</label>`,
+      )
+      .join(
+        "",
+      )}</div><div class="form-section"><h3>Рабочий календарь</h3><div class="weekday-row">${["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((name, i) => checkbox("workdays", name, (item.workdays || [0, 1, 2, 3, 4]).includes(i), String(i))).join("")}</div><div class="spacer"></div><div class="field-grid">${input("holidays", "Нерабочие даты", (item.holidays || []).join(", "), "text", 'placeholder="2026-11-04, 2027-01-01"')}${input("working_dates", "Дополнительные рабочие даты", (item.working_dates || []).join(", "), "text", 'placeholder="2026-12-26"')}</div></div><div class="form-section"><div class="card-header"><h3>Материалы площадки</h3>${button("Добавить материал", "add-resource")}</div><div data-resource-editor></div></div>`,
     {
       bind: (form) => {
         const render = () => {
@@ -442,6 +551,15 @@ function branchEditor(ctx, item = {}) {
         const body = {
           code: fields.code,
           name: fields.name,
+          workplace: {
+            city: fields.work_city,
+            street: fields.work_street,
+            building: fields.work_building,
+          },
+          late_join_policy: fields.late_join_policy,
+          support_recipient_ids: [
+            ...form.querySelectorAll("[data-support-recipient]:checked"),
+          ].map((x) => x.value),
           timezone: fields.timezone,
           scenario_id: fields.scenario_id || null,
           workdays,
@@ -454,10 +572,15 @@ function branchEditor(ctx, item = {}) {
           revision: item.revision || null,
           active: item.active ?? true,
         };
-        await ctx.api.put(
+        const saved = await ctx.api.put(
           `/api/admin/branches/${encodeURIComponent(body.code)}`,
           body,
         );
+        if (fields.route_variant)
+          await ctx.api.post(
+            `/api/admin/branches/${encodeURIComponent(body.code)}/route-v04`,
+            { variant: fields.route_variant, revision: saved.revision },
+          );
         notify("Площадка сохранена");
         await ctx.refresh();
       },

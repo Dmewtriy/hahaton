@@ -44,6 +44,24 @@ export const api = {
   delete(path) {
     return this.request(path, { method: "DELETE" });
   },
+  async downloadFile(path, filename) {
+    if (window.WebApp?.initData && window.WebApp?.downloadFile) {
+      await window.WebApp.downloadFile(
+        new URL(path, location.origin).href,
+        filename,
+      );
+      return;
+    }
+    const response = await fetch(path);
+    if (!response.ok)
+      throw new Error("Ссылка истекла. Сформируйте выгрузку заново");
+    const url = URL.createObjectURL(await response.blob());
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  },
   async download(id, filename) {
     if (window.WebApp?.initData && window.WebApp?.downloadFile) {
       const link = await this.post(

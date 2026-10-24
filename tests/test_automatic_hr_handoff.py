@@ -24,7 +24,7 @@ def test_unknown_answer_automatically_hands_over_and_resumes_survey(client, runt
     with runtime.db.transaction() as session:
         assert len(list(session.scalars(select(TicketMessage)))) == 1
         assert len(list(session.scalars(select(Ticket)))) == 1
-    assert client.post(f"/api/tickets/{ticket_id}/close", headers=auth("hr-a-key")).status_code == 200
+    assert client.post(f"/api/tickets/{ticket_id}/close", headers=auth("hr-a-key")).status_code == 409
     event(runtime, "8")
     with runtime.db.transaction() as session:
         assert session.scalar(select(SurveyRun)).status == "completed"

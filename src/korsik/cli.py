@@ -19,6 +19,7 @@ def main():
     init.add_argument("--demo", action="store_true")
     sub.add_parser("migrate")
     sub.add_parser("seed-demo")
+    sub.add_parser("install-v04", help="Install source-backed v0.4 scenario and missing-material registry")
     sub.add_parser("worker")
     sub.add_parser("poll")
     sub.add_parser("sync-commands", help="Register Russian slash-command hints in MAX")
@@ -82,6 +83,20 @@ def main():
             from .seed import seed_demo
 
             print("Demo created. Private credentials: " + str(seed_demo(runtime)))
+        elif args.command == "install-v04":
+            from .profile_v04 import install
+
+            with runtime.db.transaction(write_lock=True) as session:
+                scenario = install(session)
+                print(
+                    json.dumps(
+                        {
+                            "scenario_id": scenario.id,
+                            "steps": len(scenario.definition["steps"]),
+                            "source_rows": 55,
+                        }
+                    )
+                )
         elif args.command == "worker":
             Worker(runtime).run()
         elif args.command == "tick":

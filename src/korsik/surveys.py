@@ -1,19 +1,25 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from sqlalchemy import select
 
 from .calendar import now
 from .models import CampaignRecipient, ScheduledStep, SurveyAnswer, SurveyRun
 from .queue import enqueue, send
+from .templates import render
 
 
 def start_survey(session, employee, step):
-    employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "awaiting_hr_message"}
+    employee.dialogue = {
+        k: v for k, v in employee.dialogue.items() if k not in {"awaiting_hr_message", "support_compose"}
+    }
     run = SurveyRun(
         employee_id=employee.id,
         scheduled_step_id=step.id,
         definition=step.payload["survey"],
         started_at=now(session),
+        expires_at=datetime.fromisoformat(step.payload["expires_at"])
+        if step.payload.get("expires_at")
+        else None,
     )
     session.add(run)
     session.flush()
@@ -29,6 +35,7 @@ def start_survey(session, employee, step):
 
 
 def active_run(session, employee):
+    expire_runs(session, employee.id)
     return session.scalar(
         select(SurveyRun)
         .where(
@@ -44,6 +51,12 @@ def prompt(session, employee, run, suffix):
     buttons = []
     if run.awaiting_comment:
         text = question.get("comment_prompt", "Расскажите подробнее.")
+        if question.get("comment_contact_alternative"):
+            text += " Можно объяснить причину здесь или связаться с HR."
+            buttons = support_buttons(session, employee, run, question)
+        if run.optional_comment:
+            text = "Можно оставить комментарий или нажать «Продолжить»."
+            buttons = [{"text": "Продолжить", "payload": f"a:{run.id}:{run.position}:skip"}]
     else:
         text = question["text"]
         if question["kind"] in {"single", "multiple"}:
@@ -66,20 +79,32 @@ def prompt(session, employee, run, suffix):
                 text += "\nНажмите вариант ответа или отправьте его номер."
         elif question["kind"] == "rating":
             text += f"\nВведите число от {question['minimum']} до {question['maximum']}."
+            if question.get("minimum_label") or question.get("maximum_label"):
+                text += f"\n{question['minimum']} — {question.get('minimum_label', '')}; {question['maximum']} — {question.get('maximum_label', '')}."
     text += (
         "\nДля отдельного вопроса: /ask ваш вопрос. Прогресс опроса сохранится. Сообщение HR: /hr ваш текст."
     )
-    send(
+    item = send(
         session,
         employee.identity_id,
-        text,
+        render(session, employee, text),
         f"survey:{run.id}:{run.position}:{suffix}",
         now(session),
         buttons=buttons,
     )
+    from .models import RouteRun
+
+    route = session.scalar(select(RouteRun).where(RouteRun.scheduled_step_id == run.scheduled_step_id))
+    if route:
+        item.body = {**item.body, "route_run_id": route.id, "route_node": route.position}
+    if item.status == "blocked_material":
+        item.status = "pending"
 
 
 def consume_answer(session, employee, run, text, event_key, callback=None):
+    if run.status != "active" or run.expires_at and run.expires_at <= now(session):
+        expire_runs(session, employee.id)
+        return
     question = run.definition["questions"][run.position]
     if callback:
         parts = callback.split(":")
@@ -100,11 +125,18 @@ def consume_answer(session, employee, run, text, event_key, callback=None):
         )
     )
     if run.awaiting_comment:
+        if run.optional_comment and ((callback and text == "skip") or text.casefold() == "продолжить"):
+            run.awaiting_comment = False
+            run.optional_comment = False
+            advance(session, employee, run, event_key)
+            return
         if callback or not text.strip() or len(text) > 15000:
             prompt(session, employee, run, event_key)
             return
         answer.comment = text.strip()
+        answer.comment_created_at = now(session)
         run.awaiting_comment = False
+        run.optional_comment = False
         queue_analysis(session, employee, answer, question)
         advance(session, employee, run, event_key)
         return
@@ -136,7 +168,11 @@ def consume_answer(session, employee, run, text, event_key, callback=None):
         elif text in options:
             if kind == "multiple":
                 selection = set(run.selection)
-                selection.symmetric_difference_update({text})
+                if options[text].get("exclusive"):
+                    selection = set() if text in selection else {text}
+                else:
+                    selection = {x for x in selection if not options[x].get("exclusive")}
+                    selection.symmetric_difference_update({text})
                 run.selection = sorted(selection)
                 prompt(session, employee, run, event_key)
                 return
@@ -148,13 +184,16 @@ def consume_answer(session, employee, run, text, event_key, callback=None):
         needs_comment = any(options[x].get("needs_comment") for x in selected)
         notify_hr = any(options[x].get("notify_hr") for x in selected)
         for option_id in selected:
-            if options[option_id].get("reply"):
+            if options[option_id].get("reply") and not options[option_id].get("reply_after_survey"):
                 send(
                     session,
                     employee.identity_id,
-                    options[option_id]["reply"],
+                    render(session, employee, options[option_id]["reply"]),
                     f"option:{event_key}:{option_id}",
                     now(session),
+                    buttons=support_buttons(session, employee, run, question)
+                    if options[option_id].get("support_actions")
+                    else [],
                 )
     elif kind == "rating":
         try:
@@ -193,6 +232,10 @@ def consume_answer(session, employee, run, text, event_key, callback=None):
     if needs_comment:
         run.awaiting_comment = True
         prompt(session, employee, run, event_key)
+    elif kind == "rating" and question.get("optional_comment_on_positive"):
+        run.awaiting_comment = True
+        run.optional_comment = True
+        prompt(session, employee, run, event_key)
     else:
         if kind == "text":
             queue_analysis(session, employee, answer, question)
@@ -215,22 +258,121 @@ def advance(session, employee, run, event_key):
     if run.position == len(run.definition["questions"]):
         run.status = "completed"
         run.completed_at = now(session)
+        if run.definition.get("kind") == "quiz":
+            run.result = score_quiz(session, run)
         session.get(ScheduledStep, run.scheduled_step_id).status = "completed"
         recipient = session.scalar(
             select(CampaignRecipient).where(CampaignRecipient.scheduled_step_id == run.scheduled_step_id)
         )
         if recipient:
             recipient.status = "completed"
-        send(
-            session,
-            employee.identity_id,
-            "Спасибо за обратную связь! Опрос завершён.",
-            f"complete:{run.id}",
-            now(session),
-        )
+        completion_text = run.definition.get("completion_text", "Спасибо за обратную связь! Опрос завершён.")
+        if run.result:
+            completion_text = (
+                f"Тест завершён. Результат: {run.result['points']} из {run.result['maximum']} "
+                f"({run.result['percent']}%). "
+                + (
+                    "Тест пройден."
+                    if run.result["passed"]
+                    else "Порог пока не достигнут. Обратитесь к HR за повторным назначением."
+                )
+            )
+        if completion_text:
+            from .templates import render
+
+            send(
+                session,
+                employee.identity_id,
+                render(session, employee, completion_text),
+                f"complete:{run.id}",
+                now(session),
+            )
+        for question in run.definition["questions"]:
+            answer = session.scalar(
+                select(SurveyAnswer).where(
+                    SurveyAnswer.run_id == run.id, SurveyAnswer.question_id == question["id"]
+                )
+            )
+            selected = (
+                answer.value["answer"]
+                if isinstance(answer.value["answer"], list)
+                else [answer.value["answer"]]
+            )
+            for option in question.get("options", []):
+                if option["id"] in selected and option.get("reply_after_survey") and option.get("reply"):
+                    send(
+                        session,
+                        employee.identity_id,
+                        option["reply"],
+                        f"survey-reaction:{run.id}:{question['id']}:{option['id']}",
+                        now(session),
+                        buttons=support_buttons(session, employee, run, question)
+                        if option.get("support_actions")
+                        else [],
+                    )
+        from .routes import survey_completed
+
+        survey_completed(session, employee, run)
         session.flush()
         from .scenarios import drain_dialogue_queue
 
         drain_dialogue_queue(session, employee)
     else:
         prompt(session, employee, run, event_key)
+
+
+def score_quiz(session, run):
+    answers = {
+        a.question_id: a.value["answer"]
+        for a in session.scalars(select(SurveyAnswer).where(SurveyAnswer.run_id == run.id))
+    }
+    maximum = sum(q.get("points", 1) for q in run.definition["questions"])
+    points = 0
+    for question in run.definition["questions"]:
+        value = answers.get(question["id"])
+        selected = set(value if isinstance(value, list) else [value])
+        if selected == set(question.get("correct_options", [])):
+            points += question.get("points", 1)
+    # Compare integer products: rounding must not turn a failed result into a pass.
+    return {
+        "points": points,
+        "maximum": maximum,
+        "percent": round(100 * points / maximum, 2),
+        "pass_percent": run.definition.get("pass_percent", 70),
+        "passed": 100 * points >= maximum * run.definition.get("pass_percent", 70),
+    }
+
+
+def expire_runs(session, employee_id=None):
+    from .models import Employee
+    from .scenarios import step_allowed
+
+    query = select(SurveyRun).where(SurveyRun.status == "active")
+    if employee_id:
+        query = query.where(SurveyRun.employee_id == employee_id)
+    for run in session.scalars(query):
+        step = session.get(ScheduledStep, run.scheduled_step_id)
+        expired = run.expires_at and run.expires_at <= now(session)
+        if not expired and step_allowed(session, session.get(Employee, run.employee_id), step):
+            continue
+        run.status = "expired" if expired else "cancelled"
+        step.status = run.status
+        recipient = session.scalar(
+            select(CampaignRecipient).where(CampaignRecipient.scheduled_step_id == run.scheduled_step_id)
+        )
+        if recipient:
+            recipient.status = run.status
+
+
+def support_buttons(session, employee, run, question):
+    from .models import Identity
+
+    hr = session.get(Identity, employee.recruiter_id)
+    buttons = [{"text": "Передать HR через бота", "payload": f"support:{run.id}:{question['id']}"}]
+    if hr and hr.contact_url:
+        buttons.append(
+            {"text": "Личный контакт рекрутера", "payload": f"contact:{run.id}:{question['id']}"}
+            if question.get("comment_contact_alternative")
+            else {"type": "link", "text": "Личный контакт рекрутера", "url": hr.contact_url}
+        )
+    return buttons

@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 from .access import in_scope, new_token, require, token_hash
 from .calendar import add_months, now
-from .models import Branch, Employee, Identity, Invitation
+from .models import AssignmentHistory, Branch, Department, Employee, Identity, Invitation, ManagerRule
 from .schemas import EmployeeCreate
 
 
@@ -24,8 +24,9 @@ def create_employee(session, actor, data: EmployeeCreate):
         ),
         "Рекрутер должен иметь доступ к площадке",
     )
-    if data.manager_id:
-        manager = session.get(Identity, data.manager_id)
+    manager_id = resolve_manager(session, data)
+    if manager_id:
+        manager = session.get(Identity, manager_id)
         require(
             bool(manager and manager.active and "manager" in manager.roles and in_scope(manager, branch.code))
         )
@@ -41,15 +42,52 @@ def create_employee(session, actor, data: EmployeeCreate):
         branch_code=branch.code,
         department=data.department,
         category=data.category,
-        manager_id=data.manager_id,
+        manager_id=manager_id,
         recruiter_id=data.recruiter_id,
         hire_date=data.hire_date,
         probation_end=end,
         timezone=data.timezone or branch.timezone,
+        adaptation_plan_url=data.adaptation_plan_url,
+        it_access_url=data.it_access_url,
     )
     session.add(employee)
     session.flush()
+    record_assignment(session, actor, employee, {})
     return employee
+
+
+def resolve_manager(session, data):
+    if data.manager_id:
+        return data.manager_id
+    if not data.auto_assign_manager:
+        return None
+    rule = session.scalar(
+        select(ManagerRule).where(
+            ManagerRule.recruiter_id == data.recruiter_id, ManagerRule.branch_code == data.branch_code
+        )
+    )
+    if rule:
+        return rule.manager_id
+    department = session.scalar(
+        select(Department).where(
+            Department.branch_code == data.branch_code,
+            Department.name == data.department,
+            Department.active.is_(True),
+        )
+    )
+    return department.manager_id if department else None
+
+
+def assignment(employee):
+    return {k: getattr(employee, k) for k in ("branch_code", "department", "recruiter_id", "manager_id")}
+
+
+def record_assignment(session, actor, employee, previous):
+    current = assignment(employee)
+    if previous != current:
+        session.add(
+            AssignmentHistory(employee_id=employee.id, actor_id=actor.id, previous=previous, current=current)
+        )
 
 
 def invite(session, identity_id, hours):
@@ -114,4 +152,8 @@ def employee_summary(employee):
         "status": employee.status,
         "stage": employee.stage,
         "active": employee.active,
+        "onboarding_status": employee.onboarding_status,
+        "onboarding_ended_at": employee.onboarding_ended_at.isoformat()
+        if employee.onboarding_ended_at
+        else None,
     }

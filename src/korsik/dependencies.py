@@ -16,8 +16,16 @@ def runtime_dependency(request: Request):
     return request.app.state.runtime
 
 
-def session_dependency(runtime=Depends(runtime_dependency)):
+def session_dependency(request: Request, runtime=Depends(runtime_dependency)):
     with runtime.db.transaction(write_lock=True) as session:
+        if request.url.path.startswith("/api/reports"):
+            if runtime.db.engine.dialect.name == "postgresql":
+                from sqlalchemy import text
+
+                session.execute(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))
+            from .calendar import now
+
+            session.info["report_snapshot_at"] = now(session)
         yield session
 
 

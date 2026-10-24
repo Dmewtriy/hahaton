@@ -98,6 +98,7 @@ export async function campaignsPage(ctx) {
             title: item.title + " (копия)",
             revision: null,
             due_at: null,
+            expires_at: null,
           });
         if (action === "detail") return campaignDetail(ctx, id);
         if (action === "publish") return publishCampaign(ctx, item);
@@ -229,7 +230,7 @@ export async function campaignEditor(ctx, item = {}) {
         ],
         audience.mode,
         null,
-      )}<div data-audience-options></div><div data-audience-summary class="audience-preview">Нажмите «Проверить получателей» перед публикацией.</div><div class="spacer"></div>${button("Проверить получателей", "audience-preview")}</div><div class="form-section"><h3>Когда отправить</h3>${input("due_at", "Дата и время в вашем часовом поясе", due, "datetime-local", "", "Оставьте пустым, чтобы отправить сразу после публикации.")}<span class="field-label">Вложения</span><div class="recipient-grid">${ctx.refs.documents.map((d) => checkbox("document_ids", d.title, item.document_ids?.includes(d.id), d.id)).join("") || "<small>Документов пока нет</small>"}</div></div><div class="notice">${icon("info")}Сейчас создаётся только черновик. Перед отправкой вы отдельно подтвердите получателей. Уже начатые диалоги и опросы будут учтены очередью.</div>`,
+      )}<div data-audience-options></div><div data-audience-summary class="audience-preview">Нажмите «Проверить получателей» перед публикацией.</div><div class="spacer"></div>${button("Проверить получателей", "audience-preview")}</div><div class="form-section"><h3>Когда отправить</h3>${input("due_at", "Дата и время в вашем часовом поясе", due, "datetime-local", "", "Оставьте пустым, чтобы отправить сразу после публикации.")}${input("expires_at", "Пройти / доставить до (необязательно)", item.expires_at ? new Date(new Date(item.expires_at).getTime() - new Date(item.expires_at).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "", "datetime-local", "", "После срока опрос закроется, ответы сохранятся, напоминания прекратятся.")}<span class="field-label">Вложения</span><div class="recipient-grid">${ctx.refs.documents.map((d) => checkbox("document_ids", d.title, item.document_ids?.includes(d.id), d.id)).join("") || "<small>Документов пока нет</small>"}</div></div><div class="notice">${icon("info")}Сейчас создаётся только черновик. Перед отправкой вы отдельно подтвердите получателей. Уже начатые диалоги и опросы будут учтены очередью.</div>`,
     {
       submitLabel: "Сохранить черновик",
       bind: (form) => {
@@ -300,6 +301,9 @@ export async function campaignEditor(ctx, item = {}) {
             template_id:
               fields.kind === "survey" ? fields.template_id || null : null,
             audience,
+            expires_at: fields.expires_at
+              ? new Date(fields.expires_at).toISOString()
+              : null,
             due_at: fields.due_at
               ? new Date(fields.due_at).toISOString()
               : null,
@@ -346,7 +350,7 @@ export async function campaignDetail(ctx, id) {
     .join("");
   drawer(
     data.title,
-    `<div class="actions">${badge(data.status)}${data.stored_status === "draft" ? button("Редактировать", "edit") + button("Запустить", "publish", "", "primary") : ""}</div><div class="spacer"></div><div class="result-summary"><div class="card"><strong>${data.recipient_count}</strong><small>Получателей</small></div><div class="card"><strong>${completed}</strong><small>Завершили опрос</small></div><div class="card"><strong>${sent}</strong><small>Сообщений отправлено</small></div></div><div class="form-section"><h3>Сообщение</h3><div class="bubble">${e(data.text)}</div><p class="muted">${e(audienceLabel(data.audience))} · ${dateTime(data.due_at)}</p></div><div class="form-section"><h3>Получатели и выполнение</h3>${data.recipients.length ? data.recipients.map((r) => `<div class="card-row"><div><strong>${e(r.name)}</strong><p>${e(r.department)}</p></div>${badge(r.status)}</div>`).join("") : '<p class="muted">Получатели зафиксируются при публикации.</p>'}</div>${aggregate}`,
+    `<div class="actions">${badge(data.status)}${data.stored_status === "draft" ? button("Редактировать", "edit") + button("Запустить", "publish", "", "primary") : ""}</div><div class="spacer"></div><div class="result-summary"><div class="card"><strong>${data.recipient_count}</strong><small>Получателей</small></div><div class="card"><strong>${completed}</strong><small>Завершили опрос</small></div><div class="card"><strong>${sent}</strong><small>Сообщений отправлено</small></div></div><div class="form-section"><h3>Сообщение</h3><div class="bubble">${e(data.text)}</div><p class="muted">${e(audienceLabel(data.audience))} · ${dateTime(data.due_at)}</p></div><div class="form-section"><h3>Получатели и выполнение</h3>${data.recipients.length ? data.recipients.map((r) => `<div class="card-row"><div><strong>${e(r.name)}</strong><p>${e(r.department)}</p></div>${badge(r.status)}${r.result ? `<span>${r.result.points}/${r.result.maximum} · ${r.result.percent}% · ${r.result.passed ? "пройден" : "не пройден"}</span>` : ""}</div>`).join("") : '<p class="muted">Получатели зафиксируются при публикации.</p>'}</div>${aggregate}`,
     {
       bind: (form) =>
         delegate(form, async (action) => {

@@ -165,7 +165,7 @@ def test_explicit_hr_message_keeps_survey_independent(client, runtime):
     with runtime.db.transaction() as session:
         assert len(list(session.scalars(select(TicketMessage)))) == 2
     assert client.post(f"/api/tickets/{ticket_id}/close", headers=auth("hr-b-key")).status_code == 403
-    assert client.post(f"/api/tickets/{ticket_id}/close", headers=auth("hr-a-key")).status_code == 200
+    assert client.post(f"/api/tickets/{ticket_id}/close", headers=auth("hr-a-key")).status_code == 409
     event(runtime, "8")
     with runtime.db.transaction() as session:
         assert session.scalar(select(SurveyRun)).status == "completed"

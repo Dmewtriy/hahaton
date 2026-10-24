@@ -15,6 +15,7 @@ ALLOWED_EXTENSIONS = {".pdf", ".txt", ".md", ".docx", ".pptx", ".png", ".jpg", "
 def employee_can_read(employee, document):
     return (
         document.active
+        and document.published
         and ("*" in document.branch_codes or employee.branch_code in document.branch_codes)
         and (not document.categories or employee.category in document.categories)
     )
@@ -46,7 +47,19 @@ def allowed_documents(session, employee):
     ]
 
 
-def store(session, settings, title, filename, content, branches, categories, version=1):
+def store(
+    session,
+    settings,
+    title,
+    filename,
+    content,
+    branches,
+    categories,
+    version=1,
+    *,
+    previous=None,
+    auto_publish=True,
+):
     suffix = Path(filename).suffix.lower()
     if suffix not in ALLOWED_EXTENSIONS or len(content) > settings.max_upload_bytes or not content:
         raise HTTPException(422, "Недопустимый формат, размер или пустой файл")
@@ -69,6 +82,10 @@ def store(session, settings, title, filename, content, branches, categories, ver
         categories=categories,
         version=version,
         created_at=now(session),
+        family_id=(previous.family_id or previous.id) if previous else doc_id,
+        replaces_id=previous.id if previous else None,
+        published=False,
+        auto_publish=auto_publish,
     )
     session.add(doc)
     session.flush()
@@ -87,4 +104,31 @@ def public_document(document):
         "status": document.status,
         "processor_version": document.processor_version,
         "active": document.active,
+        "published": document.published,
+        "auto_publish": document.auto_publish,
+        "family_id": document.family_id or document.id,
+        "replaces_id": document.replaces_id,
+        "last_error": document.last_error,
+        "revision": document.revision,
     }
+
+
+def publish(session, document):
+    """Atomically switch the active version after processing; lock the family root."""
+    if not document.active or document.status not in {"ready", "ready_stub"}:
+        raise HTTPException(409, "Опубликовать можно только обработанный действующий документ")
+    root = document.family_id or document.id
+    session.scalar(select(Document).where(Document.id == root).with_for_update())
+    for other in session.scalars(
+        select(Document)
+        .where(Document.family_id == root)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ):
+        if other.id != document.id and other.published:
+            other.published = False
+            other.revision += 1
+    document.published = True
+    document.revision += 1
+    session.flush()
+    return document

@@ -1,0 +1,101 @@
+{
+  "contract_status": "candidate_not_yet_agreed",
+  "schema": {
+    "$defs": {
+      "AnalysisResult": {
+        "additionalProperties": false,
+        "properties": {
+          "sentiment": {
+            "enum": [
+              "positive",
+              "neutral",
+              "negative"
+            ],
+            "title": "Sentiment",
+            "type": "string"
+          },
+          "risk": {
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Risk",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Topics",
+            "type": "array"
+          },
+          "explanation": {
+            "maxLength": 3000,
+            "title": "Explanation",
+            "type": "string"
+          },
+          "needs_hr": {
+            "default": false,
+            "title": "Needs Hr",
+            "type": "boolean"
+          },
+          "processor_version": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Processor Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sentiment",
+          "risk",
+          "explanation",
+          "processor_version"
+        ],
+        "title": "AnalysisResult",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "schema_version": {
+        "const": "1",
+        "default": "1",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "event_id": {
+        "maxLength": 150,
+        "minLength": 1,
+        "title": "Event Id",
+        "type": "string"
+      },
+      "answer_id": {
+        "title": "Answer Id",
+        "type": "string"
+      },
+      "result": {
+        "$ref": "#/$defs/AnalysisResult"
+      },
+      "manager_signal": {
+        "default": "none",
+        "enum": [
+          "none",
+          "meeting_recommended"
+        ],
+        "title": "Manager Signal",
+        "type": "string"
+      }
+    },
+    "required": [
+      "event_id",
+      "answer_id",
+      "result"
+    ],
+    "title": "AnalysisEvent",
+    "type": "object"
+  }
+}

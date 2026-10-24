@@ -125,8 +125,8 @@ def test_documents_metadata_replacement_archive_and_restore(client, runtime):
     )
     assert new.status_code == 201 and new.json()["version"] == 2
     current = client.get("/api/admin/documents", headers=headers).json()
-    assert len(current) == 1 and current[0]["id"] != doc_id
-    assert client.get(f"/api/documents/{doc_id}/download", headers=headers).status_code == 403
+    assert len(current) == 2  # The previous version stays available while the replacement is pending.
+    assert client.get(f"/api/documents/{doc_id}/download", headers=headers).status_code == 200
     new_id = new.json()["id"]
     assert client.delete(f"/api/admin/documents/{new_id}", headers=headers).status_code == 200
     assert client.post(f"/api/admin/documents/{new_id}/restore", headers=headers).status_code == 200

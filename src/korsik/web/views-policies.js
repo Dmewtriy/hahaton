@@ -23,8 +23,6 @@ export async function policyPanel(ctx) {
     "Воскресенье",
   ];
   const risks = {
-    none: "Без риска",
-    demo_risk: "Учебный сигнал",
     low: "Низкий",
     medium: "Средний",
     high: "Высокий",
@@ -47,6 +45,11 @@ export async function policyPanel(ctx) {
               escalation.minimum_risk,
               null,
             ) +
+            checkbox(
+              "recommend_meeting",
+              "Рекомендовать руководителю личную встречу при срабатывании правила",
+              escalation.recommend_meeting ?? true,
+            ) +
             input(
               "topics",
               "Ограничить сигналы темами",
@@ -61,6 +64,7 @@ export async function policyPanel(ctx) {
                 enabled: form.elements.enabled.checked,
                 minimum_risk: form.elements.minimum_risk.value,
                 topics: csv(form.elements.topics.value),
+                recommend_meeting: form.elements.recommend_meeting.checked,
               });
               notify("Правила сигналов сохранены");
               await ctx.refresh();

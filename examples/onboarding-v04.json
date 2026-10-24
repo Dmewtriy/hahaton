@@ -1,0 +1,2258 @@
+{
+  "name": "Корсик — исходный маршрут v0.4",
+  "version": 1,
+  "steps": [
+    {
+      "id": "M01",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": -3,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Знакомство с Корсиком",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R003",
+        "XLS1-R004",
+        "XLS1-R005",
+        "XLS1-R006",
+        "XLS1-R007",
+        "XLS1-R008"
+      ],
+      "actions": [
+        {
+          "id": "r3",
+          "source_ref": "XLS1-R003",
+          "kind": "material",
+          "text": "Что умеет этот бот...",
+          "material_key": "MAT-R003"
+        },
+        {
+          "id": "r4",
+          "source_ref": "XLS1-R004",
+          "kind": "material",
+          "text": "Добро пожаловать в нашу команду!\n Привет-привет-привет! 🐾 Меня зовут Корсик, ваш персональный гид по миру Группы ПОЛИПЛАСТИК! 🤗  \n\nРад знакомству и обещаю сделать вашу адаптацию веселой, легкой и комфортной! 💃 Вместе мы изучим компанию и найдем друзей среди лучших специалистов отрасли. 🌟  \n\nГотов делиться секретами успешной интеграции, отвечать на ваши вопросы и помогать адаптироваться в новом коллективе! 👍\n\nДавайте начнем путешествие навстречу большим профессиональным успехам и теплым отношениям! ✨  \n\nКорсик",
+          "material_key": "MAT-R004"
+        },
+        {
+          "id": "style",
+          "kind": "choice",
+          "text": "Как мы будем общаться?",
+          "options": [
+            {
+              "id": "1",
+              "label": "На ТЫ",
+              "set_style": "informal"
+            },
+            {
+              "id": "2",
+              "label": "На ВЫ",
+              "set_style": "formal"
+            }
+          ],
+          "source_ref": "XLS1-R006"
+        },
+        {
+          "id": "r7",
+          "source_ref": "XLS1-R007",
+          "kind": "message",
+          "text": "Очень приятно с тобой познакомиться, {name}!"
+        },
+        {
+          "id": "r8",
+          "source_ref": "XLS1-R008",
+          "kind": "material",
+          "text": "Меня зовут Корсик, я помогу тебе быстро и легко адаптироваться на новом рабочем месте!",
+          "material_key": "MAT-R008"
+        }
+      ]
+    },
+    {
+      "id": "M02",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": -3,
+        "working_day": null,
+        "at": "09:05",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Документы для оформления",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R009",
+        "XLS1-R010"
+      ],
+      "actions": [
+        {
+          "id": "r9",
+          "source_ref": "XLS1-R009",
+          "kind": "message",
+          "text": "Для того, чтобы ты пришел подготовленный в свой первый рабочий день, ознакомься со списком необходимых для оформления документов и подготовь их к своему выходу на работу.",
+          "branch_codes": [
+            "GrPP",
+            "Luzhniki"
+          ]
+        },
+        {
+          "id": "list9",
+          "source_ref": "XLS1-R009",
+          "kind": "material",
+          "text": "Необходимые документы для Вашего трудоустройства:\n1.\tБумажная трудовая книжка и сведения о трудовой деятельности (можно выгрузить с сайта гос. услуг);\n2.\tПаспорт;\n3.\tСНИЛС;\n4.\tИНН;\n5.\tДокумент об образовании (диплом, свидетельства, удостоверения, допуски);\n6.\tСвидетельство о браке/разводе (в случае смены ФИО);\n7.\tСвидетельство о рождении ребенка (до 18 лет);\n8.\tДокументы воинского учета.",
+          "branch_codes": [
+            "GrPP",
+            "Luzhniki"
+          ],
+          "material_key": "MAT-R009"
+        },
+        {
+          "id": "r10",
+          "source_ref": "XLS1-R010",
+          "kind": "message",
+          "text": "Для того, чтобы ты пришел подготовленный в свой первый рабочий день, ознакомься со списком необходимых для оформления документов и подготовь их к своему выходу на работу.",
+          "branch_codes": [
+            "GTP"
+          ]
+        },
+        {
+          "id": "list10",
+          "source_ref": "XLS1-R010",
+          "kind": "material",
+          "text": "Необходимые документы для Вашего трудоустройства:\n1.\tБумажная трудовая книжка и сведения о трудовой деятельности (можно выгрузить с сайта гос. услуг);\n2.\tПаспорт;\n3.\tСНИЛС;\n4.\tИНН;\n5.\tДокумент об образовании (диплом, свидетельства, удостоверения, допуски);\n6.\tСвидетельство о браке/разводе (в случае смены ФИО);\n7.\tСвидетельство о рождении ребенка (до 18 лет);\n8.\tДокументы воинского учета.\n9. Фотографии 3*4 в количестве 2шт (Цвет/ЧБ)",
+          "branch_codes": [
+            "GTP"
+          ],
+          "material_key": "MAT-R010"
+        }
+      ]
+    },
+    {
+      "id": "M03",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": -3,
+        "working_day": null,
+        "at": "09:10",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Как добраться до работы",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R011",
+        "XLS1-R012",
+        "XLS1-R013"
+      ],
+      "actions": [
+        {
+          "id": "transport11",
+          "kind": "choice",
+          "text": "Чтобы дорога до офиса была комфортнее, у нас есть корпоративный транспорт! Рассказать о маршрутах и расписании?",
+          "options": [
+            {
+              "id": "1",
+              "label": "Показать"
+            },
+            {
+              "id": "2",
+              "label": "Сейчас не нужно"
+            }
+          ],
+          "branch_codes": [
+            "GrPP"
+          ],
+          "source_ref": "XLS1-R011"
+        },
+        {
+          "id": "res11",
+          "source_ref": "XLS1-R011",
+          "kind": "material",
+          "material_key": "RES-R011",
+          "text": "",
+          "branch_codes": [
+            "GrPP"
+          ],
+          "when": {
+            "choice": "transport11",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "transport12",
+          "kind": "choice",
+          "text": "Чтобы дорога до предприятия была комфортнее, у нас есть корпоративный транспорт! Рассказать о маршрутах и расписании?",
+          "options": [
+            {
+              "id": "1",
+              "label": "Показать"
+            },
+            {
+              "id": "2",
+              "label": "Сейчас не нужно"
+            }
+          ],
+          "branch_codes": [
+            "GTP"
+          ],
+          "source_ref": "XLS1-R012"
+        },
+        {
+          "id": "res12",
+          "source_ref": "XLS1-R012",
+          "kind": "material",
+          "material_key": "RES-R012",
+          "text": "",
+          "branch_codes": [
+            "GTP"
+          ],
+          "when": {
+            "choice": "transport12",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "transport13",
+          "kind": "choice",
+          "text": "Чтобы ты легко спланировал свой маршрут в первый день, я собрал для тебя всю информацию о том, как добраться до офиса. Интересно?",
+          "options": [
+            {
+              "id": "1",
+              "label": "Показать"
+            },
+            {
+              "id": "2",
+              "label": "Сейчас не нужно"
+            }
+          ],
+          "branch_codes": [
+            "Luzhniki"
+          ],
+          "source_ref": "XLS1-R013"
+        },
+        {
+          "id": "res13",
+          "source_ref": "XLS1-R013",
+          "kind": "material",
+          "material_key": "RES-R013",
+          "text": "",
+          "branch_codes": [
+            "Luzhniki"
+          ],
+          "when": {
+            "choice": "transport13",
+            "equals": "1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "M04",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": -3,
+        "working_day": null,
+        "at": "09:15",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Факты о компании",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R014",
+        "XLS1-R015"
+      ],
+      "actions": [
+        {
+          "id": "r14",
+          "source_ref": "XLS1-R014",
+          "kind": "message",
+          "text": "Я готов  поделиться самыми интересными фактами о своей организации.\n\n🧑🏼‍🔧 Факт №1: Я горжусь тем, что работаю в компании, которая делает мир лучше каждый день! Наши инновационные трубы помогают обеспечивать чистой водой миллионы людей по всей стране. А ещё, знаешь, какое наше самое гордое достижение? Наша продукция помогает экономить природные ресурсы благодаря долговечности и энергоэффективности. Представляешь, как круто создавать будущее экологически чистым способом?\n\n📚 Факт №2: Знаешь, какой секрет успешной карьеры в нашем дружном коллективе? Здесь ценят инициативу и поддерживают таланты! Все сотрудники имеют равные возможности развиваться профессионально и строить карьеру. Даже я иногда участвую в тренингах и семинарах — расширяю кругозор и делюсь знаниями с новичками.\n\n🛠️ Факт №3: Кстати, хочешь посмотреть мир и почувствовать себя настоящим путешественником? Группа «ПОЛИПЛАСТИК» имеет филиалы по всей России и странам СНГ, так что твоя карьера может легко превратиться в захватывающее приключение. Стартуя с одного города, можно переехать куда угодно и покорять вершины успеха в любой точке страны. Ммм... интересно, правда же?\n\nПрисоединяйся к нашей большой команде, ведь здесь тебя ждут интересные проекты, поддержка коллег и большие перспективы!"
+        },
+        {
+          "id": "r15",
+          "source_ref": "XLS1-R015",
+          "kind": "message",
+          "text": "Очень скоро мы начнем полноценное погружение в компанию, а пока отдыхай. Я напишу тебе за день до выхода на работу \n\nДо встречи, {name}! 👋🏻"
+        }
+      ]
+    },
+    {
+      "id": "M05",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": -1,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Готовность к первому дню",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R016",
+        "XLS1-R017"
+      ],
+      "actions": [
+        {
+          "id": "ready",
+          "kind": "choice",
+          "text": "Привет, {name}! Уже завтра наступит твой первый рабочий день. Ты готов?",
+          "options": [
+            {
+              "id": "1",
+              "label": "Да, жду не дождусь!",
+              "reply": "Супер! Мне нравится твой настрой ✨\n\nВесь первый день мы проведем вместе, я тебе расскажу все самое важное о нашей компании и пришлю много полезной информации, чтобы твое погружение прошло как можно легче."
+            },
+            {
+              "id": "2",
+              "label": "Готов/Готова",
+              "reply": "Супер! Мне нравится твой настрой ✨\n\nВесь первый день мы проведем вместе, я тебе расскажу все самое важное о нашей компании и пришлю много полезной информации, чтобы твое погружение прошло как можно легче."
+            },
+            {
+              "id": "3",
+              "label": "Да, но немного волнуюсь",
+              "reply": "Это нормально - немного волноваться в твой первый рабочий день. Поверь мне, я сам через это все проходил, когда меня создавали 😓\n\nВесь первый день мы проведем вместе, я тебе расскажу все самое важное о нашей компании и пришлю много полезной информации, чтобы твое погружение прошло как можно легче."
+            }
+          ],
+          "source_ref": "XLS1-R016"
+        },
+        {
+          "id": "r17",
+          "source_ref": "XLS1-R017",
+          "kind": "message",
+          "text": "Для того, чтобы ты пришел подготовленный в свой первый рабочий день, напоминаю про список необходимых для оформления документов, подготовь их к своему выходу на работу."
+        },
+        {
+          "id": "list17",
+          "source_ref": "XLS1-R017",
+          "kind": "material",
+          "text": "Необходимые документы для Вашего трудоустройства:\n1.\tБумажная трудовая книжка и сведения о трудовой деятельности (можно выгрузить с сайта гос. услуг);\n2.\tПаспорт;\n3.\tСНИЛС;\n4.\tИНН;\n5.\tДокумент об образовании (диплом, свидетельства, удостоверения, допуски);\n6.\tСвидетельство о браке/разводе (в случае смены ФИО);\n7.\tСвидетельство о рождении ребенка (до 18 лет);\n8.\tДокументы воинского учета.\n9. Фотографии 3*4 в количестве 2шт (Цвет/ЧБ)",
+          "material_key": "MAT-R017"
+        }
+      ]
+    },
+    {
+      "id": "M06",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "10:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Первый день и ИТ-доступы",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R018"
+      ],
+      "actions": [
+        {
+          "id": "r18",
+          "source_ref": "XLS1-R018",
+          "kind": "material",
+          "text": "Поздравляю с первым рабочим днем, {name}!  🥳\n\nУверен, что ты будешь отлично справляться со своими задачами, вносить свой вклад в наше общее дело и делиться идеями. Мы всегда готовы поддержать тебя и создать комфортные условия для работы. Пожалуйста, не стесняйся, обращайся к коллегам из нашей команды, мы всегда открыты для общения.",
+          "material_key": "MAT-R018"
+        },
+        {
+          "id": "it",
+          "kind": "employee_resource",
+          "field": "it_access_url",
+          "title": "Подготовленные ИТ-доступы",
+          "text": "Подготовленные ИТ-доступы:",
+          "source_ref": "XLS1-R018"
+        }
+      ]
+    },
+    {
+      "id": "M07",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "11:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Карта рабочего пространства",
+      "informal_text": null,
+      "branch_codes": [
+        "GTP",
+        "Luzhniki"
+      ],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R020",
+        "XLS1-R021"
+      ],
+      "actions": [
+        {
+          "id": "map20",
+          "kind": "choice",
+          "text": "Наша территория довольно большая, но я помогу тебе в ней разобраться! Хочешь, я покажу подробную карту?",
+          "options": [
+            {
+              "id": "1",
+              "label": "Показать"
+            },
+            {
+              "id": "2",
+              "label": "Сейчас не нужно"
+            }
+          ],
+          "branch_codes": [
+            "GTP"
+          ],
+          "source_ref": "XLS1-R020"
+        },
+        {
+          "id": "res20",
+          "source_ref": "XLS1-R020",
+          "kind": "material",
+          "material_key": "RES-R020",
+          "text": "",
+          "branch_codes": [
+            "GTP"
+          ],
+          "when": {
+            "choice": "map20",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "map21",
+          "kind": "choice",
+          "text": "Наш офис довольно большой, но я помогу тебе в нем разобраться! Хочешь я покажу тебе подробную карту?",
+          "options": [
+            {
+              "id": "1",
+              "label": "Показать"
+            },
+            {
+              "id": "2",
+              "label": "Сейчас не нужно"
+            }
+          ],
+          "branch_codes": [
+            "Luzhniki"
+          ],
+          "source_ref": "XLS1-R021"
+        },
+        {
+          "id": "res21",
+          "source_ref": "XLS1-R021",
+          "kind": "material",
+          "material_key": "RES-R021",
+          "text": "",
+          "branch_codes": [
+            "Luzhniki"
+          ],
+          "when": {
+            "choice": "map21",
+            "equals": "1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "M08",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "12:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Оборудование и доступы",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R022",
+        "XLS1-R023"
+      ],
+      "actions": [
+        {
+          "id": "equipment22",
+          "kind": "choice",
+          "text": "Тебе предстоит многое узнать о нашей компании. Но сначала решим пару организационных вопросов.\n\nНа твоем рабочем месте тебя будет ждать необходимая техника. Для тебя уже заведена учетная запись и доступы IT. Есть ли у тебя все необходимые доступы и материалы?",
+          "options": [
+            {
+              "id": "1",
+              "label": "Да, все есть",
+              "reply": "Замечательно! Тогда пока осваивайся, а я напишу тебе чуть позже."
+            },
+            {
+              "id": "2",
+              "label": "Нет",
+              "reply": "Ничего страшного! В таком случае лучше всего уточнить у твоего руководителя, когда будут заведены доступы и предоставлены необходимые материалы."
+            }
+          ],
+          "branch_codes": [
+            "GrPP",
+            "Luzhniki"
+          ],
+          "source_ref": "XLS1-R022"
+        },
+        {
+          "id": "equipment23",
+          "kind": "choice",
+          "text": "Тебе предстоит многое узнать о нашей компании. Но сначала решим пару организационных вопросов.\n\nК вашему первому рабочему дню мы подготовили рабочее место и необходимое оборудование. Всё настроено для начала работы. Все ли необходимое у вас в наличии?",
+          "options": [
+            {
+              "id": "1",
+              "label": "Да, все есть",
+              "reply": "Замечательно! Тогда пока осваивайся, а я напишу тебе чуть позже."
+            },
+            {
+              "id": "2",
+              "label": "Нет",
+              "reply": "Ничего страшного! В таком случае лучше всего уточнить у твоего руководителя, когда будут заведены доступы и предоставлены необходимые материалы."
+            }
+          ],
+          "branch_codes": [
+            "GTP"
+          ],
+          "source_ref": "XLS1-R023"
+        }
+      ]
+    },
+    {
+      "id": "M09",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "12:30",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Питание на площадке",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R025",
+        "XLS1-R026",
+        "XLS1-R027",
+        "XLS1-R028"
+      ],
+      "actions": [
+        {
+          "id": "lunch",
+          "kind": "choice",
+          "text": "Хочешь, подскажу, где пообедать?",
+          "options": [
+            {
+              "id": "1",
+              "label": "Да!"
+            },
+            {
+              "id": "2",
+              "label": "Нет, спасибо!",
+              "reply": "Я тебя понял! Если ты передумаешь, ты всегда можешь набрать /Food и я подскажу тебе где пообедать.\n\nЕсли да:\nСледующая реплика"
+            }
+          ],
+          "source_ref": "XLS1-R025"
+        },
+        {
+          "id": "res26",
+          "source_ref": "XLS1-R026",
+          "kind": "material",
+          "material_key": "RES-R026",
+          "text": "",
+          "branch_codes": [
+            "GrPP"
+          ],
+          "when": {
+            "choice": "lunch",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "mat26",
+          "source_ref": "XLS1-R026",
+          "kind": "material",
+          "material_key": "MAT-R026",
+          "text": "",
+          "branch_codes": [
+            "GrPP"
+          ],
+          "when": {
+            "choice": "lunch",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "r26",
+          "source_ref": "XLS1-R026",
+          "kind": "message",
+          "text": "Приятного аппетита!",
+          "branch_codes": [
+            "GrPP"
+          ],
+          "when": {
+            "choice": "lunch",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "res27",
+          "source_ref": "XLS1-R027",
+          "kind": "material",
+          "material_key": "RES-R027",
+          "text": "",
+          "branch_codes": [
+            "Luzhniki"
+          ],
+          "when": {
+            "choice": "lunch",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "mat27",
+          "source_ref": "XLS1-R027",
+          "kind": "material",
+          "material_key": "MAT-R027",
+          "text": "",
+          "branch_codes": [
+            "Luzhniki"
+          ],
+          "when": {
+            "choice": "lunch",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "r27",
+          "source_ref": "XLS1-R027",
+          "kind": "message",
+          "text": "Приятного аппетита!",
+          "branch_codes": [
+            "Luzhniki"
+          ],
+          "when": {
+            "choice": "lunch",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "res28",
+          "source_ref": "XLS1-R028",
+          "kind": "material",
+          "material_key": "RES-R028",
+          "text": "",
+          "branch_codes": [
+            "GTP"
+          ],
+          "when": {
+            "choice": "lunch",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "mat28",
+          "source_ref": "XLS1-R028",
+          "kind": "material",
+          "material_key": "MAT-R028",
+          "text": "",
+          "branch_codes": [
+            "GTP"
+          ],
+          "when": {
+            "choice": "lunch",
+            "equals": "1"
+          }
+        },
+        {
+          "id": "r28",
+          "source_ref": "XLS1-R028",
+          "kind": "message",
+          "text": "Приятного аппетита!",
+          "branch_codes": [
+            "GTP"
+          ],
+          "when": {
+            "choice": "lunch",
+            "equals": "1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "M10",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "13:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Справочник контактов",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R029",
+        "XLS1-R030",
+        "XLS1-R031"
+      ],
+      "actions": [
+        {
+          "id": "r29",
+          "source_ref": "XLS1-R029",
+          "kind": "message",
+          "text": "Я думаю, ты уже немного освоился на рабочем месте и успел познакомиться с небольшой частью нашего коллектива. В команде ПОЛИПЛАСТИК 8500 человек!"
+        },
+        {
+          "id": "r30",
+          "source_ref": "XLS1-R030",
+          "kind": "material",
+          "text": "Присылаю справочник с контактами сотрудников 💫  https://my.polyplastic.ru/employees/Pages/address-book.aspx\nОбращаю внимание: справочник доступен исключительно с рабочих устройств внутри корпоративной сети либо при входе через корпоративную учётную запись.",
+          "branch_codes": [
+            "GrPP",
+            "Luzhniki"
+          ],
+          "material_key": "MAT-R030"
+        },
+        {
+          "id": "r31",
+          "source_ref": "XLS1-R031",
+          "kind": "material",
+          "text": "Присылаю справочник с контактами сотрудников 💫  \nhttp://ats/\nОбращаю внимание: справочник доступен исключительно с рабочих устройств внутри корпоративной сети либо при входе через корпоративную учётную запись.",
+          "branch_codes": [
+            "GTP"
+          ],
+          "material_key": "MAT-R031"
+        }
+      ]
+    },
+    {
+      "id": "M11",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "15:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Корпоративная презентация",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R032"
+      ],
+      "actions": [
+        {
+          "id": "r32",
+          "source_ref": "XLS1-R032",
+          "kind": "material",
+          "text": "Мы ценим каждого сотрудника и верим, что только вместе мы сможем достичь больших результатов. Ты - часть нашей команды, и твой вклад в проекты, которые мы реализуем, имеет огромное значение. Наша миссия – улучшать качество жизни людей, создавая удобную и долговечную инфраструктуру для жизни и бизнеса, развивая новый технологический уклад, задавая отраслевые стандарты качества продукта и сервиса.",
+          "material_key": "RES-R032"
+        }
+      ]
+    },
+    {
+      "id": "M12",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 1,
+        "at": "18:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Завершение первого дня",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [
+        "office"
+      ],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R033"
+      ],
+      "actions": [
+        {
+          "id": "r33",
+          "source_ref": "XLS1-R033",
+          "kind": "material",
+          "text": "Первый рабочий день позади!\n\nЭто очень важный момент, первые шаги в новой работе всегда особенные. Я уверен, что ты успешно справился со своими первыми задачами.",
+          "material_key": "MAT-R033"
+        }
+      ]
+    },
+    {
+      "id": "M13",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 3,
+        "at": "11:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Спортивный комплекс",
+      "informal_text": null,
+      "branch_codes": [
+        "GTP"
+      ],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R037"
+      ],
+      "actions": [
+        {
+          "id": "sports",
+          "kind": "choice",
+          "text": "Мы заботимся о твоем здоровье и продуктивности! На территории предприятия есть спортивный комплекс, где ты можешь позаниматься после работы. Рассказать подробнее о расписании и оснащении?",
+          "options": [
+            {
+              "id": "1",
+              "label": "Показать"
+            },
+            {
+              "id": "2",
+              "label": "Сейчас не нужно"
+            }
+          ],
+          "source_ref": "XLS1-R037"
+        },
+        {
+          "id": "res37",
+          "source_ref": "XLS1-R037",
+          "kind": "material",
+          "material_key": "RES-R037",
+          "text": "",
+          "when": {
+            "choice": "sports",
+            "equals": "1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "M14",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 0,
+        "working_day": 3,
+        "at": "17:30",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Третий рабочий день",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R038",
+        "XLS1-R039",
+        "XLS1-R040",
+        "XLS1-R041",
+        "XLS1-R042"
+      ],
+      "actions": [
+        {
+          "id": "r38",
+          "source_ref": "XLS1-R038",
+          "kind": "message",
+          "text": "Первые пару дней на новом месте могут быть немного сложными, поэтому мы предлагаем пройти тебе опрос, чтобы поделиться с нами своими впечатлениями!"
+        },
+        {
+          "id": "survey_M14",
+          "kind": "survey",
+          "survey_id": "M14",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "id": "M15",
+      "schedule": {
+        "anchor": "hire",
+        "months": 0,
+        "days": 14,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Две недели работы",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R047"
+      ],
+      "actions": [
+        {
+          "id": "r47",
+          "source_ref": "XLS1-R047",
+          "kind": "material",
+          "text": "Привет, {name}!\nХотел узнать, как у тебя дела? Нужна ли помощь с чем-то?",
+          "material_key": "MAT-R047"
+        },
+        {
+          "id": "survey_M15",
+          "kind": "survey",
+          "survey_id": "M15",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "id": "M16",
+      "schedule": {
+        "anchor": "hire",
+        "months": 1,
+        "days": 0,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Первый месяц и план адаптации",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R048",
+        "XLS1-R049"
+      ],
+      "actions": [
+        {
+          "id": "r48",
+          "source_ref": "XLS1-R048",
+          "kind": "material",
+          "text": "Привет, {name}!\nПоздравляю тебя с успешным завершением месяца работы! Так держать!\n\nПусть каждый новый месяц приносит еще больше возможностей для развития.",
+          "material_key": "MAT-R048"
+        },
+        {
+          "id": "plan",
+          "kind": "employee_resource",
+          "field": "adaptation_plan_url",
+          "title": "Персональный адаптационный план",
+          "text": "Адаптационный план:",
+          "source_ref": "XLS1-R049"
+        },
+        {
+          "id": "mat49",
+          "source_ref": "XLS1-R049",
+          "kind": "material",
+          "material_key": "MAT-R049",
+          "text": ""
+        },
+        {
+          "id": "survey_M16",
+          "kind": "survey",
+          "survey_id": "M16",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "id": "M17",
+      "schedule": {
+        "anchor": "hire",
+        "months": 1,
+        "days": 14,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Подборка фильмов",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R051",
+        "XLS1-R052"
+      ],
+      "actions": [
+        {
+          "id": "r51",
+          "source_ref": "XLS1-R051",
+          "kind": "message",
+          "text": "Привет, {name}!"
+        },
+        {
+          "id": "r52",
+          "source_ref": "XLS1-R052",
+          "kind": "message",
+          "text": "А еще я собрал для тебя подборку фильмов, которые, возможно, тебе будет интересно посмотреть на выходных (подсказка: они связаны с выходом на новую работу!)\n\n1. «Дьявол носит Prada» (The Devil Wears Prada, 2006) 👠\nЭнди — главная героиня фильма — устраивается в модный журнал на должность младшей ассистентки главного редактора, Миранды Пристли. С каждым днем ей приходится выполнять все более немыслимые задачи жесткой начальницы, проверять себя, чтобы понять, чего она хочет на самом деле.\n\n2. «Стажёр» (The Intern, 2015) 👨🏻‍🦳\nГлавный герой, пенсионер Бен Уитакер, не побоялся в 70 лет стать стажером в крупном онлайн-магазине одежды. Он задает много вопросов, вникает в профессию и получает наслаждение от новой работы. Теплый и душевный фильм о том, что возраст для новых знаний не препятствие.\n\n3. В погоне за счастьем (The Pursuit of Happyness, 2006) 👨‍👦\nОтец-одиночка, Крис Гарднер, оказавшись в сложном финансовом положении, устраивается стажером в брокерскую компанию, рассчитывая получить должность специалиста. Только на протяжении стажировки он не будет получать никаких денег.\n\n4. Мне бы в небо (Up in the Air, 2009) ✈️\nФильм о жизни корпоративного юриста Райана Бингэма. Его работа заключается в том, чтобы сообщать сотрудникам из разных организаций неприятную новость, что они… уволены. Главный герой - живое воплощение успеха, о котором многие мечтают, но цена такого образа весьма высока.\n\n5. Я не знаю, как она делает это — комедия о работающей в консалтинговой компании маме с двумя маленькими детьми и желанием быть хорошим специалистом, мамой, женой. С хорошей щепоткой юмора."
+        }
+      ]
+    },
+    {
+      "id": "M18",
+      "schedule": {
+        "anchor": "hire",
+        "months": 1,
+        "days": 21,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Настроение и поддержка",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R053",
+        "XLS1-R054",
+        "XLS1-R055",
+        "XLS1-R056",
+        "XLS1-R057"
+      ],
+      "actions": [
+        {
+          "id": "r53",
+          "source_ref": "XLS1-R053",
+          "kind": "material",
+          "text": "Привет!",
+          "material_key": "MAT-R053"
+        },
+        {
+          "id": "questions_time",
+          "kind": "wait",
+          "at": "09:01"
+        },
+        {
+          "id": "r54",
+          "source_ref": "XLS1-R054",
+          "kind": "message",
+          "text": "Мы подготовили небольшой опрос, чтобы ты смог поделиться с нами своими впечатлениями после двух месяцев работы."
+        },
+        {
+          "id": "survey_M18_55",
+          "kind": "survey",
+          "survey_id": "M18_55",
+          "text": "",
+          "branch_codes": [
+            "GrPP",
+            "Luzhniki"
+          ]
+        },
+        {
+          "id": "survey_M18_56",
+          "kind": "survey",
+          "survey_id": "M18_56",
+          "text": "",
+          "branch_codes": [
+            "GTP"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M19",
+      "schedule": {
+        "anchor": "hire",
+        "months": 2,
+        "days": 0,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Два месяца работы",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R058"
+      ],
+      "actions": [
+        {
+          "id": "r58",
+          "source_ref": "XLS1-R058",
+          "kind": "material",
+          "text": "Привет, {name}! \nЯ давно тебе не писал, не хотел отвлекать от работы. Но не мог пропустить такую знаковую дату! \n\nТы уже на финишной прямой, совсем скоро закончится твой испытательный срок.",
+          "material_key": "MAT-R058"
+        }
+      ]
+    },
+    {
+      "id": "M20",
+      "schedule": {
+        "anchor": "hire",
+        "months": 2,
+        "days": 14,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Книги и открытка",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R059",
+        "XLS1-R060"
+      ],
+      "actions": [
+        {
+          "id": "r59",
+          "source_ref": "XLS1-R059",
+          "kind": "message",
+          "text": "Привет, {name}!\nПока мы не виделись, я собрал для тебя еще одну подборку. На этот раз - книги для саморазвития и карьерного роста. Надеюсь, что-то из списка приглянется 😉\n\n🔸 «Ты способна на большее. 12 привычек, которые мешают женщинам сделать карьеру\", Маршалл Голдсмит, Салли Хелгесен\nАвторы описывают 12 привычек, которые мешают исключительно женщинам в их желании сделать карьеру. Книга поможет определить причины «пробуксовки», изменить свое поведение и выйти на новый профессиональный уровень.\n\n🔹 «Найти свое призвание», Кен Робинсон\nКнига помогает понять разницу между работой в режиме \"надо\" и работой, для которой ты был рожден. Даны конкретные инструменты самопознания, которые помогают разобраться в себе.\n\n🔸 «Кради как художник», Остин Клеон \nКнига вдохновляет тогда, когда наступает кризис идей. Чтобы нарисовать свою картину, нужно перерисовать сначала сотню копий.\n\n🔹 «Между надо и хочу», Эль Луна\nЕсли вы находитесь сейчас на распутье, вам обязательно нужно прочитать эту книгу! Этакая книга-собеседник. Шаги предельно понятны: нужно изучить свои \"надо\", понять, чего \"хочу\", и действовать.\n\n🔸 «Предназначение», Александр Рей\nКнига-тренинг с пошаговой инструкцией, что нужно сделать, чтобы найти свое предназначение. Много философских высказываний, которые запоминаешь надолго.\n\n🔹 «Работа твоей мечты», Барбара Шер\nСборник советов и идей по тому, как правильно подобрать работу мечты. Некоторые из них чуть наивны. Помогает выйти за рамки стандартного понимания карьеры.\n\n🔸 «Работа», Байрон Кейти\nКнига-путеводитель для работы над собой. Если технику 4 вопросов выполнить честно, результат не заставит себя ждать.\n\n🔹 «Great work. Как найти вдохновение, полюбить свою работу и начать зарабатывать», Дэвид Стерт.\nКнига помогает понять, на что стоит тратить свое время для достижения успеха. Автор рассказывает о пяти практических навыках, которые помогут придумать новые идеи, инновационные подходы и делать такую работу, которую заметят и оценят.\n\n🔸 «Энергия – новая валюта. Как поддерживать баланс жизненных сил», Леонид Кроль\nКнига о том, как правильно распределять энергию. О том, как у разных людей разные источники наполнения. В книге много примеров и практических рекомендаций.",
+          "categories": [
+            "office"
+          ]
+        },
+        {
+          "id": "mat60",
+          "source_ref": "XLS1-R060",
+          "kind": "material",
+          "material_key": "MAT-R060",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "id": "M21",
+      "schedule": {
+        "anchor": "probation_end",
+        "months": 0,
+        "days": 0,
+        "working_day": null,
+        "at": "09:00",
+        "next_workday": false
+      },
+      "kind": "flow",
+      "text": "Завершение адаптации",
+      "informal_text": null,
+      "branch_codes": [],
+      "categories": [],
+      "resource_keys": [],
+      "document_ids": [],
+      "survey_id": null,
+      "manual": false,
+      "reply_to": "none",
+      "source_refs": [
+        "XLS1-R061",
+        "XLS1-R062",
+        "XLS1-R063",
+        "XLS1-R065",
+        "XLS1-R066",
+        "XLS1-R067",
+        "XLS1-R068"
+      ],
+      "actions": [
+        {
+          "id": "r61",
+          "source_ref": "XLS1-R061",
+          "kind": "material",
+          "text": "Дорогой {name},\nЭти 3 месяца пролетели так быстро! Ты только начинаешь познавать нашу компанию и вот, уже завершился твой адаптационный период...\n\nПока эмоции все еще свежи, поделишься с нами своими впечатлениями от прохождения испытательного срока?",
+          "material_key": "MAT-R061"
+        },
+        {
+          "id": "questions_time",
+          "kind": "wait",
+          "at": "09:01"
+        },
+        {
+          "id": "survey_M21",
+          "kind": "survey",
+          "survey_id": "M21",
+          "text": ""
+        },
+        {
+          "id": "r66",
+          "source_ref": "XLS1-R066",
+          "kind": "message",
+          "text": "Спасибо! Мы обязательно учтем твои рекомендации 💙"
+        },
+        {
+          "id": "r67",
+          "source_ref": "XLS1-R067",
+          "kind": "message",
+          "text": "И напоследок кидаю тебе плейлист для концентрации внимания! 🎶",
+          "buttons": [
+            {
+              "type": "link",
+              "text": "плейлист",
+              "url": "https://music.yandex.ru/artist/5631933?lang=en"
+            }
+          ]
+        },
+        {
+          "id": "farewell",
+          "kind": "choice",
+          "text": "Кажется, все вопросы заданы, а материалы переданы. Пришло время нам с тобой попрощаться на ближайшее время.\n\nНадеюсь, я немного ускорил процесс твоего погружения в нашу компанию и помог приспособиться к новой среде. Если в будущем тебе понадобится помощь, я думаю, ты уже знаешь, что всегда можешь обратиться к моим коллегам в HR.\n\nНаше с тобой общение подошло к концу, я был рад тебя сопровождать! \nДо встречи, {name}! 👋🏻",
+          "options": [
+            {
+              "id": "1",
+              "label": "Пока, Корсик! 💙"
+            },
+            {
+              "id": "2",
+              "label": "😭😞😭😞🥺😞"
+            }
+          ],
+          "source_ref": "XLS1-R068"
+        },
+        {
+          "id": "mat68",
+          "source_ref": "XLS1-R068",
+          "kind": "material",
+          "material_key": "MAT-R068",
+          "text": ""
+        }
+      ]
+    }
+  ],
+  "surveys": [
+    {
+      "id": "M14",
+      "title": "Опрос третьего рабочего дня",
+      "questions": [
+        {
+          "id": "D3Q01",
+          "text": "Вопрос 1: Были ли вопросы при оформлении?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "o1",
+              "label": "Все отлично!",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "Остались вопросы",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Хорошо, я тебя понял! Помни, что ты всегда можешь связаться с рекрутером, описать проблему или задать интересующие тебя вопросы.",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o3",
+              "label": "Возникли трудности с документами",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Очень важно иметь возможность полноценно изучить подписываемые документы. Я буду благодарен, если ты поделишься с нами, почему у тебя не получилось этого сделать. В чем заключалась проблема?",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": false
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R039"
+        },
+        {
+          "id": "D3Q02",
+          "text": "Вопрос 2: Как тебя встретили новые коллеги?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "o1",
+              "label": "Отлично!",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "Пока присматриваюсь",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o3",
+              "label": "Никак, все заняты",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Жалко, что не удалось познакомиться с новыми коллегами. Скорее всего, ты вышел на работу в период большой нагрузки, такое бывает. Но если тебе кажется, что что-то пошло не так, то не бойся поднять этот вопрос со своим руководителем или написать моим коллегам в HR. Мы всегда готовы помочь.",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": false
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R040"
+        },
+        {
+          "id": "D3Q03",
+          "text": "Вопрос 3: Понятны ли тебе задачи на испытательный срок?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "o1",
+              "label": "Да, все понятно!",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Отлично 💪🏻",
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "Жду разъяснений от руководителя",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Хорошо. Если в ближайшее время ты не получишь разъяснения по своим задачам, то лучше всего будет напрямую обсудить этот вопрос с руководителем. Также помни, что ты всегда можешь связаться с рекрутером, описать проблему или задать интересующие тебя вопросы. Мы всегда готовы помочь.",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o3",
+              "label": "Пока ничего не понял",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Понимание своих задач на испытательном сроке - ключевой элемент его успешного прохождения. Если у тебя нет четкого представления, в чем будет заключаться твоя работа на ближайшие три месяца, то лучше всего обсудить этот вопрос с руководителем. Если недопонимание так и не прояснилось после общения с руководителем, то ты всегда можешь написать моим коллегам в отдел подбора персонала.",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": false
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R041"
+        }
+      ],
+      "reminder_days": [],
+      "kind": "survey",
+      "pass_percent": 70,
+      "completion_text": "Спасибо за обратную связь!\nУвидимся завтра 👋🏻",
+      "source_refs": []
+    },
+    {
+      "id": "M15",
+      "title": "Двухнедельный опрос",
+      "questions": [
+        {
+          "id": "W2Q01",
+          "text": "Вам понятны поставленные задачи?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "yes",
+              "label": "Да",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "no",
+              "label": "Нет",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R047"
+        },
+        {
+          "id": "W2Q02",
+          "text": "Вам достаточно информации для качественного выполнения вашей работы",
+          "kind": "single",
+          "options": [
+            {
+              "id": "yes",
+              "label": "Да",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "no",
+              "label": "Нет",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R047"
+        },
+        {
+          "id": "W2Q03",
+          "text": "Насколько доступен ваш руководитель для вопросов и обратной связи?",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": true,
+          "comment_contact_alternative": false,
+          "minimum_label": "недоступен",
+          "maximum_label": "всегда доступен",
+          "source_ref": "XLS1-R047"
+        },
+        {
+          "id": "W2Q04",
+          "text": "Оцените качество обратной связи от руководителя.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": true,
+          "comment_contact_alternative": false,
+          "minimum_label": "отсутствует",
+          "maximum_label": "исчерпывающая",
+          "source_ref": "XLS1-R047"
+        },
+        {
+          "id": "W2Q05",
+          "text": "Насколько ваши коллеги оказывают поддержку при появлении вопросов или сложностей в работе",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": true,
+          "comment_contact_alternative": false,
+          "minimum_label": "нет взаимодействия",
+          "maximum_label": "отличное взаимодействие",
+          "source_ref": "XLS1-R047"
+        },
+        {
+          "id": "W2Q06",
+          "text": "Оцените уровень поддержки по вопросам связанным с настройкой и предоставлением доступов/техники/рабочего пространства.",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": true,
+          "comment_contact_alternative": false,
+          "minimum_label": "низкий",
+          "maximum_label": "высокий",
+          "source_ref": "XLS1-R047"
+        },
+        {
+          "id": "W2Q07",
+          "text": "Насколько своевременно были предоставлены необходимые доступы. Обязательное поле (",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": true,
+          "comment_contact_alternative": false,
+          "minimum_label": "были задержки",
+          "maximum_label": "без задержек",
+          "source_ref": "XLS1-R047"
+        },
+        {
+          "id": "W2Q08",
+          "text": "Как вы оцениваете качество поддержки от HR по возникающим вопросам?",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "низкое",
+          "maximum_label": "очень высокое",
+          "source_ref": "XLS1-R047"
+        },
+        {
+          "id": "W2Q09",
+          "text": "Оцените, пожалуйста, качество поддержки HR в подготовке к трудоустройству?",
+          "kind": "rating",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": 8,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "низкое",
+          "maximum_label": "очень высокое",
+          "source_ref": "XLS1-R047"
+        }
+      ],
+      "reminder_days": [],
+      "kind": "survey",
+      "pass_percent": 70,
+      "completion_text": "",
+      "source_refs": []
+    },
+    {
+      "id": "M16",
+      "title": "Первый месяц",
+      "questions": [
+        {
+          "id": "plan",
+          "text": "Мы придаём большое значение успешной адаптации новых сотрудников. Подскажи, как идет работа по адаптационному плану?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "o1",
+              "label": "Все хорошо! Продвигаюсь по плану",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Прекрасно! Тогда, продолжай в том же духе 💪🏻",
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "Все ок! Немного отстаю от графика",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Прекрасно! Тогда, продолжай в том же духе 💪🏻",
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o3",
+              "label": "Я отстаю от графика.",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Спасибо за обратную связь! Ты можешь связаться с HR-специалистом с помощью команды /HR или направить сообщение через меня, описав трудности, с которыми ты столкнулся.",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": false
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R049"
+        }
+      ],
+      "reminder_days": [],
+      "kind": "survey",
+      "pass_percent": 70,
+      "completion_text": "",
+      "source_refs": []
+    },
+    {
+      "id": "M18_55",
+      "title": "Опрос настроения и поддержки",
+      "questions": [
+        {
+          "id": "MOODQ01",
+          "text": "С каким настроением ты ежедневно приходишь на работу?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "o1",
+              "label": "С отличным! Мне все нравится!",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "С безразличным: поработал и ушел",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Очень жаль, что работа не приносит тебе удовольствие. Если я и мои коллеги можем помочь тебе чем-то, направь вопрос в отдел подбора персонала. Мы вместе постараемся придумать решение и сделать твою жизнь на работе комфортнее.",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": true
+            },
+            {
+              "id": "o3",
+              "label": "Уже устал, а задачи все валятся",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Мы все иногда можем сталкиваться с большим объемом работы, короткими сроками или слишком высокими ожиданиями со стороны руководства и коллег. Все это может создать большое давление и привести к отрицательным последствиям для физического и эмоционального здоровья. 😞\nСостояние эмоционального напряжения не является нормой, и в таком случае я бы рекомендовал обратиться в отдел подбора персонала: описать свою проблему, чтобы мы вместе придумали, как исправить ситуацию и сделать твою жизнь на работе комфортнее.",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": true
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R055"
+        },
+        {
+          "id": "MOODQ02",
+          "text": "Кто тебе помогает в период испытательного срока?",
+          "kind": "multiple",
+          "options": [
+            {
+              "id": "o1",
+              "label": "Руководитель",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "Коллеги",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o3",
+              "label": "Рекрутер",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o4",
+              "label": "Никто!",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Поддержка - важная составляющая успешной адаптации. Я всегда готов помочь тебе! Но какие-то вопросы слишком сложные, чтобы я мог решить их самостоятельно. В таких случаях ты всегда можешь обратиться за помощью к рекрутеру.",
+              "exclusive": true,
+              "support_actions": true,
+              "reply_after_survey": true
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R055"
+        },
+        {
+          "id": "MOODQ03",
+          "text": "Что помогло бы ускорить твою адаптацию?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "o1",
+              "label": "Удаленный формат работы",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "Более четкие задачи",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o3",
+              "label": "Автоматизация процессов",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o4",
+              "label": "Помощь коллег",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o5",
+              "label": "Свой вариант",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R055"
+        }
+      ],
+      "reminder_days": [],
+      "kind": "survey",
+      "pass_percent": 70,
+      "completion_text": "Спасибо за обратную связь!",
+      "source_refs": []
+    },
+    {
+      "id": "M18_56",
+      "title": "Опрос настроения и поддержки",
+      "questions": [
+        {
+          "id": "MOODQ01",
+          "text": "С каким настроением ты ежедневно приходишь на работу?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "o1",
+              "label": "С отличным! Мне все нравится!",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "С безразличным: поработал и ушел",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Очень жаль, что работа не приносит тебе удовольствие. Если я и мои коллеги можем помочь тебе чем-то, направь вопрос в отдел подбора персонала. Мы вместе постараемся придумать решение и сделать твою жизнь на работе комфортнее.",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": true
+            },
+            {
+              "id": "o3",
+              "label": "Уже устал, а задачи все валятся",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Мы все иногда можем сталкиваться с большим объемом работы, короткими сроками или слишком высокими ожиданиями со стороны руководства и коллег. Все это может создать большое давление и привести к отрицательным последствиям для физического и эмоционального здоровья. 😞\nСостояние эмоционального напряжения не является нормой, и в таком случае я бы рекомендовал обратиться в отдел подбора персонала: описать свою проблему, чтобы мы вместе придумали, как исправить ситуацию и сделать твою жизнь на работе комфортнее.",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": true
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R056"
+        },
+        {
+          "id": "MOODQ02",
+          "text": "Кто тебе помогает в период испытательного срока?",
+          "kind": "multiple",
+          "options": [
+            {
+              "id": "o1",
+              "label": "Руководитель",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "Коллеги",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o3",
+              "label": "Рекрутер",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o4",
+              "label": "Никто!",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Поддержка - важная составляющая успешной адаптации. Я всегда готов помочь тебе! Но какие-то вопросы слишком сложные, чтобы я мог решить их самостоятельно. В таких случаях ты всегда можешь обратиться за помощью к рекрутеру.",
+              "exclusive": true,
+              "support_actions": true,
+              "reply_after_survey": true
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R056"
+        },
+        {
+          "id": "MOODQ03",
+          "text": "Что помогло бы ускорить твою адаптацию?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "o1",
+              "label": "Более четкие задачи",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "Автоматизация процессов",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o3",
+              "label": "Помощь коллег",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o4",
+              "label": "Свой вариант",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R056"
+        }
+      ],
+      "reminder_days": [],
+      "kind": "survey",
+      "pass_percent": 70,
+      "completion_text": "Спасибо за обратную связь!",
+      "source_refs": []
+    },
+    {
+      "id": "M21",
+      "title": "Итоговый опрос",
+      "questions": [
+        {
+          "id": "FINALQ01",
+          "text": "Вопрос 1: Что было самым сложным в период адаптации?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "o1",
+              "label": "Со всем справился",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "Коммуникации с другими отделами",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o3",
+              "label": "Нечеткие задачи",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o4",
+              "label": "Другое",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": null,
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R062"
+        },
+        {
+          "id": "FINALQ02",
+          "text": "Вопрос 2: Планируешь ли ты продолжить работу по итогам испытательного срока?",
+          "kind": "single",
+          "options": [
+            {
+              "id": "o1",
+              "label": "Да, однозначно!",
+              "needs_comment": false,
+              "notify_hr": false,
+              "reply": "Мы рады видеть тебя в нашей команде и надеемся, что ты останешься с нами на долгое время! 🎉",
+              "exclusive": false,
+              "support_actions": false,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o2",
+              "label": "Не уверен",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": "Могу ли я поинтересоваться, в чем причина твоих сомнений по поводу нашей компании?",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": false
+            },
+            {
+              "id": "o3",
+              "label": "Нет, задумываюсь об уходе",
+              "needs_comment": true,
+              "notify_hr": false,
+              "reply": "Очень жаль, что ты сомневаешься в дальнейшем сотрудничестве с нами. Могу ли я поинтересоваться, что на это повлияло?",
+              "exclusive": false,
+              "support_actions": true,
+              "reply_after_survey": false
+            }
+          ],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": true,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R063"
+        },
+        {
+          "id": "FINALQ03",
+          "text": "Что порекомендуешь улучшить для более комфортной адаптации сотрудника?",
+          "kind": "text",
+          "options": [],
+          "minimum": 1,
+          "maximum": 10,
+          "comment_below": null,
+          "comment_prompt": "Расскажите, пожалуйста, подробнее.",
+          "correct_options": [],
+          "points": 1,
+          "optional_comment_on_positive": false,
+          "comment_contact_alternative": false,
+          "minimum_label": "",
+          "maximum_label": "",
+          "source_ref": "XLS1-R065"
+        }
+      ],
+      "reminder_days": [],
+      "kind": "survey",
+      "pass_percent": 70,
+      "completion_text": "",
+      "source_refs": []
+    }
+  ]
+}

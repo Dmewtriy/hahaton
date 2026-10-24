@@ -1,0 +1,2567 @@
+{
+  "version": "0.4",
+  "source_file": "Финал. ТЗ. Чат-бот Корсик- 15.09.xlsx",
+  "sha256": "e1017eecc95ed3a2287e9d9c11fe2da5e275c5f0886b63c4944c636557d9e9e6",
+  "read_date": "2026-10-24",
+  "sheets": [
+    {
+      "name": "27.02.2026",
+      "dimension": "A1:J1043",
+      "state": "visible",
+      "merged_ranges": [],
+      "hidden_rows": [],
+      "hidden_columns": [],
+      "cells": {
+        "A1": {
+          "value": "Техническое задание — сценарий на разработку чат-бота по адаптации новых сотрудников",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A2": {
+          "value": "№ п/п",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B2": {
+          "value": "Месяц/день/время информирования",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C2": {
+          "value": "Информационный повод",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D2": {
+          "value": "Тег сотрудника",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E2": {
+          "value": "Форма/Макет",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F2": {
+          "value": "Текст сообщения",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G2": {
+          "value": "Обязательный этап",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I2": {
+          "value": "Сопроводительное изображение",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A3": {
+          "value": 0,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B3": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F3": {
+          "value": "Что умеет этот бот... ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G3": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I3": {
+          "value": "Изображение 14",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A4": {
+          "value": 0,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B4": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F4": {
+          "value": "Добро пожаловать в нашу команду!\n Привет-привет-привет! 🐾 Меня зовут Корсик, ваш персональный гид по миру Группы ПОЛИПЛАСТИК! 🤗  \n\nРад знакомству и обещаю сделать вашу адаптацию веселой, легкой и комфортной! 💃 Вместе мы изучим компанию и найдем друзей среди лучших специалистов отрасли. 🌟  \n\nГотов делиться секретами успешной интеграции, отвечать на ваши вопросы и помогать адаптироваться в новом коллективе! 👍\n\nДавайте начнем путешествие навстречу большим профессиональным успехам и теплым отношениям! ✨  \n\nКорсик",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G4": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I4": {
+          "value": "Изображение 2",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A5": {
+          "value": "2023-01-01T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B5": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C5": {
+          "value": "Уточнить, как можно обращаться к сотруднику",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E5": {
+          "value": "Следующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F5": {
+          "value": "Как мы будем общаться?",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G5": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A6": {
+          "value": "2023-02-01T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B6": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C6": {
+          "value": "Уточнить, как можно обращаться к сотруднику",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E6": {
+          "value": "Следующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F6": {
+          "value": "Варианты ответов:\n1) На ТЫ\n2) На ВЫ\n",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G6": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A7": {
+          "value": "2023-03-01T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B7": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E7": {
+          "value": "Следующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F7": {
+          "value": "Очень приятно с тобой познакомиться, Х! ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G7": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A8": {
+          "value": "2023-04-01T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B8": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C8": {
+          "value": "Знакомство с Корсиком (имя бота)",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E8": {
+          "value": "QR-код на оффер и/или приглашение дублирует рекрутер. Корсик_Приветствие",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F8": {
+          "value": "1.\tВариант: Меня зовут Корсик, я помогу тебе быстро и легко адаптироваться на новом рабочем месте!\n2.\tВариант: Я — чат-бот, созданный специально для того, чтобы облегчить твоё знакомство с новым рабочим местом и ускорить адаптацию!\n\nВ течение первых трех месяцев я буду сопровождать тебя в пути, предоставлять информацию о компании, которая поможет тебе лучше ориентироваться в рабочей среде. ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G8": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I8": {
+          "value": "Изображение 1",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A9": {
+          "value": "2023-05-01T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B9": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C9": {
+          "value": "Проинформировать кандидата о списке документов, необходимых для оформления",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D9": {
+          "value": "GrPP, Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E9": {
+          "value": "Следующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F9": {
+          "value": "Для того, чтобы ты пришел подготовленный в свой первый рабочий день, ознакомься со списком необходимых для оформления документов и подготовь их к своему выходу на работу.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G9": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I9": {
+          "value": "Изображение 3",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "J9": {
+          "value": "Необходимые документы для Вашего трудоустройства:\n1.\tБумажная трудовая книжка и сведения о трудовой деятельности (можно выгрузить с сайта гос. услуг);\n2.\tПаспорт;\n3.\tСНИЛС;\n4.\tИНН;\n5.\tДокумент об образовании (диплом, свидетельства, удостоверения, допуски);\n6.\tСвидетельство о браке/разводе (в случае смены ФИО);\n7.\tСвидетельство о рождении ребенка (до 18 лет);\n8.\tДокументы воинского учета.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": {
+            "author": "Комарова Елена Васильевна",
+            "text": "Комарова Елена Васильевна:\nэтот список на картинке"
+          },
+          "hyperlink": null
+        },
+        "A10": {
+          "value": "2023-05-01T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B10": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C10": {
+          "value": "Проинформировать кандидата о списке документов, необходимых для оформления",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D10": {
+          "value": "GTP",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E10": {
+          "value": "Следующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F10": {
+          "value": "Для того, чтобы ты пришел подготовленный в свой первый рабочий день, ознакомься со списком необходимых для оформления документов и подготовь их к своему выходу на работу.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G10": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I10": {
+          "value": "Изображение 3",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "J10": {
+          "value": "Необходимые документы для Вашего трудоустройства:\n1.\tБумажная трудовая книжка и сведения о трудовой деятельности (можно выгрузить с сайта гос. услуг);\n2.\tПаспорт;\n3.\tСНИЛС;\n4.\tИНН;\n5.\tДокумент об образовании (диплом, свидетельства, удостоверения, допуски);\n6.\tСвидетельство о браке/разводе (в случае смены ФИО);\n7.\tСвидетельство о рождении ребенка (до 18 лет);\n8.\tДокументы воинского учета.\n9. Фотографии 3*4 в количестве 2шт (Цвет/ЧБ)",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": {
+            "author": "Комарова Елена Васильевна",
+            "text": "Комарова Елена Васильевна:\nэтот список на картинке"
+          },
+          "hyperlink": null
+        },
+        "B11": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C11": {
+          "value": "Проинформировать кандидата о корпоративном транспорте",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D11": {
+          "value": "GrPP",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E11": {
+          "value": "Следующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F11": {
+          "value": "Чтобы дорога до офиса была комфортнее, у нас есть корпоративный транспорт! Рассказать о маршрутах и расписании?",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G11": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B12": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C12": {
+          "value": "Проинформировать кандидата о корпоративном транспорте",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D12": {
+          "value": "GTP",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E12": {
+          "value": "Следующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F12": {
+          "value": "Чтобы дорога до предприятия была комфортнее, у нас есть корпоративный транспорт! Рассказать о маршрутах и расписании?",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G12": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B13": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C13": {
+          "value": "Проинформировать кандидата о корпоративном транспорте",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D13": {
+          "value": "Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E13": {
+          "value": "Следующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F13": {
+          "value": "Чтобы ты легко спланировал свой маршрут в первый день, я собрал для тебя всю информацию о том, как добраться до офиса. Интересно?",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G13": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B14": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F14": {
+          "value": "Я готов  поделиться самыми интересными фактами о своей организации.\n\n🧑🏼‍🔧 Факт №1: Я горжусь тем, что работаю в компании, которая делает мир лучше каждый день! Наши инновационные трубы помогают обеспечивать чистой водой миллионы людей по всей стране. А ещё, знаешь, какое наше самое гордое достижение? Наша продукция помогает экономить природные ресурсы благодаря долговечности и энергоэффективности. Представляешь, как круто создавать будущее экологически чистым способом?\n\n📚 Факт №2: Знаешь, какой секрет успешной карьеры в нашем дружном коллективе? Здесь ценят инициативу и поддерживают таланты! Все сотрудники имеют равные возможности развиваться профессионально и строить карьеру. Даже я иногда участвую в тренингах и семинарах — расширяю кругозор и делюсь знаниями с новичками.\n\n🛠️ Факт №3: Кстати, хочешь посмотреть мир и почувствовать себя настоящим путешественником? Группа «ПОЛИПЛАСТИК» имеет филиалы по всей России и странам СНГ, так что твоя карьера может легко превратиться в захватывающее приключение. Стартуя с одного города, можно переехать куда угодно и покорять вершины успеха в любой точке страны. Ммм... интересно, правда же?\n\nПрисоединяйся к нашей большой команде, ведь здесь тебя ждут интересные проекты, поддержка коллег и большие перспективы!",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G14": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A15": {
+          "value": "2023-07-01T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B15": {
+          "value": "За 2-3 дня до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E15": {
+          "value": "Следующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F15": {
+          "value": "Очень скоро мы начнем полноценное погружение в компанию, а пока отдыхай. Я напишу тебе за день до выхода на работу \n\nДо встречи, Х! 👋🏻 ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G15": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A16": {
+          "value": 2,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B16": {
+          "value": "За день до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C16": {
+          "value": "Первый рабочий день",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E16": {
+          "value": "Корсик_Первый рабочий день",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F16": {
+          "value": "Привет, Х! Уже завтра наступит твой первый рабочий день. Ты готов?\nВарианты ответов:\n1) Да, жду не дождусь!\n2) Готов/Готова \n3) Да, но немного волнуюсь\n\nЕсли ответили 1-2:\nСупер! Мне нравится твой настрой ✨ \n\nЕсли ответили 3:\nЭто нормально - немного волноваться в твой первый рабочий день. Поверь мне, я сам через это все проходил, когда меня создавали 😓 \n\nВесь первый день мы проведем вместе, я тебе расскажу все самое важное о нашей компании и пришлю много полезной информации, чтобы твое погружение прошло как можно легче. ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G16": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B17": {
+          "value": "За день до выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C17": {
+          "value": "Первый рабочий день",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D17": {
+          "value": "Напомнить кандидату о списке документов, необходимых для оформления",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F17": {
+          "value": "Для того, чтобы ты пришел подготовленный в свой первый рабочий день, напоминаю про список необходимых для оформления документов, подготовь их к своему выходу на работу.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G17": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I17": {
+          "value": "Изображение 3",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "J17": {
+          "value": "Необходимые документы для Вашего трудоустройства:\n1.\tБумажная трудовая книжка и сведения о трудовой деятельности (можно выгрузить с сайта гос. услуг);\n2.\tПаспорт;\n3.\tСНИЛС;\n4.\tИНН;\n5.\tДокумент об образовании (диплом, свидетельства, удостоверения, допуски);\n6.\tСвидетельство о браке/разводе (в случае смены ФИО);\n7.\tСвидетельство о рождении ребенка (до 18 лет);\n8.\tДокументы воинского учета.\n9. Фотографии 3*4 в количестве 2шт (Цвет/ЧБ)",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": {
+            "author": "Комарова Елена Васильевна",
+            "text": "Комарова Елена Васильевна:\nэтот список на картинке"
+          },
+          "hyperlink": null
+        },
+        "A18": {
+          "value": 3,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B18": {
+          "value": "В первый рабочий день в 10:00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C18": {
+          "value": "Поздравление с первым рабочим днем.\n Отправка всех доступов к системам",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E18": {
+          "value": "Корсик_С началом деятельности - открытка. \n Доступы к системам",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F18": {
+          "value": "Поздравляю с первым рабочим днем, Х!  🥳\n\nУверен, что ты будешь отлично справляться со своими задачами, вносить свой вклад в наше общее дело и делиться идеями. Мы всегда готовы поддержать тебя и создать комфортные условия для работы. Пожалуйста, не стесняйся, обращайся к коллегам из нашей команды, мы всегда открыты для общения. ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G18": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I18": {
+          "value": "Изображение 4",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B19": {
+          "value": "В первый рабочий день в 10:00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C19": {
+          "value": "Поздравление с первым рабочим днем.\n Отправка всех доступов к системам",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F19": {
+          "value": "отправить приветственное письмо\nЗдравствуйте, Имя кандидата!\n\nОт лица всей команды поздравляем Вас с вступлением в наши ряды! Мы искренне рады видеть нового коллегу среди наших профессионалов и уверены, что ваше присоединение станет важным этапом в развитии компании.\n\nПрежде всего хотим выразить благодарность за доверие и выбор именно нашего коллектива. Впереди у вас много интересных проектов, профессиональных достижений и замечательных знакомств с новыми коллегами.\n\nПеред первым рабочим днем мы подготовили для вас важную информацию:\n\n- Вы получите доступ ко внутренней документации и необходимым сервисам для начала работы.\n- В течение первой рабочей недели мы познакомим вас с основными процессами, покажем рабочее пространство и представим коллектив.\n- Ваш непосредственный руководитель и куратор подробно расскажут обо всех аспектах вашей будущей деятельности.\n\nЖелаем Вам успешного старта, увлекательной работы и вдохновляющих результатов! Уверены, впереди нас ждет многое, и ваша работа внесёт весомый вклад в развитие компании.\n\nЕсли возникнут любые вопросы или пожелания, пожалуйста, сообщайте нам сразу. Мы готовы поддержать вас на каждом этапе вашего пути.\n\nДобро пожаловать в нашу команду!",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B20": {
+          "value": "В первый рабочий день в 11:00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C20": {
+          "value": "Отправка карты территории организации",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D20": {
+          "value": "GTP",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F20": {
+          "value": "Наша территория довольно большая, но я помогу тебе в ней разобраться! Хочешь, я покажу подробную карту?",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G20": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B21": {
+          "value": "В первый рабочий день в 11:00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C21": {
+          "value": "Отправка карты этажей офиса",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D21": {
+          "value": "Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F21": {
+          "value": "Наш офис довольно большой, но я помогу тебе в нем разобраться! Хочешь я покажу тебе подробную карту?",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G21": {
+          "value": "да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A22": {
+          "value": "2023-01-03T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B22": {
+          "value": "В первый рабочий день в 12:00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D22": {
+          "value": "GrPP, Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E22": {
+          "value": "Корсик_Доступы",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F22": {
+          "value": "Тебе предстоит многое узнать о нашей компании. Но сначала решим пару организационных вопросов.\n\nНа твоем рабочем месте тебя будет ждать необходимая техника. Для тебя уже заведена учетная запись и доступы IT. Есть ли у тебя все необходимые доступы и материалы?\n\nВарианты ответов:\n- Да, все есть\n- Нет\n\nЕсли да:\nЗамечательно! Тогда пока осваивайся, а я напишу тебе чуть позже.\n\nЕсли нет:\nНичего страшного! В таком случае лучше всего уточнить у твоего руководителя, когда будут заведены доступы и предоставлены необходимые материалы.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G22": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A23": {
+          "value": "2023-01-03T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B23": {
+          "value": "В первый рабочий день в 12:00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D23": {
+          "value": "GTP",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E23": {
+          "value": "Корсик_Доступы",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F23": {
+          "value": "Тебе предстоит многое узнать о нашей компании. Но сначала решим пару организационных вопросов.\n\nК вашему первому рабочему дню мы подготовили рабочее место и необходимое оборудование. Всё настроено для начала работы. Все ли необходимое у вас в наличии?\n\nВарианты ответов:\n- Да, все есть\n- Нет\n\nЕсли да:\nЗамечательно! Тогда пока осваивайся, а я напишу тебе чуть позже.\n\nЕсли нет:\nНичего страшного! В таком случае лучше всего уточнить у твоего руководителя, когда будут заведены доступы и предоставлены необходимые материалы.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G23": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B24": {
+          "value": "В первый рабочий день в 12:01",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E24": {
+          "value": "Следующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F24": {
+          "value": "Дарю небольшую открытку!\n# Приложить Открытку к сообщению",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I24": {
+          "value": "Изображение Открытка №1",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A25": {
+          "value": "2023-02-03T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B25": {
+          "value": "В первый рабочий день В 12.30",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C25": {
+          "value": "Вопрос:  Хочешь, подскажу, где пообедать?",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E25": {
+          "value": "Корсик_Где пообедать_вопрос",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F25": {
+          "value": "Хочешь, подскажу, где пообедать?\n\nВарианты ответов:\n- Да!\n- Нет, спасибо!\n\nЕсли нет:\nЯ тебя понял! Если ты передумаешь, ты всегда можешь набрать /Food и я подскажу тебе где пообедать.\n\nЕсли да:\nСледующая реплика",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G25": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B26": {
+          "value": "В случае варианта ответа\n «Да»",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C26": {
+          "value": "Ответ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D26": {
+          "value": "GrPP",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E26": {
+          "value": "Корсик_Где пообедать_ответ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F26": {
+          "value": "#Приложить пдф-ку с перечнем вкусных заведений в месте работы сотрудника\nПриятного аппетита! ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G26": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I26": {
+          "value": "Изображение 5",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B27": {
+          "value": "В случае варианта ответа\n «Да»",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C27": {
+          "value": "Ответ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D27": {
+          "value": "Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E27": {
+          "value": "Корсик_Где пообедать_ответ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F27": {
+          "value": "#Приложить пдф-ку с перечнем вкусных заведений в месте работы сотрудника\nПриятного аппетита! ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G27": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I27": {
+          "value": "Изображение 5",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B28": {
+          "value": "В случае варианта ответа\n «Да»",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C28": {
+          "value": "Ответ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D28": {
+          "value": "GTP",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E28": {
+          "value": "Корсик_Где пообедать_ответ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F28": {
+          "value": "#Приложить пдф-ку с перечнем вкусных заведений в месте работы сотрудника\nПриятного аппетита! ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G28": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I28": {
+          "value": "Изображение 5",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A29": {
+          "value": "3.3",
+          "data_type": "s",
+          "number_format": "@",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B29": {
+          "value": "В первый рабочий день 13.00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C29": {
+          "value": "Справочник контактов.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E29": {
+          "value": "Корсик_Справочник",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F29": {
+          "value": "Я думаю, ты уже немного освоился на рабочем месте и успел познакомиться с небольшой частью нашего коллектива. В команде ПОЛИПЛАСТИК 8500 человек! ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G29": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A30": {
+          "value": "3.3",
+          "data_type": "s",
+          "number_format": "@",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B30": {
+          "value": "В первый рабочий день 13.00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C30": {
+          "value": "Справочник контактов.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D30": {
+          "value": "GrPP, Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E30": {
+          "value": "Корсик_Справочник",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F30": {
+          "value": "Присылаю справочник с контактами сотрудников 💫  https://my.polyplastic.ru/employees/Pages/address-book.aspx\n# Приложить ссылку на справочник\nОбращаю внимание: справочник доступен исключительно с рабочих устройств внутри корпоративной сети либо при входе через корпоративную учётную запись.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G30": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I30": {
+          "value": "Изображение 6",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A31": {
+          "value": "3.3",
+          "data_type": "s",
+          "number_format": "@",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B31": {
+          "value": "В первый рабочий день 13.00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C31": {
+          "value": "Справочник контактов.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D31": {
+          "value": "GTP",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E31": {
+          "value": "Корсик_Справочник",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F31": {
+          "value": "Присылаю справочник с контактами сотрудников 💫  \nhttp://ats/\n# Приложить ссылку на справочник\nОбращаю внимание: справочник доступен исключительно с рабочих устройств внутри корпоративной сети либо при входе через корпоративную учётную запись.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G31": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I31": {
+          "value": "Изображение 6",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A32": {
+          "value": "2023-04-03T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B32": {
+          "value": "В первый рабочий день В 15.00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C32": {
+          "value": "Корпоративная презентация о компании",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E32": {
+          "value": "Корсик_Ты – часть большой команды (презентация)",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F32": {
+          "value": "\nМы ценим каждого сотрудника и верим, что только вместе мы сможем достичь больших результатов. Ты - часть нашей команды, и твой вклад в проекты, которые мы реализуем, имеет огромное значение. Наша миссия – улучшать качество жизни людей, создавая удобную и долговечную инфраструктуру для жизни и бизнеса, развивая новый технологический уклад, задавая отраслевые стандарты качества продукта и сервиса.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G32": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A33": {
+          "value": "2023-05-03T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B33": {
+          "value": "В первый рабочий день В 18:00 для сотрудников офиса",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C33": {
+          "value": "Окончание первого рабочего дня",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E33": {
+          "value": "Корсик _первый рабочий день",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F33": {
+          "value": "Первый рабочий день позади!\n\nЭто очень важный момент, первые шаги в новой работе всегда особенные. Я уверен, что ты успешно справился со своими первыми задачами.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G33": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I33": {
+          "value": "Изображение 10",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B34": {
+          "value": "Во второй рабочий день 10:00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F34": {
+          "value": "Составь, пожалуйста краткое описание своего опыта, навыков и достижений, приложи фотографию. Я представлю тебя коллегам (образец)",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "H34": {
+          "value": "переменная по отмашке рекрутера",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A35": {
+          "value": 5,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B35": {
+          "value": "В третий рабочий день в 09.00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C35": {
+          "value": "Адаптационный план. Для офисных сотрудников",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E35": {
+          "value": "Корсик_Твой руководитель для тебя составил адаптационный план",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F35": {
+          "value": "Привет, Х! \nКак быстро летит время! Мы только познакомились, и вот уже наступил твой третий рабочий день. ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F36": {
+          "value": "Надеюсь, что ты уже чуть лучше понимаешь нашу компанию, наши ценности и правила. Чтобы полностью влиться в команду, твой руководитель подготовил для тебя адаптационный план. \n\nЕсли у тебя возникнут вопросы или потребуется помощь во время адаптации, не бойся обращаться к своему руководителю. \n\n#Адаптационный план",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "H36": {
+          "value": "переменная по отмашке рекрутера",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I36": {
+          "value": "Изображение 7",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B37": {
+          "value": "В третий рабочий день в 11.00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C37": {
+          "value": "Информация о спортивном зале",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D37": {
+          "value": "GTP",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F37": {
+          "value": "Мы заботимся о твоем здоровье и продуктивности! На территории предприятия есть спортивный комплекс, где ты можешь позаниматься после работы. Рассказать подробнее о расписании и оснащении?",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G37": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B38": {
+          "value": "В третий рабочий день В 17:30",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F38": {
+          "value": "Первые пару дней на новом месте могут быть немного сложными, поэтому мы предлагаем пройти тебе опрос, чтобы поделиться с нами своими впечатлениями!",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G38": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A39": {
+          "value": "2023-01-05T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B39": {
+          "value": "В третий рабочий день В 17:30",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C39": {
+          "value": "Опрос по итогам третьего рабочего дня",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E39": {
+          "value": "Опрос бота",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F39": {
+          "value": "Вопрос 1: Были ли вопросы при оформлении?\nА) Все отлично!\nБ) Остались вопросы\nВ) Возникли трудности с документами\n\nЕсли ответ А: Переход к Вопросу 2\n\nЕсли ответ Б: Хорошо, я тебя понял! Помни, что ты всегда можешь связаться с рекрутером, описать проблему или задать интересующие тебя вопросы. \nВозможность для сотрудника нажать кнопку \"связаться с рекрутером\" (=перейти в диалог к нему). Далее переход ко 2 вопросу.\n\nЕсли ответ В: Очень важно иметь возможность полноценно изучить подписываемые документы. Я буду благодарен, если ты поделишься с нами, почему у тебя не получилось этого сделать. В чем заключалась проблема? \nОпции для сотрудника: передать проблему в отдел подбора персонала через Корсика (возможность написать что-то в диалоге с Корсиком), связаться с рекрутером (перейти в диалог c рекрутером). Далее переход ко 2 вопросу.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G39": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B40": {
+          "value": "В третий рабочий день В 17:30",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F40": {
+          "value": "Вопрос 2: Как тебя встретили новые коллеги?\nА) Отлично!\nБ) Пока присматриваюсь\nВ) Никак, все заняты\n\nЕсли ответ А: Переход к Вопросу 3\n\nЕсли ответ Б: Переход к Вопросу 3\n\nЕсли ответ В: Жалко, что не удалось познакомиться с новыми коллегами. Скорее всего, ты вышел на работу в период большой нагрузки, такое бывает. Но если тебе кажется, что что-то пошло не так, то не бойся поднять этот вопрос со своим руководителем или написать моим коллегам в HR. Мы всегда готовы помочь.\nОпции для сотрудника: передать проблему в HR через Корсика, связаться с HR (перейти в диалог к нему). Далее переход к 3 вопросу.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G40": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B41": {
+          "value": "В третий рабочий день В 17:30",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F41": {
+          "value": "Вопрос 3: Понятны ли тебе задачи на испытательный срок?\nА) Да, все понятно!\nБ) Жду разъяснений от руководителя\nВ) Пока ничего не понял\n\nЕсли ответ А: Отлично 💪🏻\n\nЕсли ответ Б: Хорошо. Если в ближайшее время ты не получишь разъяснения по своим задачам, то лучше всего будет напрямую обсудить этот вопрос с руководителем. Также помни, что ты всегда можешь связаться с рекрутером, описать проблему или задать интересующие тебя вопросы. Мы всегда готовы помочь.\nВозможность для сотрудника нажать кнопку \"связаться с рекрутером\" (=перейти в диалог к нему).\n\nЕсли ответ В: Понимание своих задач на испытательном сроке - ключевой элемент его успешного прохождения. Если у тебя нет четкого представления, в чем будет заключаться твоя работа на ближайшие три месяца, то лучше всего обсудить этот вопрос с руководителем. Если недопонимание так и не прояснилось после общения с руководителем, то ты всегда можешь написать моим коллегам в отдел подбора персонала.\n\nОпции для сотрудника: передать проблему в отдел персонала через Корсика, связаться с рекрутером (перейти в диалог к нему). ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G41": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B42": {
+          "value": "В третий рабочий день В 17:30",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F42": {
+          "value": "Спасибо за обратную связь!\nУвидимся завтра 👋🏻",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G42": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A43": {
+          "value": 6,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B43": {
+          "value": "Через 10 дней после выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C43": {
+          "value": "Информация о корпоративных праздниках, спортивных мероприятиях – фотоархив",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D43": {
+          "value": "GrPP, Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E43": {
+          "value": "Корсик_Как мы проводим корпоративные мероприятия",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F43": {
+          "value": "Привет, Х! \nСегодня я хотел бы рассказать тебе об еще одном аспекте работы в нашей компании. ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B44": {
+          "value": "Через 10 дней после выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D44": {
+          "value": "GrPP, Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F44": {
+          "value": "Как мы проводим корпоративные мероприятия? ✨🎊\n\nНаши корпоративные мероприятия - это не только возможность для сотрудников отдохнуть и развлечься, но и важная часть культуры компании. Мы стремимся создать дружелюбную и поддерживающую атмосферу, где каждый сотрудник будет чувствовать себя частью нашей большой команды.\n\nФормат праздников варьируется от традиционных корпоративов до игровых мероприятий, таких как спортивные соревнования, профессиональные и календарные праздники.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I44": {
+          "value": "Изображение 11",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B45": {
+          "value": "Через 10 дней после выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D45": {
+          "value": "GrPP, Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F45": {
+          "value": "А вот пара фотографий с мероприятий\n\n",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I45": {
+          "value": "ФОТО",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A46": {
+          "value": 6,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B46": {
+          "value": "Через 10 дней после выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D46": {
+          "value": "GrPP, Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F46": {
+          "value": "Мы надеемся, что ты присоединишься к нам на ближайших мероприятиях и насладишься дружелюбной и позитивной атмосферой!",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B47": {
+          "value": "Через 2 недели после выхода на работу",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C47": {
+          "value": "Чек",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F47": {
+          "value": "Привет, Х!\nХотел узнать, как у тебя дела? Нужна ли помощь с чем-то?\n\n1.        Вам понятны поставленные задачи? (да/нет) \nПри отрицательном варианте в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n2.        Вам достаточно информации для качественного выполнения вашей работы (да/нет)\nПри отрицательном варианте в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n3.        Насколько доступен ваш руководитель для вопросов и обратной связи? (шкала 1 - недоступен, 10 - всегда доступен) + поле для комментария. В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n4.        Оцените качество обратной связи от руководителя. (шкала 1 - отсутствует, 10 – исчерпывающая) + поле для комментария. В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n5.        Насколько ваши коллеги оказывают поддержку при появлении вопросов или сложностей в работе (Шкала 1 - нет взаимодействия, 10 - отличное взаимодействие) + поле для комментария. В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n6.        Оцените уровень поддержки по вопросам связанным с настройкой и предоставлением доступов/техники/рабочего пространства. (шкала 1 - низкий, 10 – высокий)  + поле для комментария. В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n7.        Насколько своевременно были предоставлены необходимые доступы. Обязательное поле (1 - были задержки, 10 - без задержек) + поле для комментария. В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n8.        Как вы оцениваете качество поддержки от HR по возникающим вопросам? 1 - низкое, 10 - очень высокое + поле для комментария (В случае ответа ниже 8). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n9.        Оцените, пожалуйста, качество поддержки HR в подготовке к трудоустройству? 1 - низкое, 10 - очень высокое + поле для комментария (В случае ответа ниже 8). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G47": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I47": {
+          "value": "Изображение 14",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A48": {
+          "value": 7,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B48": {
+          "value": "Первый день второго месяца работы в 09.00. ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C48": {
+          "value": "Поздравление с первым прошедшим месяцем. Вопрос: как идет работа по адаптационному плану",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E48": {
+          "value": "Корсик_первый день второго месяца. Как идет работа по адаптационному плану?",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F48": {
+          "value": "Привет, Х!\nПоздравляю тебя с успешным завершением месяца работы! Так держать!\n\nПусть каждый новый месяц приносит еще больше возможностей для развития.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G48": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I48": {
+          "value": "Изображение 10",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B49": {
+          "value": "Первый день второго месяца работы в 09.00. ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F49": {
+          "value": "Мы придаём большое значение успешной адаптации новых сотрудников. Подскажи, как идет работа по адаптационному плану?\n\n1) Все хорошо! Продвигаюсь по плану\n2) Все ок! Немного отстаю от графика\n3) Я отстаю от графика.\n\nЕсли 1-2: Прекрасно! Тогда, продолжай в том же духе 💪🏻\nЕсли 3 - Спасибо за обратную связь! Ты можешь связаться с HR-специалистом с помощью команды /HR или направить сообщение через меня, описав трудности, с которыми ты столкнулся.\n\nОпции для сотрудника: передать проблему в отдел подбора персонала через Корсика, связаться с рекрутером (перейти в диалог к нему).",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G49": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I49": {
+          "value": "Изображение 7",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B50": {
+          "value": "Через 1 месяц и  2 недели",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F50": {
+          "value": "Привет, Х!\nНебольшое напоминание: через 2-3 дня у тебя будет встреча с менеджером по подбору персонала для обсуждения продвижения по адаптационному плану. Все детали тебе пришлет закрепленный за тобой Сотрудник Отдела по подбору и адаптации персонала. 🙂",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I50": {
+          "value": "Изображение 15",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B51": {
+          "value": "Через 1 месяц и  2 недели",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F51": {
+          "value": "Привет, Х!",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G51": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B52": {
+          "value": "Через 1 месяц и  2 недели",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F52": {
+          "value": "А еще я собрал для тебя подборку фильмов, которые, возможно, тебе будет интересно посмотреть на выходных (подсказка: они связаны с выходом на новую работу!)\n\n1. «Дьявол носит Prada» (The Devil Wears Prada, 2006) 👠\nЭнди — главная героиня фильма — устраивается в модный журнал на должность младшей ассистентки главного редактора, Миранды Пристли. С каждым днем ей приходится выполнять все более немыслимые задачи жесткой начальницы, проверять себя, чтобы понять, чего она хочет на самом деле.\n\n2. «Стажёр» (The Intern, 2015) 👨🏻‍🦳\nГлавный герой, пенсионер Бен Уитакер, не побоялся в 70 лет стать стажером в крупном онлайн-магазине одежды. Он задает много вопросов, вникает в профессию и получает наслаждение от новой работы. Теплый и душевный фильм о том, что возраст для новых знаний не препятствие.\n\n3. В погоне за счастьем (The Pursuit of Happyness, 2006) 👨‍👦\nОтец-одиночка, Крис Гарднер, оказавшись в сложном финансовом положении, устраивается стажером в брокерскую компанию, рассчитывая получить должность специалиста. Только на протяжении стажировки он не будет получать никаких денег.\n\n4. Мне бы в небо (Up in the Air, 2009) ✈️\nФильм о жизни корпоративного юриста Райана Бингэма. Его работа заключается в том, чтобы сообщать сотрудникам из разных организаций неприятную новость, что они… уволены. Главный герой - живое воплощение успеха, о котором многие мечтают, но цена такого образа весьма высока.\n\n5. Я не знаю, как она делает это — комедия о работающей в консалтинговой компании маме с двумя маленькими детьми и желанием быть хорошим специалистом, мамой, женой. С хорошей щепоткой юмора.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G52": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B53": {
+          "value": "Через 1 месяц и  3 недели",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F53": {
+          "value": "Привет!\n# Приложить Открытку к сообщению",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G53": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I53": {
+          "value": "Изображение 8",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B54": {
+          "value": "Через 1 месяц и  3 недели",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F54": {
+          "value": "Мы подготовили небольшой опрос, чтобы ты смог поделиться с нами своими впечатлениями после двух месяцев работы.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G54": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A55": {
+          "value": "2023-01-08T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B55": {
+          "value": "Через 1 месяц и  3 недели. В 09.01",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C55": {
+          "value": "Опрос по итогам двух месяцев работы",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D55": {
+          "value": "GrPP, Luzhniki",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E55": {
+          "value": "Опрос бота",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F55": {
+          "value": "1) С каким настроением ты ежедневно приходишь на работу?\n - С отличным! Мне все нравится!\n - С безразличным: поработал и ушел\n - Уже устал, а задачи все валятся\n\n2) Кто тебе помогает в период испытательного срока? (несколько вариантов ответа)\n - Руководитель\n - Коллеги\n - Рекрутер\n - Никто!\n\n3) Что помогло бы ускорить твою адаптацию?\n - Удаленный формат работы\n - Более четкие задачи\n - Автоматизация процессов\n - Помощь коллег\n - Свой вариант: возможность написать свой вариант",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G55": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A56": {
+          "value": "2023-01-08T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B56": {
+          "value": "Через 1 месяц и  3 недели. В 09.01",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C56": {
+          "value": "Опрос по итогам двух месяцев работы",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D56": {
+          "value": "GTP",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E56": {
+          "value": "Опрос бота",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F56": {
+          "value": "1) С каким настроением ты ежедневно приходишь на работу?\n - С отличным! Мне все нравится!\n - С безразличным: поработал и ушел\n - Уже устал, а задачи все валятся\n\n2) Кто тебе помогает в период испытательного срока? (несколько вариантов ответа)\n - Руководитель\n - Коллеги\n - Рекрутер\n - Никто!\n\n3) Что помогло бы ускорить твою адаптацию?\n - Более четкие задачи\n - Автоматизация процессов\n - Помощь коллег\n - Свой вариант: возможность написать свой вариант",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G56": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F57": {
+          "value": "ОТВЕТЫ:\n\nСпасибо за обратную связь! \n\n+\n\nЕсли на первый вопрос сотрудник дал 2 вариант ответа:\nОчень жаль, что работа не приносит тебе удовольствие. Если я и мои коллеги можем помочь тебе чем-то, направь вопрос в отдел подбора персонала. Мы вместе постараемся придумать решение и сделать твою жизнь на работе комфортнее. \nОпции для сотрудника: передать проблему в отдел подбора персонала через Корсика, связаться с рекрутером (перейти в диалог к нему).\n\nЛИБО\n\nЕсли на первый вопрос сотрудник дал 3 вариант ответа:\nМы все иногда можем сталкиваться с большим объемом работы, короткими сроками или слишком высокими ожиданиями со стороны руководства и коллег. Все это может создать большое давление и привести к отрицательным последствиям для физического и эмоционального здоровья. 😞\nСостояние эмоционального напряжения не является нормой, и в таком случае я бы рекомендовал обратиться в отдел подбора персонала: описать свою проблему, чтобы мы вместе придумали, как исправить ситуацию и сделать твою жизнь на работе комфортнее. \nОпции для сотрудника: передать проблему в отдел подбора персонала через Корсика, связаться с рекрутером (перейти в диалог к нему).\n\n+\n\nЕсли на второй вопрос был дан 4-ый ответ:\nПоддержка - важная составляющая успешной адаптации. Я всегда готов помочь тебе! Но какие-то вопросы слишком сложные, чтобы я мог решить их самостоятельно. В таких случаях ты всегда можешь обратиться за помощью к рекрутеру.\nОпции для сотрудника: передать проблему в отдел подбора персонала через Корсика, связаться с рекрутером (перейти в диалог к нему).",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G57": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B58": {
+          "value": "Первый день третьего месяца в 09.00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C58": {
+          "value": "Два месяца работы. Поздравление, напоминание и опрос",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E58": {
+          "value": "Корсик _ Финишная прямая",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F58": {
+          "value": "Привет, Х! \nЯ давно тебе не писал, не хотел отвлекать от работы. Но не мог пропустить такую знаковую дату! \n\nТы уже на финишной прямой, совсем скоро закончится твой испытательный срок.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G58": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I58": {
+          "value": "Изображение 9",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B59": {
+          "value": "Через 2 месяца и 2 недели. Для офисных сотрудников",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F59": {
+          "value": "Привет, Х!\nПока мы не виделись, я собрал для тебя еще одну подборку. На этот раз - книги для саморазвития и карьерного роста. Надеюсь, что-то из списка приглянется 😉\n\n🔸 «Ты способна на большее. 12 привычек, которые мешают женщинам сделать карьеру\", Маршалл Голдсмит, Салли Хелгесен\nАвторы описывают 12 привычек, которые мешают исключительно женщинам в их желании сделать карьеру. Книга поможет определить причины «пробуксовки», изменить свое поведение и выйти на новый профессиональный уровень.\n\n🔹 «Найти свое призвание», Кен Робинсон\nКнига помогает понять разницу между работой в режиме \"надо\" и работой, для которой ты был рожден. Даны конкретные инструменты самопознания, которые помогают разобраться в себе.\n\n🔸 «Кради как художник», Остин Клеон \nКнига вдохновляет тогда, когда наступает кризис идей. Чтобы нарисовать свою картину, нужно перерисовать сначала сотню копий.\n\n🔹 «Между надо и хочу», Эль Луна\nЕсли вы находитесь сейчас на распутье, вам обязательно нужно прочитать эту книгу! Этакая книга-собеседник. Шаги предельно понятны: нужно изучить свои \"надо\", понять, чего \"хочу\", и действовать.\n\n🔸 «Предназначение», Александр Рей\nКнига-тренинг с пошаговой инструкцией, что нужно сделать, чтобы найти свое предназначение. Много философских высказываний, которые запоминаешь надолго.\n\n🔹 «Работа твоей мечты», Барбара Шер\nСборник советов и идей по тому, как правильно подобрать работу мечты. Некоторые из них чуть наивны. Помогает выйти за рамки стандартного понимания карьеры.\n\n🔸 «Работа», Байрон Кейти\nКнига-путеводитель для работы над собой. Если технику 4 вопросов выполнить честно, результат не заставит себя ждать.\n\n🔹 «Great work. Как найти вдохновение, полюбить свою работу и начать зарабатывать», Дэвид Стерт.\nКнига помогает понять, на что стоит тратить свое время для достижения успеха. Автор рассказывает о пяти практических навыках, которые помогут придумать новые идеи, инновационные подходы и делать такую работу, которую заметят и оценят.\n\n🔸 «Энергия – новая валюта. Как поддерживать баланс жизненных сил», Леонид Кроль\nКнига о том, как правильно распределять энергию. О том, как у разных людей разные источники наполнения. В книге много примеров и практических рекомендаций. \n",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G59": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B60": {
+          "value": "Через 2 месяца и 2 недели",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F60": {
+          "value": "# Приложить Открытку к сообщению",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G60": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I60": {
+          "value": "Изображение Открытка №2",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A61": {
+          "value": 9,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B61": {
+          "value": "Последний день испытат. срока в 09.00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C61": {
+          "value": "Поздравление с окончанием испытательного срока",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E61": {
+          "value": "Корсик _окончание испытательного срока",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F61": {
+          "value": "Дорогой Х,\nЭти 3 месяца пролетели так быстро! Ты только начинаешь познавать нашу компанию и вот, уже завершился твой адаптационный период...\n\nПока эмоции все еще свежи, поделишься с нами своими впечатлениями от прохождения испытательного срока?",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G61": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I61": {
+          "value": "Изображение 10",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A62": {
+          "value": "2023-01-09T00:00:00",
+          "data_type": "d",
+          "number_format": "d\\.m",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B62": {
+          "value": "В 09.01",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C62": {
+          "value": "Опрос по итогам испытательного срока",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E62": {
+          "value": "Опрос бота",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F62": {
+          "value": "Вопрос 1: Что было самым сложным в период адаптации?\nА) Со всем справился\nБ) Коммуникации с другими отделами\nВ) Нечеткие задачи\nГ) Другое: возможность отправить свой вариант ответа\n\nСразу после ответа переход к следующему вопросу.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G62": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F63": {
+          "value": "Вопрос 2: Планируешь ли ты продолжить работу по итогам испытательного срока?\nА) Да, однозначно!\nБ) Не уверен\nВ) Нет, задумываюсь об уходе\n\nЕсли ответ А: Мы рады видеть тебя в нашей команде и надеемся, что ты останешься с нами на долгое время! 🎉\nДалее переход к Вопросу 3\n\nЕсли ответ Б: Могу ли я поинтересоваться, в чем причина твоих сомнений по поводу нашей компании? \nВозможность для сотрудника ответить в чате с ботом либо нажать кнопку \"Готов озвучить причину в личной коммуникации с рекрутером\" для перехода в диалог к рекрутеру. Далее переход к Вопросу 3\n\nЕсли ответ В: Очень жаль, что ты сомневаешься в дальнейшем сотрудничестве с нами. Могу ли я поинтересоваться, что на это повлияло?\nВозможность для сотрудника ответить в чате с ботом либо нажать кнопку \"Готов озвучить причину в личной коммуникации с рекрутером\" для перехода в диалог к рекрутеру. Далее переход к Вопросу 3\n",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G63": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B64": {
+          "value": "Последний день ИС",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F64": {
+          "value": "      1. Оцените уровень нагрузки по задачам (1 - очень некомфортная, 10 - полностью комфортная) + поле для комментария (В случае ответа ниже 8). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n2.        Насколько ваши ожидания от работы совпадают с реальностью (1 - разочаровали, 10 - превзошли ожидания) + поле для комментария (В случае ответа ниже 8). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n3.        Вам достаточно информации для качественного выполнения вашей работы (да/нет)\n+поле для комментария (В случае ответа нет).  При отрицательном варианте в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n4.        Насколько доступен ваш руководитель для вопросов и обратной связи? (шкала 1 - недоступен, 10 - всегда доступен) + поле для комментария (В случае ответа ниже 8). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n5.        Оцените качество обратной связи от руководителя. (шкала 1 - отсутствует, 10 – исчерпывающая) + поле для комментария (В случае ответа ниже 8). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n6.        Насколько ваши коллеги оказывают поддержку при появлении вопросов или сложностей в работе (1 - нет взаимодействия, 10 - отличное взаимодействие). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n7.        Как вы оцениваете ваше взаимодействие с другими подразделениями (шкала 1-плохо 10-отличное взаимодействие). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n8.        Как вы оцениваете качество поддержки от HR по возникающим вопросам? 1 - низкое, 10 - очень высокое + поле для комментария (В случае ответа ниже 8). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.\n9.        Насколько вам удалось реализовать поставленные на испытательный срок задачи (1 – совсем не удалось, 10 – удалось полностью) + поле для комментария (В случае ответа ниже 8). В случае ответа ниже 8  в боте должно открываться диалоговое окно с просьбой указать причину/ы несогласия.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F65": {
+          "value": "Вопрос 3: Что порекомендуешь улучшить для более комфортной адаптации сотрудника?\nОткрытый вопрос",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G65": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F66": {
+          "value": "Спасибо! Мы обязательно учтем твои рекомендации 💙",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G66": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F67": {
+          "value": "И напоследок кидаю тебе плейлист для концентрации внимания! 🎶\n\n(наложить на слово \"плейлист\" гиперссылку на https://music.yandex.ru/artist/5631933?lang=en )",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": "https://music.yandex.ru/artist/5631933?lang=en"
+        },
+        "G67": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F68": {
+          "value": "Кажется, все вопросы заданы, а материалы переданы. Пришло время нам с тобой попрощаться на ближайшее время.\n\nНадеюсь, я немного ускорил процесс твоего погружения в нашу компанию и помог приспособиться к новой среде. Если в будущем тебе понадобится помощь, я думаю, ты уже знаешь, что всегда можешь обратиться к моим коллегам в HR.\n\nНаше с тобой общение подошло к концу, я был рад тебя сопровождать! \nДо встречи, Х! 👋🏻\n\nВарианты ответов:\n- Пока, Корсик! 💙\n- 😭😞😭😞🥺😞\n\n+ОТКРЫТКА с пожеланием",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "G68": {
+          "value": "Да",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I68": {
+          "value": "Изображение 16",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A69": {
+          "value": 0,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B69": {
+          "value": "Если сотрудник задаст вопрос Корсику (просто так) ",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F69": {
+          "value": "Какие-то вопросы слишком сложные, чтобы я мог решить их самостоятельно. Я посоветуюсь с коллегами из подбора персонала и вернусь с ответом!\n\nОпции для сотрудника: передать проблему в отдел подбора персонала через Корсика, связаться с рекрутером (перейти в диалог к нему)",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I69": {
+          "value": "Изображение 13",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "A70": {
+          "value": 0,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B70": {
+          "value": "Если Корсик запустил опрос, а сотрудник НЕ прошел его в течение 1 дня (напомнить на завтра + на послезавтра)",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "F70": {
+          "value": "Привет, Х!\nПишу с небольшим напоминанием, что ты не прошел опрос. \nПожалуйста, не забудь это сделать в ближайшее время.\n\nP.S.: Он займет всего 1-2 минуты!",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "I70": {
+          "value": "Изображение 12",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        }
+      }
+    },
+    {
+      "name": "Лист1",
+      "dimension": "A1:H1",
+      "state": "visible",
+      "merged_ranges": [],
+      "hidden_rows": [],
+      "hidden_columns": [],
+      "cells": {
+        "A1": {
+          "value": 8,
+          "data_type": "n",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "B1": {
+          "value": "Первый день третьего месяца в 09.00",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "C1": {
+          "value": "Два месяца работы. Поздравление, напоминание и опрос",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "D1": {
+          "value": "Корсик _Финишная прямая",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "E1": {
+          "value": "Привет, Х! \nЯ давно тебе не писал, не хотел отвлекать от работы. Но не мог пропустить такую знаковую дату! \n\nТы уже на финишной прямой, совсем скоро закончится твой испытательный срок.",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        },
+        "H1": {
+          "value": "Изображение с цитатой великих людей, например, Энштейн)",
+          "data_type": "s",
+          "number_format": "General",
+          "comment": null,
+          "hyperlink": null
+        }
+      }
+    }
+  ],
+  "embedded_media": [],
+  "required_rows": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    20,
+    21,
+    22,
+    23,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    47,
+    48,
+    49,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    65,
+    66,
+    67,
+    68
+  ],
+  "optional_rows": [
+    19,
+    24,
+    34,
+    35,
+    36,
+    43,
+    44,
+    45,
+    46,
+    50,
+    64,
+    69,
+    70
+  ]
+}

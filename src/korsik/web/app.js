@@ -28,7 +28,14 @@ import {
   campaignDetail,
 } from "./views-campaigns.js";
 import { ticketsPage, ticketDetail } from "./views-support.js";
+import {
+  teamPage,
+  meetingsPage,
+  digestsPage,
+  managerRulesPage,
+} from "./views-role.js";
 
+import { reportsPage, materialsPage, processingPage } from "./views-tools.js";
 const root = document.querySelector("#root");
 const definitions = [
   ["overview", "Обзор", "home", overview],
@@ -37,11 +44,18 @@ const definitions = [
   ["departments", "Подразделения", "department", departmentsPage],
   ["documents", "Документы", "document", documentsPage],
   ["surveys", "Опросники", "survey", surveysPage],
+  ["reports", "Выгрузки", "document", reportsPage],
+  ["materials", "Материалы маршрута", "document", materialsPage],
+  ["processing", "Обработка", "clock", processingPage],
   ["campaigns", "Рассылки", "send", campaignsPage],
   ["scenarios", "Адаптация", "scenario", scenariosPage],
   ["tickets", "Переписка HR", "ticket", ticketsPage],
   ["access", "Доступ и роли", "lock", accessPage],
   ["settings", "Настройки", "settings", settingsPage],
+  ["team", "Моя команда", "users", teamPage],
+  ["meetings", "Личные встречи", "users", meetingsPage],
+  ["digests", "Недельные сводки", "document", digestsPage],
+  ["manager-rules", "Назначение руководителей", "department", managerRulesPage],
 ];
 const ctx = {
   api,
@@ -99,6 +113,7 @@ ctx.loadRefs = async () => {
   );
   names.forEach((name, i) => (ctx.refs[name] = values[i]));
   ctx.refs.staff = await api.get("/api/staff-directory");
+  ctx.refs.reference = await api.get("/api/admin/reference-data");
 };
 ctx.refresh = async () => {
   await ctx.loadRefs();
@@ -109,14 +124,19 @@ ctx.navigate = async (view) => navigate(view);
 function shell() {
   const allowed = definitions.filter(
     ([name]) =>
-      name === "overview" ||
+      (name === "overview" && ctx.me.is_admin) ||
+      (name === "team" && ctx.me.capabilities.view_team) ||
+      (name === "meetings" &&
+        (ctx.me.capabilities.view_team || ctx.me.capabilities.manage_hr)) ||
+      (name === "digests" && ctx.me.roles.includes("hr_head")) ||
       (name === "access"
         ? ctx.me.capabilities.manage_people
         : name === "settings"
           ? ctx.me.capabilities.manage_hr || ctx.me.capabilities.manage_access
-          : ctx.me.capabilities.manage_hr),
+          : !["team", "meetings", "digests"].includes(name) &&
+            ctx.me.capabilities.manage_hr),
   );
-  root.innerHTML = `<div class="shell"><aside class="sidebar"><div class="brand"><span class="brand-mark">К</span><div><strong>Корсик</strong><small>Рабочее пространство HR</small></div></div><div class="nav-group eyebrow">Управление</div><nav aria-label="Основная навигация">${allowed.map(([name, label, symbol]) => `<button class="nav-btn" data-view="${name}">${icon(symbol)}<span>${label}</span>${name === "tickets" ? '<span class="inbox-nav-dot" data-inbox-badge hidden role="img" aria-label="Новые сообщения HR"></span>' : ""}</button>`).join("")}</nav><div class="nav-bottom"><div class="nav-scope">Область управления<strong>${e(ctx.me.branch_codes.includes("*") ? "Все площадки компании" : ctx.me.branch_codes.join(", ") || "Управление доступом")}</strong></div><button class="nav-btn" data-logout>${icon("logout")}Выйти</button></div></aside><div class="workspace"><header class="topbar"><div class="actions"><button class="icon-btn mobile-menu" data-menu aria-label="Открыть навигацию">${icon("menu")}</button><div class="breadcrumb">Рабочее пространство <span> / </span><strong id="current-section">Обзор</strong></div></div><div class="user-info"><span class="avatar">${e(initials(ctx.me.name))}</span><div><strong>${e(ctx.me.name)}</strong><small>${e(ctx.me.roles.map(roleName).join(", ") || "Администратор доступа")}</small></div></div></header><main id="content" class="content" tabindex="-1"></main></div></div>`;
+  root.innerHTML = `<div class="shell"><aside class="sidebar"><div class="brand"><span class="brand-mark">К</span><div><strong>Корсик</strong><small>${ctx.me.is_admin ? "Рабочее пространство HR" : "Моя команда"}</small></div></div><div class="nav-group eyebrow">Управление</div><nav aria-label="Основная навигация">${allowed.map(([name, label, symbol]) => `<button class="nav-btn" data-view="${name}">${icon(symbol)}<span>${label}</span>${name === "tickets" ? '<span class="inbox-nav-dot" data-inbox-badge hidden role="img" aria-label="Новые сообщения HR"></span>' : ""}</button>`).join("")}</nav><div class="nav-bottom"><div class="nav-scope">Область управления<strong>${e(ctx.me.branch_codes.includes("*") ? "Все площадки компании" : ctx.me.branch_codes.join(", ") || "Управление доступом")}</strong></div><button class="nav-btn" data-logout>${icon("logout")}Выйти</button></div></aside><div class="workspace"><header class="topbar"><div class="actions"><button class="icon-btn mobile-menu" data-menu aria-label="Открыть навигацию">${icon("menu")}</button><div class="breadcrumb">Рабочее пространство <span> / </span><strong id="current-section">Обзор</strong></div></div><div class="user-info"><span class="avatar">${e(initials(ctx.me.name))}</span><div><strong>${e(ctx.me.name)}</strong><small>${e(ctx.me.roles.map(roleName).join(", ") || "Администратор доступа")}</small></div></div></header><main id="content" class="content" tabindex="-1"></main></div></div>`;
   root
     .querySelectorAll("[data-view]")
     .forEach((b) => (b.onclick = () => navigate(b.dataset.view)));
@@ -153,7 +173,9 @@ async function navigate(view) {
   target.innerHTML =
     '<div class="loading" role="status">Загружаем данные…</div>';
   try {
-    const screen = await definition[3](ctx);
+    const screen = await (view === "overview" && !ctx.me.is_admin
+      ? teamPage(ctx)
+      : definition[3](ctx));
     if (request !== navigationId) return;
     target.innerHTML = screen.html;
     screen.bind?.(target);
@@ -169,13 +191,19 @@ async function navigate(view) {
 async function authenticated(token) {
   api.setToken(token);
   ctx.me = await api.get("/api/me");
-  if (!ctx.me.is_admin) {
+  if (!ctx.me.can_use_workspace) {
     api.setToken(null);
     throw new Error("У вашего аккаунта нет административного доступа");
   }
   await ctx.loadRefs();
   shell();
-  await navigate("overview");
+  await navigate(
+    ctx.me.capabilities.manage_hr
+      ? "overview"
+      : ctx.me.capabilities.view_team
+        ? "team"
+        : "access",
+  );
   startInboxPolling();
 }
 
@@ -186,7 +214,7 @@ async function loginScreen(message = "") {
   } catch {
     config = { local_login: false };
   }
-  root.innerHTML = `<div class="login-screen"><section class="login-brand"><div class="brand"><span class="brand-mark">К</span><strong>Корсик</strong></div><div><div class="eyebrow">Люди. Поддержка. Развитие.</div><h1>Хорошее начало<br>для каждого сотрудника.</h1><p>Всё для адаптации команды: сотрудники, знания, опросы и своевременная помощь HR.</p></div><footer>Кабинет администратора · ПОЛИПЛАСТИК</footer></section><section class="login-form-wrap"><div class="login-form"><h2>Кабинет HR</h2><p>${config.local_login ? "В MAX кабинет открывается автоматически. Для локальной работы войдите административным ключом." : "Откройте кабинет из бота MAX под аккаунтом HR или администратора."}</p>${config.local_login ? '<form id="local-login"><div class="field"><label for="admin-key">Ключ доступа</label><input id="admin-key" name="api_key" type="password" autocomplete="off" required placeholder="Вставьте ключ HR или администратора"></div><div class="form-error" role="alert"></div><button class="btn primary" type="submit">Войти в кабинет</button></form>' : ""}<div id="login-message" class="${message ? "notice warning" : ""}">${e(message)}</div><footer>Сотрудникам и руководителям без административных прав кабинет недоступен. Ключ остаётся только в памяти этой вкладки.</footer></div></section></div>`;
+  root.innerHTML = `<div class="login-screen"><section class="login-brand"><div class="brand"><span class="brand-mark">К</span><strong>Корсик</strong></div><div><div class="eyebrow">Люди. Поддержка. Развитие.</div><h1>Хорошее начало<br>для каждого сотрудника.</h1><p>Всё для адаптации команды: сотрудники, знания, опросы и своевременная помощь HR.</p></div><footer>Кабинет администратора · ПОЛИПЛАСТИК</footer></section><section class="login-form-wrap"><div class="login-form"><h2>Кабинет HR</h2><p>${config.local_login ? "В MAX кабинет открывается автоматически. Для локальной работы войдите ключом своего аккаунта." : "Откройте кабинет из бота MAX под аккаунтом HR, руководителя или администратора."}</p>${config.local_login ? '<form id="local-login"><div class="field"><label for="admin-key">Ключ доступа</label><input id="admin-key" name="api_key" type="password" autocomplete="off" required placeholder="Вставьте ключ HR или администратора"></div><div class="form-error" role="alert"></div><button class="btn primary" type="submit">Войти в кабинет</button></form>' : ""}<div id="login-message" class="${message ? "notice warning" : ""}">${e(message)}</div><footer>Сотрудники работают в чате. Руководителям доступен только просмотр своей команды. Ключ остаётся только в памяти этой вкладки.</footer></div></section></div>`;
   root
     .querySelector("#local-login")
     ?.addEventListener("submit", async (event) => {

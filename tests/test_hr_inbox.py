@@ -143,7 +143,7 @@ def test_inbox_reply_is_idempotent_and_uses_one_history(client, runtime):
         ).status_code
         == 409
     )
-    assert client.post("/api/admin/inbox/e1/resolve", headers=auth("hr-a-key")).json()["resolved"] == 1
+    assert client.post("/api/admin/inbox/e1/resolve", headers=auth("hr-a-key")).status_code == 409
     event(runtime, "/hr Новое сообщение")
     history = client.get("/api/admin/inbox/e1", headers=auth("hr-a-key")).json()["messages"]
     assert [m["text"] for m in history if m["kind"] == "employee"] == ["Вопрос", "Новое сообщение"]

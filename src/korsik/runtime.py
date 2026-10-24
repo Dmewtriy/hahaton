@@ -10,6 +10,7 @@ class Runtime:
         self.settings = settings
         settings.data_dir.mkdir(parents=True, exist_ok=True)
         self.db = database or Database(settings.database_url)
+        self.db.sessions.configure(info={"data_dir": settings.data_dir})
         self.ml = ml or (StubML() if settings.ml_mode == "stub" else HTTPML(settings))
         self.transport = transport or (MockMAX() if settings.transport == "mock" else MAXClient(settings))
 

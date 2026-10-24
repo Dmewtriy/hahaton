@@ -37,10 +37,15 @@ def employee_thread(session, actor, employee_id):
 
 def threads(session, actor, scope="mine", archived=False):
     access.require(access.is_hr(actor))
+    assigned = set(
+        session.scalars(
+            select(Ticket.employee_id).where(Ticket.recruiter_id == actor.id, Ticket.status != "closed")
+        )
+    )
     people = [
         e
         for e in analytics.visible_employees(session, actor)
-        if e.active != archived and (scope == "all" or e.recruiter_id == actor.id)
+        if e.active != archived and (scope == "all" or e.recruiter_id == actor.id or e.id in assigned)
     ]
     ids = [e.id for e in people]
     if not ids:
@@ -124,6 +129,19 @@ def history(session, actor, employee_id, *, before=0, after=0, limit=100):
         "recruiter_id": employee.recruiter_id,
         "active": employee.active,
         "has_more": more,
+        "cases": [
+            {
+                "id": t.id,
+                "reason": t.reason,
+                "status": t.status,
+                "resolution": t.resolution,
+                "recruiter_id": t.recruiter_id,
+                "outcome": t.outcome,
+            }
+            for t in session.scalars(
+                select(Ticket).where(Ticket.employee_id == employee_id).order_by(Ticket.created_at.desc())
+            )
+        ],
         "messages": [
             {
                 "id": m.id,
@@ -171,7 +189,7 @@ def send_employee_message(session, employee, text, key, reason="Сообщени
     return ticket
 
 
-def reply(session, actor, employee, text, key):
+def reply(session, actor, employee, text, key, ticket_id=None):
     from . import tickets
 
     existing = session.scalar(select(HRMessage).where(HRMessage.dedupe_key == "hr-out:" + key))
@@ -179,15 +197,25 @@ def reply(session, actor, employee, text, key):
         if existing.text != text:
             raise HTTPException(409, "Ключ отправки уже использован для другого сообщения")
         return existing
-    ticket = session.scalar(
-        select(Ticket)
-        .where(Ticket.employee_id == employee.id, Ticket.status != "closed")
-        .order_by(Ticket.created_at.desc(), Ticket.id.desc())
+    opened = list(
+        session.scalars(
+            select(Ticket)
+            .where(Ticket.employee_id == employee.id, Ticket.status != "closed")
+            .order_by(Ticket.created_at.desc())
+        )
     )
+    if ticket_id:
+        ticket = session.get(Ticket, ticket_id)
+        if not ticket or ticket.employee_id != employee.id or ticket.status == "closed":
+            raise HTTPException(409, "Обращение недоступно для ответа")
+    else:
+        if len(opened) > 1:
+            raise HTTPException(409, "Выберите обращение, на которое отвечаете")
+        ticket = opened[0] if opened else None
     if not ticket:
         ticket = tickets.open_ticket(
             session, employee, "Ответ HR", {"initiated_by_hr": actor.id}, "hr-out:" + key
         )
-    question = tickets.reply_question(session, employee, ticket, entire_thread=True)
+    question = tickets.reply_question(session, employee, ticket)
     tickets.reply(session, actor, employee, ticket, text, key, question=question)
     return session.scalar(select(HRMessage).where(HRMessage.dedupe_key == "hr-out:" + key))

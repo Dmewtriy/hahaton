@@ -37,7 +37,7 @@ def runtime(tmp_path):
         session.add(State(key="clock", value={"now": "2026-10-23T06:00:00+00:00"}))
         session.add(State(key="digest_policy", value={"enabled": False}))
         for code in ["A", "B"]:
-            session.add(Branch(code=code, name=code, timezone="Europe/Moscow"))
+            session.add(Branch(code=code, name=code, timezone="Europe/Moscow", late_join_policy="catch_up"))
         session.add_all(
             [
                 Identity(

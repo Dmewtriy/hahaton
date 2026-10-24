@@ -40,8 +40,20 @@ class SurveyInput(StrictModel):
     description: str = Field(default="", max_length=3000)
     branch_codes: list[str] = Field(min_length=1)
     questions: list[Question] = Field(min_length=1, max_length=100)
-    reminder_days: list[int] = Field(default_factory=lambda: [1, 2])
+    reminder_days: list[int] = Field(default_factory=lambda: [1, 2], max_length=10)
     revision: int | None = Field(default=None, ge=1)
+    kind: Literal["survey", "quiz"] = "survey"
+    pass_percent: int = Field(default=70, ge=0, le=100)
+
+    @model_validator(mode="after")
+    def validate_quiz(self):
+        if self.kind == "quiz" and any(not q.correct_options for q in self.questions):
+            raise ValueError("Для каждого вопроса теста выберите правильные ответы")
+        if len({q.id for q in self.questions}) != len(self.questions):
+            raise ValueError("Идентификаторы вопросов должны быть уникальными")
+        if any(day < 1 or day > 30 for day in self.reminder_days):
+            raise ValueError("Напоминания задаются через 1–30 дней")
+        return self
 
 
 class ScenarioEdit(ScenarioDefinition):
@@ -77,8 +89,9 @@ class CampaignInput(StrictModel):
     audience: AudienceInput
     due_at: datetime | None = None
     revision: int | None = Field(default=None, ge=1)
+    expires_at: datetime | None = None
 
-    @field_validator("due_at")
+    @field_validator("due_at", "expires_at")
     @classmethod
     def aware_datetime(cls, value):
         if value and value.tzinfo is None:
@@ -89,7 +102,24 @@ class CampaignInput(StrictModel):
     def survey_required(self):
         if self.kind == "survey" and not self.template_id:
             raise ValueError("Выберите опросник")
+        if self.expires_at and self.due_at and self.expires_at <= self.due_at:
+            raise ValueError("Срок прохождения должен быть позже отправки")
         return self
+
+
+class ManagerRuleInput(StrictModel):
+    recruiter_id: str
+    branch_code: str
+    manager_id: str
+
+
+class OnboardingAction(StrictModel):
+    action: Literal["complete", "stop", "resume"]
+
+
+class DocumentPublication(StrictModel):
+    auto_publish: bool
+    revision: int = Field(ge=1)
 
 
 class TicketInput(StrictModel):

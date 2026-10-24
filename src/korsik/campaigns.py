@@ -124,6 +124,9 @@ def save_campaign(session, actor, data, campaign_id=None):
     campaign.audience = data.audience.model_dump()
     campaign.branch_codes = scope
     campaign.due_at = data.due_at or now(session)
+    campaign.expires_at = data.expires_at
+    if campaign.expires_at and campaign.expires_at <= campaign.due_at:
+        raise HTTPException(422, "Срок прохождения должен быть позже времени отправки")
     session.add(campaign)
     session.flush()
     audit(session, actor, "campaign.save", campaign.id)
@@ -139,6 +142,8 @@ def publish(session, actor, campaign, expected_hash):
 
     if campaign.status != "draft" or not campaign.active:
         raise HTTPException(409, "Эта рассылка уже опубликована или находится в архиве")
+    if campaign.expires_at and campaign.expires_at <= now(session):
+        raise HTTPException(409, "Срок рассылки уже истёк. Измените черновик")
     members = audience_members(session, actor, AudienceInput.model_validate(campaign.audience))
     if not members:
         raise HTTPException(422, "Нет доступных получателей")
@@ -180,6 +185,7 @@ def publish(session, actor, campaign, expected_hash):
             "document_ids": campaign.document_ids,
             "resource_keys": [],
             "campaign_title": campaign.title,
+            "expires_at": campaign.expires_at.isoformat() if campaign.expires_at else None,
         }
         if campaign.survey_snapshot:
             payload["survey"] = campaign.survey_snapshot
@@ -243,6 +249,32 @@ def cancel(session, actor, campaign):
     return campaign
 
 
+def expire_assignments(session, at):
+    """Expire even unstarted assignments of users who have not accepted an invitation."""
+    for step in session.scalars(
+        select(ScheduledStep)
+        .join(Campaign)
+        .where(
+            Campaign.expires_at <= at,
+            Campaign.status != "cancelled",
+            ScheduledStep.status.in_(["pending", "manual", "enqueued", "queued", "dispatched"]),
+        )
+    ):
+        delivery = session.scalar(select(Outbox).where(Outbox.dedupe_key == "step:" + step.id))
+        if (
+            step.payload["kind"] == "message"
+            and delivery
+            and delivery.status in {"sent", "uncertain", "sending"}
+        ):
+            continue
+        step.status = "expired"
+        recipient = session.scalar(
+            select(CampaignRecipient).where(CampaignRecipient.scheduled_step_id == step.id)
+        )
+        if recipient:
+            recipient.status = "expired"
+
+
 def campaign_dto(session, campaign, include_recipients=False):
     recipients = list(
         session.scalars(select(CampaignRecipient).where(CampaignRecipient.campaign_id == campaign.id))
@@ -269,12 +301,21 @@ def campaign_dto(session, campaign, include_recipients=False):
                     "branch_code": employee.branch_code,
                     "status": status,
                     "survey_run_id": run.id if run else None,
+                    "result": run.result if run else None,
                 }
             )
     status = campaign.status
     if recipients and status != "cancelled":
         if all(k in {"completed", "sent"} for k in delivery_counts):
             status = "completed"
+        elif all(k in {"completed", "sent", "expired", "cancelled", "failed"} for k in delivery_counts):
+            status = (
+                "expired"
+                if "expired" in delivery_counts
+                else "failed"
+                if "failed" in delivery_counts
+                else "cancelled"
+            )
         elif any(k in {"active", "sent", "completed", "dispatched"} for k in delivery_counts):
             status = "sending"
     result = {
@@ -293,6 +334,7 @@ def campaign_dto(session, campaign, include_recipients=False):
         "recipient_count": len(recipients),
         "progress": dict(delivery_counts),
         "published_at": campaign.published_at,
+        "expires_at": campaign.expires_at.isoformat() if campaign.expires_at else None,
     }
     if include_recipients:
         result["recipients"] = rows

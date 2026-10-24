@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import or_, select
 
-from . import analytics, bot, documents, scenarios
+from . import bot, documents, onboarding, scenarios, surveys
 from .calendar import now
 from .db import utcnow
 from .max_client import DeliveryError, normalize_update
@@ -24,7 +24,6 @@ from .models import (
     uid,
 )
 from .queue import enqueue, send
-from .schemas import EscalationRules
 
 log = logging.getLogger("korsik.worker")
 
@@ -41,6 +40,19 @@ class Worker:
     def schedule(self):
         with self.runtime.db.transaction(write_lock=True) as session:
             at = now(session)
+            from .campaigns import expire_assignments
+
+            expire_assignments(session, at)
+            for employee in session.scalars(
+                select(Employee)
+                .where(
+                    Employee.onboarding_status == "active",
+                    Employee.probation_end <= (at + timedelta(days=1)).date(),
+                )
+                .with_for_update()
+            ):
+                onboarding.sync(session, employee)
+            surveys.expire_runs(session)
             due = session.scalars(
                 select(ScheduledStep)
                 .join(Employee)
@@ -55,7 +67,7 @@ class Worker:
                     Identity.max_user_id.is_not(None),
                     Branch.active.is_(True),
                 )
-                .order_by(ScheduledStep.due_at, ScheduledStep.step_key)
+                .order_by(ScheduledStep.due_at, ScheduledStep.order_index, ScheduledStep.id)
                 .limit(500)
                 .with_for_update()
             )
@@ -76,6 +88,12 @@ class Worker:
             )
             for employee in queued_employees:
                 scenarios.drain_dialogue_queue(session, employee)
+            from .routes import retry_blocked
+
+            retry_blocked(session)
+            from .meetings import route_pending
+
+            route_pending(session)
             self.schedule_digests(session, at)
 
     def schedule_digests(self, session, at):
@@ -157,6 +175,9 @@ class Worker:
                         doc = session.get(Document, job.payload.get("document_id"))
                         if doc:
                             doc.status = "failed"
+                            doc.last_error = (
+                                "Ошибка обработки: " + type(exc).__name__ + ". Повторите обработку."
+                            )
         return True
 
     def handle(self, session, job):
@@ -186,7 +207,13 @@ class Worker:
             run = session.get(SurveyRun, data["run_id"])
             if run and run.status == "active":
                 employee = session.get(Employee, run.employee_id)
-                if employee.active and employee.status == "active":
+                step = session.get(ScheduledStep, run.scheduled_step_id)
+                if (
+                    employee.active
+                    and employee.status == "active"
+                    and (step.campaign_id or employee.onboarding_status != "stopped")
+                    and (not run.expires_at or now(session) < run.expires_at)
+                ):
                     send(
                         session,
                         employee.identity_id,
@@ -202,8 +229,11 @@ class Worker:
             actor = session.get(Identity, data["identity_id"])
             if actor and actor.active and "hr_head" in actor.roles:
                 end = datetime.fromisoformat(data["end"])
-                report = analytics.dashboard(session, actor, end - timedelta(days=7), end)
-                send(session, actor.id, analytics.digest_text(report), job.dedupe_key, now(session))
+                from .digests import create_snapshot
+
+                snapshot = create_snapshot(session, actor, end, job.dedupe_key)
+                item = send(session, actor.id, snapshot.text, job.dedupe_key, now(session))
+                item.body = {**item.body, "digest_snapshot_id": snapshot.id}
         else:
             raise ValueError("Unknown job kind")
 
@@ -223,34 +253,18 @@ class Worker:
                 "access": {"branch_code": employee.branch_code, "category": employee.category},
             }
         )
-        session.add(
-            FeedbackAnalysis(
-                answer_id=answer.id,
-                employee_id=employee.id,
-                processor_version=result.processor_version,
-                result=result.model_dump(),
-                created_at=now(session),
-            )
+        analysis = FeedbackAnalysis(
+            answer_id=answer.id,
+            employee_id=employee.id,
+            processor_version=result.processor_version,
+            result=result.model_dump(),
+            created_at=now(session),
         )
-        policy = session.get(State, "escalation_rules")
-        rules = EscalationRules.model_validate(policy.value if policy else {})
-        rank = {"none": 0, "low": 1, "medium": 2, "high": 3}
-        if (
-            rules.enabled
-            and result.needs_hr
-            and rank[result.risk] >= rank[rules.minimum_risk]
-            and (not rules.topics or set(rules.topics) & set(result.topics))
-        ):
-            from .tickets import open_ticket
+        session.add(analysis)
+        session.flush()
+        from .feedback import apply_policy
 
-            open_ticket(
-                session,
-                employee,
-                "Сигнал по обратной связи",
-                {"answer_id": answer.id, "analysis": result.model_dump()},
-                f"answer:{answer.id}",
-                human=False,
-            )
+        apply_policy(session, employee, analysis, result)
 
     def index_document(self, session, job):
         doc = session.get(Document, job.payload["document_id"])
@@ -269,10 +283,29 @@ class Worker:
             if result.status == "ready" and self.runtime.settings.ml_mode == "stub"
             else result.status
         )
+        doc.last_error = (
+            "Не удалось обработать документ. Повторите обработку или загрузите другой файл."
+            if result.status == "failed"
+            else None
+        )
+        if result.status == "ready" and doc.auto_publish:
+            newer = session.scalar(
+                select(Document.id)
+                .where(
+                    Document.family_id == (doc.family_id or doc.id),
+                    Document.version > doc.version,
+                    Document.published.is_(True),
+                    Document.active.is_(True),
+                )
+                .limit(1)
+            )
+            if not newer:
+                documents.publish(session, doc)
         if result.status == "processing":
             poll = job.payload.get("poll", 0) + 1
             if poll > 240:
                 doc.status = "failed"
+                doc.last_error = "Превышено время ожидания обработки. Запустите обработку повторно."
                 return
             enqueue(
                 session,
@@ -309,7 +342,58 @@ class Worker:
             )
             if not item:
                 return False
+            if not onboarding.delivery_allowed(session, item):
+                item.status = "cancelled"
+                return True
+            if item.body.get("meeting_signal_id"):
+                from .meetings import delivery_allowed
+
+                if not delivery_allowed(session, item):
+                    item.status = "cancelled"
+                    return True
             actor = session.get(Identity, item.recipient_id) if item.recipient_id else None
+            if item.body.get("manager_employee_id"):
+                from .meetings import manager_for
+
+                owner = session.get(Employee, item.body["manager_employee_id"])
+                current_manager = manager_for(session, owner) if owner else None
+                if not current_manager or current_manager.id != item.recipient_id:
+                    item.status = "cancelled"
+                    return True
+            if item.body.get("support_employee_id"):
+                from . import support
+                from .models import Ticket
+
+                owner = session.get(Employee, item.body["support_employee_id"])
+                ticket = (
+                    session.get(Ticket, item.body.get("support_ticket_id"))
+                    if item.body.get("support_ticket_id")
+                    else None
+                )
+                if (
+                    not actor
+                    or not owner
+                    or not (
+                        support.can_support(actor, owner) and ticket.recruiter_id == actor.id
+                        if ticket
+                        else support.can_support(actor, owner) and owner.recruiter_id == actor.id
+                    )
+                ):
+                    item.status = "cancelled"
+                    return True
+            if item.body.get("digest_snapshot_id"):
+                from .digests import can_read_snapshot
+                from .models import DigestSnapshot
+
+                snapshot = session.get(DigestSnapshot, item.body["digest_snapshot_id"])
+                if (
+                    not actor
+                    or "hr_head" not in actor.roles
+                    or not snapshot
+                    or not can_read_snapshot(session, actor, snapshot)
+                ):
+                    item.status = "cancelled"
+                    return True
             if actor and not actor.active:
                 item.status = "cancelled"
                 return True
@@ -322,6 +406,27 @@ class Worker:
                 item.status = "cancelled"
                 return True
             user_id = actor.max_user_id if actor else item.target_user_id
+            from .routes import delivery_allowed as route_delivery_allowed
+
+            if not route_delivery_allowed(session, item, employee):
+                item.status = "cancelled"
+                return True
+            for doc_id in item.body.get("required_document_ids", []):
+                doc = session.get(Document, doc_id)
+                path = self.runtime.settings.data_dir / "documents" / doc.storage_name if doc else None
+                if (
+                    not doc
+                    or not actor
+                    or not documents.can_read(session, actor, doc)
+                    or doc.status not in {"ready", "ready_stub"}
+                    or not path.is_file()
+                ):
+                    item.status = "blocked_material"
+                    item.last_error = "required_material_unavailable"
+                    from .routes import block_delivery
+
+                    block_delivery(session, item)
+                    return True
             if not user_id:
                 # Staff may not have bound MAX yet; retain the notification for later delivery.
                 return False
@@ -366,6 +471,12 @@ class Worker:
                     time.sleep(0.55)  # Single delivery worker: below 2 messages/s per dialogue and 30 rps.
             with db.transaction(write_lock=True) as session:
                 session.get(Outbox, item_id).status = "sent"
+                if body.get("meeting_signal_id"):
+                    from .models import MeetingSignal
+
+                    signal = session.get(MeetingSignal, body["meeting_signal_id"])
+                    if signal:
+                        signal.status = "delivered"
         except Exception as exc:
             with db.transaction(write_lock=True) as session:
                 item = session.get(Outbox, item_id)

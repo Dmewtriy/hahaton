@@ -11,12 +11,29 @@ Role = Literal["employee", "hr", "manager", "hr_head"]
 class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
+    @field_validator("contact_url", "adaptation_plan_url", "it_access_url", check_fields=False)
+    @classmethod
+    def safe_url(cls, value):
+        from urllib.parse import urlsplit
+
+        if value:
+            parsed = urlsplit(value)
+            if (
+                parsed.scheme not in {"http", "https"}
+                or not parsed.hostname
+                or parsed.username
+                or parsed.password
+            ):
+                raise ValueError("Укажите HTTP(S)-ссылку без логина и пароля")
+        return value or None
+
 
 class IdentityCreate(StrictModel):
     name: str = Field(min_length=1, max_length=200)
     roles: list[Role] = Field(default_factory=list)
     manage_access: bool = False
     branch_codes: list[str] = Field(default_factory=list)
+    contact_url: str | None = Field(default=None, max_length=1024)
 
 
 class IdentityUpdate(StrictModel):
@@ -25,6 +42,7 @@ class IdentityUpdate(StrictModel):
     manage_access: bool = False
     branch_codes: list[str]
     active: bool = True
+    contact_url: str | None = Field(default=None, max_length=1024)
 
 
 class BranchInput(StrictModel):
@@ -37,6 +55,16 @@ class BranchInput(StrictModel):
     resources: dict[str, str] = Field(default_factory=dict)
     scenario_id: str | None = None
     active: bool = True
+    workplace: dict[str, str] = Field(default_factory=dict)
+    late_join_policy: Literal["catch_up", "skip_past", "review"] = "review"
+    support_recipient_ids: list[str] = Field(default_factory=list, max_length=100)
+
+    @field_validator("workplace")
+    @classmethod
+    def valid_workplace(cls, value):
+        if set(value) - {"city", "street", "building", "label"} or any(len(v) > 300 for v in value.values()):
+            raise ValueError("Адрес: city, street, building, label, до 300 символов каждое")
+        return value
 
     @field_validator("timezone")
     @classmethod
@@ -69,9 +97,12 @@ class EmployeeCreate(StrictModel):
     category: str = Field(default="office", min_length=1, max_length=64)
     recruiter_id: str
     manager_id: str | None = None
+    auto_assign_manager: bool = True
     hire_date: date
     probation_end: date | None = None
     timezone: str | None = None
+    adaptation_plan_url: str | None = Field(default=None, max_length=1024)
+    it_access_url: str | None = Field(default=None, max_length=1024)
 
     @field_validator("timezone")
     @classmethod
@@ -94,7 +125,10 @@ class Option(StrictModel):
     label: str = Field(min_length=1, max_length=150)
     needs_comment: bool = False
     notify_hr: bool = False
-    reply: str | None = Field(default=None, max_length=2000)
+    reply: str | None = Field(default=None, max_length=12000)
+    exclusive: bool = False
+    support_actions: bool = False
+    reply_after_survey: bool = False
 
 
 class Question(StrictModel):
@@ -106,6 +140,13 @@ class Question(StrictModel):
     maximum: int = 10
     comment_below: int | None = None
     comment_prompt: str = "Расскажите, пожалуйста, подробнее."
+    correct_options: list[str] = Field(default_factory=list)
+    points: int = Field(default=1, ge=1, le=100)
+    optional_comment_on_positive: bool = False
+    comment_contact_alternative: bool = False
+    minimum_label: str = Field(default="", max_length=200)
+    maximum_label: str = Field(default="", max_length=200)
+    source_ref: str | None = None
 
     @model_validator(mode="after")
     def validate_question(self):
@@ -119,6 +160,14 @@ class Question(StrictModel):
             raise ValueError("Rating bounds must satisfy 0 <= minimum < maximum <= 100")
         if self.comment_below is not None and not self.minimum <= self.comment_below <= self.maximum:
             raise ValueError("comment_below must be inside the rating range")
+        if self.correct_options and (
+            self.kind not in {"single", "multiple"}
+            or not set(self.correct_options) <= {o.id for o in self.options}
+            or len(set(self.correct_options)) != len(self.correct_options)
+            or self.kind == "single"
+            and len(self.correct_options) != 1
+        ):
+            raise ValueError("Укажите корректные варианты правильного ответа")
         return self
 
 
@@ -127,6 +176,10 @@ class SurveyDefinition(StrictModel):
     title: str = Field(min_length=1, max_length=200)
     questions: list[Question] = Field(min_length=1, max_length=100)
     reminder_days: list[int] = Field(default_factory=lambda: [1, 2], max_length=10)
+    kind: Literal["survey", "quiz"] = "survey"
+    pass_percent: int = Field(default=70, ge=0, le=100)
+    completion_text: str = Field(default="Спасибо за обратную связь! Опрос завершён.", max_length=12000)
+    source_refs: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_survey(self):
@@ -134,6 +187,8 @@ class SurveyDefinition(StrictModel):
             raise ValueError("Question IDs must be unique")
         if any(day < 1 or day > 30 for day in self.reminder_days):
             raise ValueError("Reminder offsets must be 1..30 days")
+        if self.kind == "quiz" and any(not q.correct_options for q in self.questions):
+            raise ValueError("Для теста у каждого вопроса должны быть правильные варианты")
         return self
 
 
@@ -149,7 +204,7 @@ class Schedule(StrictModel):
 class StepDefinition(StrictModel):
     id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
     schedule: Schedule = Field(default_factory=Schedule)
-    kind: Literal["message", "survey", "manager_reminder"] = "message"
+    kind: Literal["message", "survey", "manager_reminder", "flow"] = "message"
     text: str = Field(min_length=1, max_length=15000)
     informal_text: str | None = Field(default=None, max_length=15000)
     branch_codes: list[str] = Field(default_factory=list)
@@ -159,14 +214,18 @@ class StepDefinition(StrictModel):
     survey_id: str | None = None
     manual: bool = False
     reply_to: Literal["none", "hr"] = "none"
+    source_refs: list[str] = Field(default_factory=list)
+    actions: list[dict] = Field(default_factory=list, max_length=100)
 
     @field_validator("text", "informal_text")
     @classmethod
     def safe_template(cls, value):
+        from .templates import TOKENS
+
         if value:
             for _, key, spec, conversion in Formatter().parse(value):
-                if key is not None and (key not in {"name", "branch", "department"} or spec or conversion):
-                    raise ValueError("Only {name}, {branch}, {department} placeholders are supported")
+                if key is not None and (key not in TOKENS or spec or conversion):
+                    raise ValueError("Недопустимая подстановка в тексте")
         return value
 
 
@@ -186,6 +245,39 @@ class ScenarioDefinition(StrictModel):
         for step in self.steps:
             if step.kind == "survey" and step.survey_id not in survey_ids:
                 raise ValueError(f"Unknown survey in step {step.id}")
+            if step.kind == "flow":
+                if not step.actions:
+                    raise ValueError("Маршрут должен содержать действия")
+                ids = set()
+                for node in step.actions:
+                    if not node.get("id") or node["id"] in ids:
+                        raise ValueError("Действия маршрута требуют уникальных ID")
+                    ids.add(node["id"])
+                    if node.get("kind") not in {
+                        "message",
+                        "material",
+                        "choice",
+                        "survey",
+                        "employee_resource",
+                        "wait",
+                    }:
+                        raise ValueError("Неизвестное действие маршрута")
+                    if node["kind"] == "survey" and node.get("survey_id") not in survey_ids:
+                        raise ValueError("Неизвестный опрос маршрута")
+                    if node["kind"] == "material" and not node.get("material_key"):
+                        raise ValueError("Укажите ключ материала")
+                    if node["kind"] == "employee_resource" and node.get("field") not in {
+                        "it_access_url",
+                        "adaptation_plan_url",
+                    }:
+                        raise ValueError("Неизвестное поле персонального материала")
+                    if node["kind"] == "wait":
+                        from datetime import time
+
+                        time.fromisoformat(node.get("at", "invalid"))
+                    if node["kind"] == "choice" and not 1 <= len(node.get("options", [])) <= 20:
+                        raise ValueError("Действие выбора требует от 1 до 20 вариантов")
+                    StepDefinition.safe_template(node.get("text"))
         return self
 
 
@@ -221,6 +313,7 @@ class EscalationRules(StrictModel):
     enabled: bool = True
     minimum_risk: Literal["low", "medium", "high"] = "high"
     topics: list[str] = Field(default_factory=list)
+    recommend_meeting: bool = True
 
 
 class DigestPolicy(StrictModel):

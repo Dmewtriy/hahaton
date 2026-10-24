@@ -4,13 +4,11 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Header, HTTPException, Query
 from pydantic import Field
-from sqlalchemy import select
 
 from . import inbox
 from .admin_service import audit
-from .calendar import now
 from .dependencies import Admin, Session
-from .models import Identity, Ticket, uid
+from .models import Identity
 from .schemas import StrictModel, TextInput
 
 router = APIRouter(prefix="/api/admin/inbox", tags=["HR Inbox"])
@@ -18,6 +16,10 @@ router = APIRouter(prefix="/api/admin/inbox", tags=["HR Inbox"])
 
 class ReadInput(StrictModel):
     last_message_id: int = Field(ge=1)
+
+
+class ReplyInput(TextInput):
+    ticket_id: str | None = None
 
 
 @router.get("")
@@ -59,7 +61,7 @@ def read(employee_id: str, data: ReadInput, session: Session, actor: Admin):
 @router.post("/{employee_id}/messages", status_code=201)
 def reply(
     employee_id: str,
-    data: TextInput,
+    data: ReplyInput,
     session: Session,
     actor: Admin,
     idempotency_key: Annotated[str, Header(min_length=1, max_length=120)],
@@ -68,7 +70,12 @@ def reply(
     if not employee.active or not session.get(Identity, employee.identity_id).active:
         raise HTTPException(409, "Сначала восстановите доступ сотрудника")
     message = inbox.reply(
-        session, actor, employee, data.text, f"inbox:{actor.id}:{employee.id}:{idempotency_key}"
+        session,
+        actor,
+        employee,
+        data.text,
+        f"inbox:{actor.id}:{employee.id}:{idempotency_key}",
+        ticket_id=data.ticket_id,
     )
     audit(session, actor, "inbox.reply", employee.id)
     return {"message_id": message.id}
@@ -76,16 +83,5 @@ def reply(
 
 @router.post("/{employee_id}/resolve")
 def resolve(employee_id: str, session: Session, actor: Admin):
-    employee = inbox.employee_thread(session, actor, employee_id)
-    opened = list(
-        session.scalars(select(Ticket).where(Ticket.employee_id == employee_id, Ticket.status != "closed"))
-    )
-    for ticket in opened:
-        ticket.status, ticket.human_mode, ticket.closed_at = "closed", False, now(session)
-    if opened:
-        message = inbox.append(
-            session, employee, None, "system", "HR отметил обращения решёнными.", "resolve:" + uid(), actor.id
-        )
-        inbox.mark_read(session, actor, employee.id, message.id)
-    audit(session, actor, "inbox.resolve", employee.id)
-    return {"resolved": len(opened)}
+    inbox.employee_thread(session, actor, employee_id)
+    raise HTTPException(409, "Выберите одно обращение и предложите решение. Закрытие подтвердит сотрудник")

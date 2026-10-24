@@ -11,17 +11,23 @@ from .admin_schemas import (
     CampaignInput,
     DepartmentInput,
     DocumentInput,
+    DocumentPublication,
     EmployeeInput,
     LocalLoginInput,
+    ManagerRuleInput,
     ManualTicketInput,
     MaxLaunchInput,
+    OnboardingAction,
     PublishInput,
+    RevisionInput,
     ScenarioEdit,
     SurveyInput,
     TicketInput,
 )
 from .dependencies import Actor, Admin, Session, bearer, runtime_dependency
+from .feedback import processing_status
 from .models import (
+    AssignmentHistory,
     Branch,
     Campaign,
     Department,
@@ -29,6 +35,7 @@ from .models import (
     Employee,
     FeedbackAnalysis,
     Identity,
+    ManagerRule,
     Scenario,
     ScheduledStep,
     State,
@@ -51,7 +58,7 @@ def policies(session: Session, actor: Admin):
     result = {"can_edit": "*" in actor.branch_codes}
     for name, model in [("digest_policy", DigestPolicy), ("escalation_rules", EscalationRules)]:
         state = session.get(State, name)
-        result[name] = state.value if state else model().model_dump()
+        result[name] = model.model_validate(state.value if state else {}).model_dump()
     return result
 
 
@@ -108,7 +115,11 @@ def overview(session: Session, actor: Admin, runtime=Depends(runtime_dependency)
         return {"access_only": True, "totals": {}, "environment": runtime.settings.environment}
     data = analytics.dashboard(session, actor)
     data["document_count"] = sum(
-        d.active and documents.can_read(session, actor, d) for d in session.scalars(select(Document))
+        d.active
+        and d.published
+        and d.status in {"ready", "ready_stub"}
+        and documents.can_read(session, actor, d)
+        for d in session.scalars(select(Document))
     )
     data["branch_count"] = sum(
         b.active and access.in_scope(actor, b.code) for b in session.scalars(select(Branch))
@@ -140,6 +151,19 @@ def create_employee(data: EmployeeInput, session: Session, actor: Admin):
 def employee_detail(employee_id: str, session: Session, actor: Admin):
     employee = access.employee_for(session, actor, employee_id, support=True)
     result = service.employee_dto(session, employee)
+    from .models import RouteRun
+
+    result["route_runs"] = [
+        {
+            "id": r.id,
+            "scheduled_step_id": r.scheduled_step_id,
+            "position": r.position,
+            "status": r.status,
+            "last_error": r.last_error,
+            "trace": r.trace,
+        }
+        for r in session.scalars(select(RouteRun).where(RouteRun.employee_id == employee.id))
+    ]
     result["schedule"] = [
         {**scenarios.step_public(s), "text": s.payload["text"], "campaign_id": s.campaign_id}
         for s in session.scalars(
@@ -161,6 +185,7 @@ def employee_detail(employee_id: str, session: Session, actor: Admin):
                     "value": answer.value,
                     "comment": answer.comment,
                     "analysis": analysis.result if analysis else None,
+                    "analysis_processing": processing_status(session, answer),
                 }
             )
         result["surveys"].append(
@@ -170,9 +195,88 @@ def employee_detail(employee_id: str, session: Session, actor: Admin):
                 "status": run.status,
                 "position": run.position,
                 "answers": answers,
+                "expires_at": run.expires_at,
+                "result": run.result,
             }
         )
+    result["assignment_history"] = [
+        {"previous": h.previous, "current": h.current, "created_at": h.created_at}
+        for h in session.scalars(
+            select(AssignmentHistory)
+            .where(AssignmentHistory.employee_id == employee.id)
+            .order_by(AssignmentHistory.created_at)
+        )
+    ]
     return result
+
+
+@router.post("/employees/{employee_id}/onboarding")
+def employee_onboarding(employee_id: str, data: OnboardingAction, session: Session, actor: Admin):
+    from . import onboarding
+
+    employee = access.employee_for(session, actor, employee_id, support=True)
+    if data.action == "resume":
+        if onboarding.past_end(session, employee):
+            raise HTTPException(409, "Сначала установите будущую дату окончания адаптации")
+        employee.onboarding_status, employee.onboarding_ended_at = "active", None
+        scenarios.rebuild_schedule(session, employee)
+    else:
+        onboarding.finish(session, employee, "completed" if data.action == "complete" else "stopped")
+    employee.revision += 1
+    service.audit(session, actor, "onboarding." + data.action, employee.id)
+    return service.employee_dto(session, employee)
+
+
+@router.get("/manager-rules")
+def manager_rules(session: Session, actor: Admin):
+    service.require_hr(actor)
+    return [
+        {"id": r.id, "recruiter_id": r.recruiter_id, "branch_code": r.branch_code, "manager_id": r.manager_id}
+        for r in session.scalars(select(ManagerRule))
+        if access.in_scope(actor, r.branch_code)
+    ]
+
+
+@router.put("/manager-rules")
+def save_manager_rule(data: ManagerRuleInput, session: Session, actor: Admin):
+    service.check_branches(session, actor, [data.branch_code])
+    service.identity_reference(session, data.recruiter_id, ["hr", "hr_head"], data.branch_code)
+    service.identity_reference(session, data.manager_id, ["manager"], data.branch_code)
+    rule = session.scalar(
+        select(ManagerRule).where(
+            ManagerRule.recruiter_id == data.recruiter_id, ManagerRule.branch_code == data.branch_code
+        )
+    )
+    if not rule:
+        rule = ManagerRule(**data.model_dump())
+        session.add(rule)
+    else:
+        rule.manager_id = data.manager_id
+    session.flush()
+    service.audit(session, actor, "manager_rule.save", rule.id)
+    return {"id": rule.id}
+
+
+@router.delete("/manager-rules/{rule_id}")
+def delete_manager_rule(rule_id: str, session: Session, actor: Admin):
+    rule = resource(session, ManagerRule, rule_id)
+    service.check_scope(actor, [rule.branch_code])
+    service.audit(session, actor, "manager_rule.delete", rule.id)
+    session.delete(rule)
+    return {"ok": True}
+
+
+@router.put("/manager-rules/{rule_id}")
+def update_manager_rule(rule_id: str, data: ManagerRuleInput, session: Session, actor: Admin):
+    rule = resource(session, ManagerRule, rule_id)
+    service.check_scope(actor, [rule.branch_code])
+    service.check_branches(session, actor, [data.branch_code])
+    service.identity_reference(session, data.recruiter_id, ["hr", "hr_head"], data.branch_code)
+    service.identity_reference(session, data.manager_id, ["manager"], data.branch_code)
+    for key, value in data.model_dump().items():
+        setattr(rule, key, value)
+    service.audit(session, actor, "manager_rule.update", rule.id)
+    return {"id": rule.id}
 
 
 @router.put("/employees/{employee_id}")
@@ -343,6 +447,8 @@ def archive_document(document_id: str, session: Session, actor: Admin):
 def restore_document(document_id: str, session: Session, actor: Admin):
     document = scoped_resource(session, actor, Document, document_id)
     service.archive(session, actor, document, active=True)
+    # Restoring a retired version must never silently replace the current regulation.
+    document.published = False
     return documents.public_document(document)
 
 
@@ -355,6 +461,12 @@ def document_version(
     runtime=Depends(runtime_dependency),
 ):
     previous = scoped_resource(session, actor, Document, document_id)
+    root = previous.family_id or previous.id
+    session.scalar(select(Document).where(Document.id == root).with_for_update())
+    version = (
+        session.scalar(select(func.max(Document.version)).where(Document.family_id == root))
+        or previous.version
+    )
     content = file.file.read(runtime.settings.max_upload_bytes + 1)
     new = documents.store(
         session,
@@ -364,12 +476,35 @@ def document_version(
         content,
         previous.branch_codes,
         previous.categories,
-        previous.version + 1,
+        version + 1,
+        previous=previous,
+        auto_publish=previous.auto_publish,
     )
-    previous.active = False
-    previous.revision += 1
     service.audit(session, actor, "document.replace", previous.id)
     return documents.public_document(new)
+
+
+@router.post("/documents/{document_id}/publish")
+def publish_document(document_id: str, data: RevisionInput, session: Session, actor: Admin):
+    document = scoped_resource(session, actor, Document, document_id)
+    for version in session.scalars(
+        select(Document).where(Document.family_id == (document.family_id or document.id))
+    ):
+        service.check_scope(actor, version.branch_codes)
+    service.revision_check(document, data.revision)
+    documents.publish(session, document)
+    service.audit(session, actor, "document.publish", document.id)
+    return documents.public_document(document)
+
+
+@router.put("/documents/{document_id}/publication")
+def document_publication(document_id: str, data: DocumentPublication, session: Session, actor: Admin):
+    document = scoped_resource(session, actor, Document, document_id)
+    service.revision_check(document, data.revision)
+    document.auto_publish = data.auto_publish
+    document.revision += 1
+    service.audit(session, actor, "document.publication", document.id)
+    return documents.public_document(document)
 
 
 @router.get("/surveys")
@@ -403,6 +538,8 @@ def clone_survey(template_id: str, session: Session, actor: Admin):
         branch_codes=actor.branch_codes,
         questions=template.definition["questions"],
         reminder_days=template.definition.get("reminder_days", [1, 2]),
+        kind=template.definition.get("kind", "survey"),
+        pass_percent=template.definition.get("pass_percent", 70),
     )
     return service.survey_dto(service.save_survey(session, actor, data))
 
@@ -636,7 +773,11 @@ def update_ticket(ticket_id: str, data: TicketInput, session: Session, actor: Ad
     ticket = resource(session, Ticket, ticket_id)
     employee = access.employee_for(session, actor, ticket.employee_id, support=True)
     service.identity_reference(session, data.recruiter_id, ["hr", "hr_head"], employee.branch_code)
+    from .support import participant
+
+    participant(session, ticket, ticket.recruiter_id, "former")
     ticket.reason, ticket.recruiter_id = data.reason, data.recruiter_id
+    participant(session, ticket, ticket.recruiter_id, "assigned")
     service.audit(session, actor, "ticket.update", ticket.id)
     return {"ok": True}
 
@@ -644,8 +785,12 @@ def update_ticket(ticket_id: str, data: TicketInput, session: Session, actor: Ad
 @router.delete("/tickets/{ticket_id}")
 def archive_ticket(ticket_id: str, session: Session, actor: Admin):
     ticket = resource(session, Ticket, ticket_id)
-    employee = access.employee_for(session, actor, ticket.employee_id, support=True)
-    tickets.close(session, actor, employee, ticket, "archive:" + ticket.id)
+    access.employee_for(session, actor, ticket.employee_id, support=True)
+    from .calendar import now
+
+    # Archiving is a separate administrative outcome, never an employee-confirmed resolution.
+    ticket.status, ticket.human_mode = "closed", False
+    ticket.outcome, ticket.closed_at = "archived", now(session)
     ticket.context = {**ticket.context, "_archived": True}
     service.audit(session, actor, "ticket.archive", ticket.id)
     return {"ok": True}
