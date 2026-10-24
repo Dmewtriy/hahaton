@@ -221,8 +221,12 @@ class Document(Base):
     auto_publish: Mapped[bool] = mapped_column(Boolean, default=True)
     last_error: Mapped[str | None] = mapped_column(String(200))
     purpose: Mapped[str] = mapped_column(String(32), default="knowledge", server_default="knowledge")
-    owner_employee_id: Mapped[str | None] = mapped_column(ForeignKey("employees.id", name="fk_documents_owner_employee"), index=True)
-    created_by: Mapped[str | None] = mapped_column(ForeignKey("identities.id", name="fk_documents_created_by"))
+    owner_employee_id: Mapped[str | None] = mapped_column(
+        ForeignKey("employees.id", name="fk_documents_owner_employee"), index=True
+    )
+    created_by: Mapped[str | None] = mapped_column(
+        ForeignKey("identities.id", name="fk_documents_created_by")
+    )
 
 
 class ConversationMessage(Base):

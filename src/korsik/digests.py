@@ -96,9 +96,13 @@ def create_snapshot(session, actor, end, request_key, settings=None):
             from types import SimpleNamespace
 
             with session.begin_nested():
-                improvement_report = build_report(session, actor, settings or SimpleNamespace(enable_demo=False), end=end)
+                improvement_report = build_report(
+                    session, actor, settings or SimpleNamespace(enable_demo=False), end=end
+                )
                 report["improvements"] = improvement_report
-                text += "\nЧто улучшить: кандидатов, проходящих порог — " + str(len(improvement_report["items"]))
+                text += "\nЧто улучшить: кандидатов, проходящих порог — " + str(
+                    len(improvement_report["items"])
+                )
         else:
             report["improvements"] = {"status": "disabled"}
             text += "\nБлок улучшений отключён: требуется согласованная политика."

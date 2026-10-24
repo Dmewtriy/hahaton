@@ -175,9 +175,10 @@ def dispatch_step(session, employee, step):
         if payload["kind"] == "manager_reminder":
             notification.body = {**notification.body, "manager_employee_id": employee.id}
         if payload.get("planning_id"):
-            notification.body = {**notification.body, **{
-                k: payload[k] for k in ("planning_id", "planning_revision", "planning_author_id")
-            }}
+            notification.body = {
+                **notification.body,
+                **{k: payload[k] for k in ("planning_id", "planning_revision", "planning_author_id")},
+            }
         if payload.get("document_ids"):
             notification.body = {**notification.body, "required_document_ids": payload["document_ids"]}
     if not step.campaign_id and payload["kind"] != "manager_reminder":

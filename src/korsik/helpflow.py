@@ -37,8 +37,12 @@ def begin(session, employee, question, run, help_id=None):
 def finish(session, employee, help, status, text, version):
     help.answer = text
     help.processor_version = version
-    help.context = {**help.context, "answer_status": status, "helpful": None,
-                    "revision": help.context.get("revision", 0) + 1}
+    help.context = {
+        **help.context,
+        "answer_status": status,
+        "helpful": None,
+        "revision": help.context.get("revision", 0) + 1,
+    }
     if status == "clarification":
         help.status = "awaiting_clarification"
     elif status == "answered":
@@ -134,8 +138,11 @@ def callback(runtime, session, employee, payload, key):
             )
             return True
         employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "active_help"}
-        help.context = {**help.context, "helpful": action == "yes",
-                        "revision": help.context.get("revision", 0) + 1}
+        help.context = {
+            **help.context,
+            "helpful": action == "yes",
+            "revision": help.context.get("revision", 0) + 1,
+        }
         if action == "yes":
             require(help.status == "awaiting_feedback")
             help.status = "resolved"

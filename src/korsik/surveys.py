@@ -96,7 +96,10 @@ def prompt(session, employee, run, suffix):
     )
     from .models import RouteRun
 
-    item.body = {**item.body, "buttons": item.body["buttons"] + [{"text": "☰ Меню", "payload": "nav:page:0"}]}
+    item.body = {
+        **item.body,
+        "buttons": item.body["buttons"] + [{"text": "☰ Меню", "payload": "nav:page:0"}],
+    }
 
     route = session.scalar(select(RouteRun).where(RouteRun.scheduled_step_id == run.scheduled_step_id))
     if route:
@@ -115,8 +118,15 @@ def reminder_allowed(session, run_id):
     employee = session.get(Employee, run.employee_id)
     step = session.get(ScheduledStep, run.scheduled_step_id)
     initial = session.scalar(select(Outbox).where(Outbox.dedupe_key == f"survey:{run.id}:0:start"))
-    return bool(employee and employee.active and employee.status == "active" and step
-                and step_allowed(session, employee, step) and initial and initial.status == "sent")
+    return bool(
+        employee
+        and employee.active
+        and employee.status == "active"
+        and step
+        and step_allowed(session, employee, step)
+        and initial
+        and initial.status == "sent"
+    )
 
 
 def consume_answer(session, employee, run, text, event_key, callback=None):

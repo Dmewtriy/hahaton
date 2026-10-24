@@ -114,7 +114,12 @@ def save_campaign(session, actor, data, campaign_id=None):
         snapshot = template.definition
     for doc_id in data.document_ids:
         doc = session.get(Document, doc_id)
-        if not doc or doc.purpose == "personal_plan" or not documents.can_read(session, actor, doc) or not doc.active:
+        if (
+            not doc
+            or doc.purpose == "personal_plan"
+            or not documents.can_read(session, actor, doc)
+            or not doc.active
+        ):
             raise HTTPException(422, "Вложение недоступно")
         if any(not documents.employee_can_read(e, doc) for e in members):
             raise HTTPException(422, "Вложение недоступно части выбранных сотрудников")
@@ -167,7 +172,12 @@ def publish(session, actor, campaign, expected_hash):
             raise HTTPException(409, "Область доступа опросника изменилась. Обновите черновик")
     for doc_id in campaign.document_ids:
         doc = session.get(Document, doc_id)
-        if not doc or not doc.active or doc.purpose == "personal_plan" or any(not documents.employee_can_read(e, doc) for e in members):
+        if (
+            not doc
+            or not doc.active
+            or doc.purpose == "personal_plan"
+            or any(not documents.employee_can_read(e, doc) for e in members)
+        ):
             raise HTTPException(409, "Вложение больше недоступно выбранным получателям")
     if campaign.message_type == "first_day_card" and not any(
         session.get(Document, d).purpose == "card_image" for d in campaign.document_ids

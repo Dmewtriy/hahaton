@@ -143,16 +143,33 @@ def receive(runtime, session, event):
     if callback and callback.startswith("event:"):
         from . import optional
 
-        allowed = (optional.employee_events(session, employee) + optional.employee_events(session, employee, past=True)) if runtime.settings.enable_optional else []
+        allowed = (
+            (
+                optional.employee_events(session, employee)
+                + optional.employee_events(session, employee, past=True)
+            )
+            if runtime.settings.enable_optional
+            else []
+        )
         selected = next((e for e in allowed if e.id == callback.split(":", 1)[1]), None)
         if not selected:
             send(session, identity.id, "Мероприятие сейчас недоступно.", "event-unavailable:" + key, at)
         else:
-            item = send(session, identity.id, selected.title + "\n" + selected.description + "\n" + selected.location,
-                        "event-detail:" + key, at, document_ids=selected.document_ids)
-            item.body = {**item.body, "required_document_ids": selected.document_ids,
-                         "planning_id": selected.id, "planning_revision": selected.revision,
-                         "planning_author_id": selected.organizer_id}
+            item = send(
+                session,
+                identity.id,
+                selected.title + "\n" + selected.description + "\n" + selected.location,
+                "event-detail:" + key,
+                at,
+                document_ids=selected.document_ids,
+            )
+            item.body = {
+                **item.body,
+                "required_document_ids": selected.document_ids,
+                "planning_id": selected.id,
+                "planning_revision": selected.revision,
+                "planning_author_id": selected.organizer_id,
+            }
         return
     if callback and callback.startswith("resume:"):
         selected = session.get(SurveyRun, callback.split(":", 1)[1])
@@ -182,10 +199,20 @@ def receive(runtime, session, event):
             rows = optional.employee_events(session, employee, past=text.partition(" ")[2].strip() == "past")
             parts = []
             for item in rows:
-                when = item.starts_at.astimezone(ZoneInfo(item.timezone)).strftime("%d.%m.%Y %H:%M") if item.starts_at else "Дата уточняется"
+                when = (
+                    item.starts_at.astimezone(ZoneInfo(item.timezone)).strftime("%d.%m.%Y %H:%M")
+                    if item.starts_at
+                    else "Дата уточняется"
+                )
                 parts.append(f"{item.title}\n{when} ({item.timezone})\n{item.location}\n{item.description}")
-            send(session, identity.id, "\n\n".join(parts) or "Корпоративных мероприятий пока нет.", "events:" + key, at,
-                 buttons=[{"text": item.title[:60], "payload": "event:" + item.id} for item in rows[:20]])
+            send(
+                session,
+                identity.id,
+                "\n\n".join(parts) or "Корпоративных мероприятий пока нет.",
+                "events:" + key,
+                at,
+                buttons=[{"text": item.title[:60], "payload": "event:" + item.id} for item in rows[:20]],
+            )
         return
     if command in {"/ask", "/hr", "/cancel", "/resume", "/cases"}:
         employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "pending_intent"}
@@ -527,8 +554,11 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
     )
     if run:
         surveys.prompt(session, employee, run, "return:" + key)
-    help.context = {**help.context, "topics": topics,
-                    "mode": "demo" if runtime.settings.ml_mode == "stub" else "real"}
+    help.context = {
+        **help.context,
+        "topics": topics,
+        "mode": "demo" if runtime.settings.ml_mode == "stub" else "real",
+    }
     helpflow.finish(session, employee, help, status, text, version)
 
 

@@ -39,8 +39,10 @@ def can_read(session, actor, document):
 
 def can_edit(actor, document):
     if document.purpose == "personal_plan":
-        return actor.active and bool(set(actor.roles) & {"hr", "hr_head"}) and all(
-            in_scope(actor, b) for b in document.branch_codes
+        return (
+            actor.active
+            and bool(set(actor.roles) & {"hr", "hr_head"})
+            and all(in_scope(actor, b) for b in document.branch_codes)
         )
     return bool(set(actor.roles) & {"hr", "hr_head"}) and all(
         in_scope(actor, b) for b in document.branch_codes
@@ -52,7 +54,8 @@ def allowed_documents(session, employee):
         d
         for d in session.scalars(
             select(Document).where(
-                Document.active.is_(True), Document.purpose == "knowledge",
+                Document.active.is_(True),
+                Document.purpose == "knowledge",
                 Document.status.in_(["ready", "ready_stub"]),
             )
         )

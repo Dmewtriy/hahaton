@@ -3,14 +3,20 @@
 import html
 import re
 
-COMMAND = re.compile(r"(?<![\w:/])/(?:menu|ask|hr|resume|cases|food|places|materials|plan|events|cancel|help|start|admin|dashboard|reply|close)\b")
+COMMAND = re.compile(
+    r"(?<![\w:/])/(?:menu|ask|hr|resume|cases|food|places|materials|plan|events|cancel|help|start|admin|dashboard|reply|close)\b"
+)
 LABEL = re.compile(r"^(Ваш вопрос|Ответ HR|Решение HR|Сотрудник|Площадка|Срок|Результат|Источники|Контакты):")
 
 
 def normalize(text):
     text = str(text).replace("\r\n", "\n").replace("\r", "\n").replace("\t", "    ")
     # Split existing command enumerations, not URLs or ordinary punctuation.
-    text = re.sub(r"[,;]\s+(?=/(?:menu|ask|hr|resume|cases|food|places|materials|plan|events|cancel|help|admin|dashboard)\b)", "\n", text)
+    text = re.sub(
+        r"[,;]\s+(?=/(?:menu|ask|hr|resume|cases|food|places|materials|plan|events|cancel|help|admin|dashboard)\b)",
+        "\n",
+        text,
+    )
     text = re.sub(r"(?m)^[ \t]*[-*][ \t]+", "• ", text)
     text = re.sub(r"\n[ \t]*\n(?:[ \t]*\n)+", "\n\n", text)
     return text.strip()
@@ -26,13 +32,20 @@ def as_html(text):
         escaped = re.sub(r"^#{1,6}\s+(.+)$", r"<b>\1</b>", escaped)
         if LABEL.match(line):
             escaped = LABEL.sub(lambda m: "<b>" + m[0] + "</b>", escaped, count=1)
-        elif (line and len(line) <= 90 and not line.startswith(("/", "•", "-", "<"))
-              and not re.match(r"^\d+[.)]", line)
-              and (line.endswith(":") or index == 0 and len(lines) > 1 and "<b>" not in escaped)):
+        elif (
+            line
+            and len(line) <= 90
+            and not line.startswith(("/", "•", "-", "<"))
+            and not re.match(r"^\d+[.)]", line)
+            and (line.endswith(":") or index == 0 and len(lines) > 1 and "<b>" not in escaped)
+        ):
             escaped = "<b>" + escaped + "</b>"
         # Do not nest code tags inside a code span originating from Markdown.
         segments = re.split(r"(<code>.*?</code>)", escaped)
-        escaped = "".join(s if s.startswith("<code>") else COMMAND.sub(lambda m: "<code>" + m[0] + "</code>", s) for s in segments)
+        escaped = "".join(
+            s if s.startswith("<code>") else COMMAND.sub(lambda m: "<code>" + m[0] + "</code>", s)
+            for s in segments
+        )
         output.append(escaped)
     return "\n".join(output)
 

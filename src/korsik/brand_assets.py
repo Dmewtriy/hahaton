@@ -43,10 +43,19 @@ def install(session, actor=None):
         doc = session.get(Document, doc_id)
         if not doc:
             doc = Document(
-                id=doc_id, title=f"Корсик · Изображение {asset['number']}",
-                original_name=asset["file"], storage_name=doc_id + ".jpg", sha256=asset["sha256"],
-                branch_codes=["*"], categories=[], version=1, status="ready", published=True,
-                purpose="route_image", processor_version="company-assets/1", family_id=doc_id,
+                id=doc_id,
+                title=f"Корсик · Изображение {asset['number']}",
+                original_name=asset["file"],
+                storage_name=doc_id + ".jpg",
+                sha256=asset["sha256"],
+                branch_codes=["*"],
+                categories=[],
+                version=1,
+                status="ready",
+                published=True,
+                purpose="route_image",
+                processor_version="company-assets/1",
+                family_id=doc_id,
                 created_at=now(session),
             )
             session.add(doc)

@@ -224,7 +224,10 @@ class Worker:
                     )
                     item.body = {**item.body, "reminder_run_id": run.id}
             else:
-                job.payload = {**job.payload, "suppressed_reason": "Опрос недоступен или первое сообщение не доставлено"}
+                job.payload = {
+                    **job.payload,
+                    "suppressed_reason": "Опрос недоступен или первое сообщение не доставлено",
+                }
         elif job.kind == "analyze":
             self.analyze(session, job)
         elif job.kind == "personal_plan":
@@ -493,9 +496,19 @@ class Worker:
                 from .message_presentation import split_message
 
                 legacy = item.body.get("next_chunk", 0) > 0
-                chunks = ([item.body["text"][i:i + 3500] for i in range(0, len(item.body["text"]), 3500)] or [""]) if legacy else split_message(item.body["text"])
-                item.body = {**item.body, "message_chunks": chunks,
-                             "presentation_format": "legacy-plain" if legacy else "html-v1"}
+                chunks = (
+                    (
+                        [item.body["text"][i : i + 3500] for i in range(0, len(item.body["text"]), 3500)]
+                        or [""]
+                    )
+                    if legacy
+                    else split_message(item.body["text"])
+                )
+                item.body = {
+                    **item.body,
+                    "message_chunks": chunks,
+                    "presentation_format": "legacy-plain" if legacy else "html-v1",
+                }
             item_id, body = item.id, dict(item.body)
             media = []
             for doc_id in body.get("document_ids", []):

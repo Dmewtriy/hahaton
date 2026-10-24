@@ -20,7 +20,9 @@ def main():
     sub.add_parser("migrate")
     sub.add_parser("seed-demo")
     sub.add_parser("install-v04", help="Install source-backed v0.4 scenario and missing-material registry")
-    sub.add_parser("install-brand-assets", help="Bind supplied Korsik images to empty Excel material references")
+    sub.add_parser(
+        "install-brand-assets", help="Bind supplied Korsik images to empty Excel material references"
+    )
     sub.add_parser("worker")
     sub.add_parser("poll")
     sub.add_parser("sync-commands", help="Register Russian slash-command hints in MAX")
