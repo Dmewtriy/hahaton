@@ -58,7 +58,7 @@ erDiagram
 - Сотрудник: `invited → active → stopped`. Блокировка — `Identity.active=false`, увольнение/выключение — также `Employee.active=false`.
 - Шаг: `pending/manual → enqueued → queued/dispatched → completed` либо `cancelled`. `dispatched` означает постановку в исходящую очередь, а не подтверждение чтения в MAX.
 - Опрос: `active → completed`; отдельно position, awaiting_comment, selection. Активный опрос содержит снимок вопросов, чтобы публикация новой версии не меняла уже заданный вопрос.
-- Обращение: `open → in_progress → closed`; флаг human_mode. Сигнал анализа не блокирует общение автоматически, ручной `/hr` и ответ HR включают человеческий режим.
+- Обращение: `open → in_progress → closed`; оно не блокирует разговор бота. `/hr` адресует отдельное сообщение HR. Единая история хранится в HRMessage, отдельные курсоры прочитанного — в HRReadState. Подробности обновления в architecture-v2.md.
 - Job: `pending → running → done` или `retry/failed`. Lease измеряется реальным временем, due_at — предметным временем.
 - Outbox: `pending → sending → sent` или `retry/failed/uncertain/cancelled`.
 

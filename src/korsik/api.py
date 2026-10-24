@@ -8,13 +8,15 @@ from typing import Annotated
 
 from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import func, select, text
+from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.staticfiles import StaticFiles
+from sqlalchemy import delete, func, select, text
 from sqlalchemy.exc import IntegrityError
 
-from . import access, analytics, documents, employees, scenarios, tickets
+from . import access, analytics, documents, download_links, employees, scenarios, tickets
 from .calendar import add_months, now
 from .config import Settings
+from .dependencies import Actor, Session, bearer
 from .max_client import normalize_update
 from .models import (
     AuditEvent,
@@ -32,6 +34,7 @@ from .models import (
     SurveyRun,
     Ticket,
     TicketMessage,
+    WebSession,
     uid,
 )
 from .runtime import Runtime
@@ -51,7 +54,6 @@ from .schemas import (
 from .worker import Worker, ingest
 
 log = logging.getLogger("korsik.api")
-bearer = HTTPBearer(auto_error=False)
 
 
 def create_app(runtime=None):
@@ -65,6 +67,13 @@ def create_app(runtime=None):
 
     app = FastAPI(title="Корсик: backend", version="0.1.0", lifespan=lifespan)
     app.state.runtime = runtime
+    from .admin_api import router as admin_router
+
+    app.include_router(admin_router)
+    from .inbox_api import router as inbox_router
+
+    app.include_router(inbox_router)
+    app.mount("/admin-assets", StaticFiles(directory=Path(__file__).parent / "web"), name="admin-assets")
 
     @app.middleware("http")
     async def technical_logs(request: Request, call_next):
@@ -87,21 +96,6 @@ def create_app(runtime=None):
         from fastapi.responses import JSONResponse
 
         return JSONResponse(status_code=409, content={"detail": "Конфликт данных или повторная операция"})
-
-    def session_dependency():
-        with runtime.db.transaction(write_lock=True) as session:
-            yield session
-
-    Session = Annotated[object, Depends(session_dependency)]
-
-    def actor_dependency(
-        session: Session, credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)]
-    ):
-        if not credentials:
-            raise HTTPException(401, "Требуется Bearer API-ключ")
-        return access.authenticate(session, credentials.credentials, runtime.settings.bootstrap_token)
-
-    Actor = Annotated[Identity, Depends(actor_dependency)]
 
     def audit(session, actor, action, resource_id):
         session.add(AuditEvent(actor_id=actor.id, action=action, resource_id=resource_id))
@@ -149,11 +143,20 @@ def create_app(runtime=None):
             "roles": actor.roles,
             "manage_access": actor.manage_access,
             "branch_codes": actor.branch_codes,
+            "is_admin": access.is_admin(actor),
+            "capabilities": {
+                "manage_hr": access.is_hr(actor),
+                "manage_people": access.can_manage_people(actor),
+                "manage_access": actor.manage_access,
+                "demo": runtime.settings.enable_demo
+                and actor.manage_access
+                and runtime.settings.environment != "production",
+            },
         }
 
     @app.get("/api/identities", tags=["Access"])
     def identities(session: Session, actor: Actor):
-        access.require(actor.manage_access)
+        access.require(access.can_manage_people(actor))
         return [
             {
                 "id": i.id,
@@ -165,11 +168,14 @@ def create_app(runtime=None):
                 "max_bound": bool(i.max_user_id),
             }
             for i in session.scalars(select(Identity))
+            if access.can_manage_identity(actor, i)
         ]
 
     @app.post("/api/identities", status_code=201, tags=["Access"])
     def create_identity(data: IdentityCreate, session: Session, actor: Actor):
-        access.require(actor.manage_access)
+        access.require(access.can_manage_people(actor))
+        if not actor.manage_access:
+            access.require(not data.manage_access and access.scope_contains(actor, data.branch_codes))
         token = access.new_token()
         identity = Identity(**data.model_dump(), token_hash=access.token_hash(token))
         session.add(identity)
@@ -179,33 +185,52 @@ def create_app(runtime=None):
 
     @app.put("/api/identities/{identity_id}", tags=["Access"])
     def change_identity(identity_id: str, data: IdentityUpdate, session: Session, actor: Actor):
-        access.require(actor.manage_access and identity_id != "bootstrap")
+        access.require(access.can_manage_people(actor) and identity_id != "bootstrap")
         identity = session.get(Identity, identity_id)
         if not identity:
             raise HTTPException(404)
-        for key, value in data.model_dump().items():
+        access.require(access.can_manage_identity(actor, identity))
+        if not actor.manage_access:
+            access.require(not data.manage_access and access.scope_contains(actor, data.branch_codes))
+        employee = session.scalar(select(Employee).where(Employee.identity_id == identity_id))
+        if employee and "*" not in data.branch_codes and employee.branch_code not in data.branch_codes:
+            raise HTTPException(422, "Площадку сотрудника меняйте в его анкете")
+        for key, value in data.model_dump(exclude_none=True).items():
             setattr(identity, key, value)
+        employee = session.scalar(select(Employee).where(Employee.identity_id == identity_id))
+        if employee:
+            if data.name is not None:
+                employee.name = data.name
+            employee.revision += 1
+            if not identity.active:
+                from .admin_service import deactivate_employee
+
+                deactivate_employee(session, employee)
         audit(session, actor, "identity.update", identity.id)
         return {"id": identity.id, "active": identity.active}
 
     @app.post("/api/identities/{identity_id}/rotate-key", tags=["Access"])
     def rotate_key(identity_id: str, session: Session, actor: Actor):
-        access.require(actor.manage_access and identity_id != "bootstrap")
+        access.require(access.can_manage_people(actor) and identity_id != "bootstrap")
         identity = session.get(Identity, identity_id)
         if not identity:
             raise HTTPException(404)
+        access.require(access.can_manage_identity(actor, identity))
         token = access.new_token()
         identity.token_hash = access.token_hash(token)
+        session.execute(delete(WebSession).where(WebSession.identity_id == identity.id))
         audit(session, actor, "identity.rotate_key", identity.id)
         return {"api_token": token}
 
     @app.post("/api/identities/{identity_id}/unbind", tags=["Access"])
     def unbind(identity_id: str, session: Session, actor: Actor):
-        access.require(actor.manage_access)
+        access.require(access.can_manage_people(actor))
         identity = session.get(Identity, identity_id)
         if not identity:
             raise HTTPException(404)
+        access.require(access.can_manage_identity(actor, identity))
         identity.max_user_id = None
+        session.execute(delete(WebSession).where(WebSession.identity_id == identity.id))
         employee = session.scalar(select(Employee).where(Employee.identity_id == identity_id))
         if employee:
             employee.status = "invited"
@@ -215,7 +240,17 @@ def create_app(runtime=None):
     @app.post("/api/identities/{identity_id}/invitation", tags=["Access"])
     def invitation(identity_id: str, session: Session, actor: Actor):
         employee = session.scalar(select(Employee).where(Employee.identity_id == identity_id))
-        access.require(actor.manage_access or bool(employee and access.can_support(actor, employee)))
+        identity = session.get(Identity, identity_id)
+        access.require(
+            bool(
+                identity
+                and (
+                    access.can_manage_identity(actor, identity)
+                    or employee
+                    and access.can_support(actor, employee)
+                )
+            )
+        )
         token = employees.invite(session, identity_id, runtime.settings.invitation_hours)
         audit(session, actor, "invitation.create", identity_id)
         url = (
@@ -260,6 +295,8 @@ def create_app(runtime=None):
         if not branch:
             branch = Branch(code=code)
             session.add(branch)
+        else:
+            branch.revision += 1
         for key, value in data.model_dump(mode="json").items():
             setattr(branch, key, value)
         session.flush()
@@ -274,7 +311,9 @@ def create_app(runtime=None):
         access.require(bool(set(actor.roles) & {"hr", "hr_head"}))
         return [
             {"id": s.id, "name": s.name, "version": s.version, "definition": s.definition}
-            for s in session.scalars(select(Scenario))
+            for s in session.scalars(
+                select(Scenario).where(Scenario.kind == "onboarding", Scenario.active.is_(True))
+            )
             if "*" in s.branch_codes or any(access.in_scope(actor, b) for b in s.branch_codes)
         ]
 
@@ -332,6 +371,7 @@ def create_app(runtime=None):
         if end < data.hire_date:
             raise HTTPException(422, "Окончание раньше выхода")
         employee.hire_date, employee.probation_end = data.hire_date, end
+        employee.revision += 1
         count = scenarios.rebuild_schedule(session, employee)
         audit(session, actor, "employee.reschedule", employee.id)
         return {"employee": employees.employee_summary(employee), "planned_steps": count}
@@ -339,8 +379,10 @@ def create_app(runtime=None):
     @app.post("/api/employees/{employee_id}/deactivate", tags=["Employees"])
     def deactivate(employee_id: str, session: Session, actor: Actor):
         employee = access.employee_for(session, actor, employee_id, support=True)
-        employee.active = False
-        session.get(Identity, employee.identity_id).active = False
+        from .admin_service import deactivate_employee
+
+        deactivate_employee(session, employee)
+        employee.revision += 1
         audit(session, actor, "employee.deactivate", employee.id)
         return {"ok": True}
 
@@ -417,9 +459,10 @@ def create_app(runtime=None):
         ticket, employee = ticket_for(session, actor, ticket_id)
         return {
             "id": ticket.id,
+            "employee_id": employee.id,
             "status": ticket.status,
             "reason": ticket.reason,
-            "context": ticket.context,
+            "context": tickets.ticket_context(session, ticket),
             "human_mode": ticket.human_mode,
             "messages": [
                 {"id": m.id, "author_id": m.author_id, "text": m.text, "at": m.created_at}
@@ -519,6 +562,33 @@ def create_app(runtime=None):
             media_type="application/octet-stream",
         )
 
+    @app.post("/api/documents/{document_id}/download-link", tags=["Documents"])
+    def download_link(document_id: str, session: Session, actor: Actor):
+        from urllib.parse import urlencode, urljoin
+
+        doc = session.get(Document, document_id)
+        if not doc:
+            raise HTTPException(404)
+        access.require(documents.can_read(session, actor, doc))
+        if not runtime.settings.webapp_public_url:
+            raise HTTPException(409, "Для скачивания внутри MAX настройте публичный HTTPS-адрес")
+        token = download_links.issue(runtime.settings.bootstrap_token, actor.id, doc.id)
+        path = f"/api/documents/{doc.id}/native-download?" + urlencode({"ticket": token})
+        return {"url": urljoin(runtime.settings.webapp_public_url, path), "expires_in": 60}
+
+    @app.get("/api/documents/{document_id}/native-download", tags=["Documents"])
+    def native_download(document_id: str, ticket: str, session: Session):
+        identity_id = download_links.validate(runtime.settings.bootstrap_token, ticket, document_id)
+        actor = session.get(Identity, identity_id)
+        doc = session.get(Document, document_id)
+        access.require(bool(actor and actor.active and doc and documents.can_read(session, actor, doc)))
+        return FileResponse(
+            runtime.settings.data_dir / "documents" / doc.storage_name,
+            filename=doc.original_name,
+            media_type="application/octet-stream",
+            headers={"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"},
+        )
+
     @app.post("/api/documents/{document_id}/deactivate", tags=["Documents"])
     def deactivate_document(document_id: str, session: Session, actor: Actor):
         doc = session.get(Document, document_id)
@@ -526,6 +596,7 @@ def create_app(runtime=None):
             raise HTTPException(404)
         access.require(documents.can_edit(actor, doc))
         doc.active = False
+        doc.revision += 1
         audit(session, actor, "document.deactivate", doc.id)
         return {"ok": True}
 
@@ -554,14 +625,14 @@ def create_app(runtime=None):
 
     @app.put("/api/policies/escalation", tags=["Configuration"])
     def save_escalation(data: EscalationRules, session: Session, actor: Actor):
-        access.require("hr_head" in actor.roles and "*" in actor.branch_codes)
+        access.require(access.is_hr(actor) and "*" in actor.branch_codes)
         session.merge(State(key="escalation_rules", value=data.model_dump()))
         audit(session, actor, "policy.escalation", "global")
         return data
 
     @app.put("/api/policies/digest", tags=["Configuration"])
     def save_digest(data: DigestPolicy, session: Session, actor: Actor):
-        access.require("hr_head" in actor.roles and "*" in actor.branch_codes)
+        access.require(access.is_hr(actor) and "*" in actor.branch_codes)
         session.merge(State(key="digest_policy", value=data.model_dump()))
         audit(session, actor, "policy.digest", "global")
         return data
@@ -698,8 +769,16 @@ def create_app(runtime=None):
             )
         ]
 
+    @app.get("/app", response_class=HTMLResponse, include_in_schema=False)
     @app.get("/dashboard", response_class=HTMLResponse, include_in_schema=False)
     def dashboard_page():
-        return (Path(__file__).parent / "web" / "dashboard.html").read_text(encoding="utf-8")
+        return HTMLResponse(
+            (Path(__file__).parent / "web" / "app.html").read_text(encoding="utf-8"),
+            headers={
+                "Cache-Control": "no-store",
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
 
     return app

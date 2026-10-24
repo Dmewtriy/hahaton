@@ -13,7 +13,7 @@ def visible_employees(session, actor):
     branch_scope = True if "*" in actor.branch_codes else Employee.branch_code.in_(actor.branch_codes)
     work_scope = []
     if "hr" in actor.roles:
-        work_scope.append(Employee.recruiter_id == actor.id)
+        work_scope.append(True)
     if "manager" in actor.roles:
         work_scope.append(Employee.manager_id == actor.id)
     if "hr_head" in actor.roles:

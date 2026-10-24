@@ -1,51 +1,95 @@
 from sqlalchemy import select
 
+from . import inbox
 from .calendar import now
-from .models import ConversationMessage, Ticket, TicketMessage
+from .models import ConversationMessage, HRMessage, SurveyAnswer, SurveyRun, Ticket, TicketMessage
 from .queue import send
 
 
+def ticket_context(session, ticket):
+    context = dict(ticket.context)
+    answer = session.get(SurveyAnswer, context["answer_id"]) if context.get("answer_id") else None
+    if answer:
+        run = session.get(SurveyRun, answer.run_id)
+        question = next(q for q in run.definition["questions"] if q["id"] == answer.question_id)
+        context["question"] = question["text"]
+        value = answer.value["answer"]
+        options = {o["id"]: o["label"] for o in question.get("options", [])}
+        context["message"] = ", ".join(
+            options.get(v, str(v)) for v in (value if isinstance(value, list) else [value])
+        )
+        if answer.comment:
+            context["message"] += "\nКомментарий: " + answer.comment
+    return context
+
+
 def open_ticket(session, employee, reason, context, dedupe_key, human=True):
+    # `human` is retained for legacy callers; a ticket never captures the bot dialogue.
     existing = session.scalar(select(Ticket).where(Ticket.dedupe_key == dedupe_key))
     if existing:
         existing.context = {**existing.context, **context}
+        if context.get("analysis"):
+            detail = ticket_context(session, existing)
+            inbox.append(
+                session,
+                employee,
+                existing,
+                "signal",
+                signal_text(reason, detail),
+                "signal-update:"
+                + existing.id
+                + ":"
+                + context["analysis"].get("processor_version", "unknown"),
+            )
         return existing
-    # A human conversation is one inbox thread, not one ticket per incoming sentence.
-    if human:
-        existing = active_human_ticket(session, employee)
-        if existing:
-            return existing
     ticket = Ticket(
         employee_id=employee.id,
         recruiter_id=employee.recruiter_id,
         reason=reason,
         context=context,
         dedupe_key=dedupe_key,
-        human_mode=human,
+        human_mode=False,
         created_at=now(session),
     )
     session.add(ticket)
     session.flush()
+    details = ticket_context(session, ticket)
+    description = details.get("message") or details.get("question") or ""
+    if context.get("initiated_by_hr"):
+        inbox.append(
+            session,
+            employee,
+            ticket,
+            "system",
+            reason,
+            "ticket-open:" + ticket.id,
+            context["initiated_by_hr"],
+        )
+    else:
+        kind = "signal" if context.get("answer_id") or context.get("analysis") else "employee"
+        body = signal_text(reason, details) if kind == "signal" else description or reason
+        inbox.append(
+            session,
+            employee,
+            ticket,
+            kind,
+            body,
+            dedupe_key if dedupe_key.startswith("hr-in:") else "ticket-open:" + ticket.id,
+            employee.identity_id if kind == "employee" else None,
+        )
     send(
         session,
         employee.recruiter_id,
         f"Новое обращение {ticket.id}\nСотрудник: {employee.name}\nПричина: {reason}\n"
-        f"Ответ: /reply {ticket.id} текст ответа\nЗакрытие: /close {ticket.id}",
+        f"{description[:1800]}\nОтвет: /reply {ticket.id} текст ответа\nЗакрытие: /close {ticket.id}",
         f"ticket:{ticket.id}:notify",
         now(session),
     )
     return ticket
 
 
-def active_human_ticket(session, employee):
-    return session.scalar(
-        select(Ticket)
-        .where(Ticket.employee_id == employee.id, Ticket.status != "closed", Ticket.human_mode.is_(True))
-        .order_by(Ticket.created_at)
-    )
-
-
 def employee_message(session, employee, ticket, text, event_key):
+    inbox.append(session, employee, ticket, "employee", text, "hr-in:" + event_key, employee.identity_id)
     session.add(
         TicketMessage(ticket_id=ticket.id, author_id=employee.identity_id, text=text, created_at=now(session))
     )
@@ -56,49 +100,75 @@ def employee_message(session, employee, ticket, text, event_key):
         f"ticket-message:{event_key}",
         now(session),
     )
+
+
+def reply_question(session, employee, ticket, *, entire_thread=False):
+    query = select(HRMessage).where(HRMessage.employee_id == employee.id, HRMessage.kind == "employee")
+    if not entire_thread:
+        query = query.where(HRMessage.ticket_id == ticket.id)
+    message = session.scalar(query.order_by(HRMessage.id.desc()).limit(1))
+    if message:
+        if message.dedupe_key.startswith("ticket-open:") and message.ticket_id:
+            context = ticket_context(session, session.get(Ticket, message.ticket_id))
+            return context.get("message") or context.get("question") or message.text
+        return message.text
+    context = ticket_context(session, ticket)
+    return context.get("message") or context.get("question")
+
+
+def reply(session, actor, employee, ticket, text, key, *, question=None):
+    from .access import can_support, require
+
+    require(can_support(actor, employee))
+    require(ticket.status != "closed", "Обращение уже закрыто")
+    question = question if question is not None else reply_question(session, employee, ticket)
+    ticket.human_mode = False
+    ticket.status = "in_progress"
+    inbox.append(session, employee, ticket, "hr", text, "hr-out:" + key, actor.id)
+    session.add(TicketMessage(ticket_id=ticket.id, author_id=actor.id, text=text, created_at=now(session)))
+    session.add(ConversationMessage(employee_id=employee.id, role="hr", text=text, created_at=now(session)))
     send(
         session,
         employee.identity_id,
-        "Сообщение передано рекрутеру.",
-        f"ticket-ack:{event_key}",
+        (f"Ваш вопрос: {question}\n" if question else "") + f"Ответ HR: {text}",
+        f"hr-reply:{key}",
         now(session),
+        buttons=[{"text": "Ответить HR", "payload": "hr"}],
     )
-
-
-def reply(session, actor, employee, ticket, text, key):
-    from .access import can_support, require
-
-    require(can_support(actor, employee) and ticket.recruiter_id == actor.id)
-    require(ticket.status != "closed", "Обращение уже закрыто")
-    active = active_human_ticket(session, employee)
-    if active and active.id != ticket.id:
-        from fastapi import HTTPException
-
-        raise HTTPException(409, "Сначала завершите уже открытый человеческий диалог")
-    ticket.human_mode = True
-    ticket.status = "in_progress"
-    session.add(TicketMessage(ticket_id=ticket.id, author_id=actor.id, text=text, created_at=now(session)))
-    session.add(ConversationMessage(employee_id=employee.id, role="hr", text=text, created_at=now(session)))
-    send(session, employee.identity_id, f"Ответ HR ({actor.name}):\n{text}", f"hr-reply:{key}", now(session))
 
 
 def close(session, actor, employee, ticket, key):
     from .access import can_support, require
-    from .scenarios import drain_dialogue_queue
-    from .surveys import active_run, prompt
 
-    require(can_support(actor, employee) and ticket.recruiter_id == actor.id)
+    require(can_support(actor, employee))
     if ticket.status == "closed":
         return
     ticket.status = "closed"
     ticket.human_mode = False
     ticket.closed_at = now(session)
-    send(
-        session, employee.identity_id, "Обращение закрыто. Продолжим адаптацию.", f"close:{key}", now(session)
+    inbox.append(
+        session,
+        employee,
+        ticket,
+        "system",
+        "HR отметил обращение решённым.",
+        "ticket-close:" + ticket.id,
+        actor.id,
     )
-    session.flush()
-    run = active_run(session, employee)
-    if run:
-        prompt(session, employee, run, key)
-    else:
-        drain_dialogue_queue(session, employee)
+    send(
+        session,
+        employee.identity_id,
+        "HR отметил обращение решённым. История переписки сохранена.",
+        f"close:{key}",
+        now(session),
+    )
+
+
+def signal_text(reason, context):
+    parts = [
+        reason,
+        context.get("question"),
+        context.get("message"),
+        context.get("analysis", {}).get("explanation"),
+    ]
+    return "\n".join(str(part) for part in parts if part)

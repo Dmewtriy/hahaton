@@ -21,6 +21,7 @@ def main():
     sub.add_parser("seed-demo")
     sub.add_parser("worker")
     sub.add_parser("poll")
+    sub.add_parser("sync-commands", help="Register Russian slash-command hints in MAX")
     tick = sub.add_parser("tick")
     tick.add_argument("--limit", type=int, default=100)
     subscribe = sub.add_parser("subscribe")
@@ -43,8 +44,11 @@ def main():
                 "KORSIK_ML_MODE=stub",
                 f"KORSIK_ENABLE_DEMO={'true' if args.demo else 'false'}",
                 f"KORSIK_MAX_WEBHOOK_SECRET={new_token()}",
+                "KORSIK_WEBAPP_PUBLIC_URL=",
+                "KORSIK_ALLOW_LOCAL_ADMIN_LOGIN=true",
                 "KORSIK_MAX_TOKEN=",
                 "KORSIK_MAX_BOT_NAME=",
+                "KORSIK_MAX_CA_FILE=certs/russian_trusted_root_ca.pem",
                 "KORSIK_ML_BASE_URL=http://localhost:9000",
                 "KORSIK_ML_TOKEN=",
                 "",
@@ -84,6 +88,23 @@ def main():
             print(json.dumps(Worker(runtime).tick(args.limit)))
         elif args.command == "poll":
             poll(runtime)
+        elif args.command == "sync-commands":
+            from .commands import PUBLIC_COMMANDS
+
+            if settings.transport != "max":
+                raise ValueError("Command registration requires transport=max")
+            previous = runtime.transport.get_info().get("commands", [])
+            backup = settings.data_dir / "backups"
+            backup.mkdir(exist_ok=True)
+            from .db import utcnow
+
+            (backup / ("max_commands_" + utcnow().strftime("%Y%m%d_%H%M%S") + ".json")).write_text(
+                json.dumps(previous, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+            result = runtime.transport.set_commands(PUBLIC_COMMANDS)
+            if result.get("commands") != PUBLIC_COMMANDS:
+                raise ValueError("MAX returned a different command list; check the registered hints")
+            print(f"Registered {len(PUBLIC_COMMANDS)} command hints in MAX.")
         elif args.command == "subscribe":
             if not settings.max_webhook_secret:
                 raise ValueError("Set KORSIK_MAX_WEBHOOK_SECRET")

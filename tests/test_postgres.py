@@ -25,6 +25,9 @@ def test_postgres_job_claiming_and_outbox(tmp_path):
             bootstrap_token="postgres-test-only-key-0000000000000000",
             data_dir=tmp_path,
             environment="test",
+            transport="mock",
+            ml_mode="stub",
+            max_ca_file=None,
             enable_demo=False,
         )
     )

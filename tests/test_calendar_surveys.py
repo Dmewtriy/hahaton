@@ -87,6 +87,13 @@ def test_multi_select_and_stale_callback(runtime):
 
 
 def test_ai_detour_preserves_comment_and_question_position(runtime):
+    from korsik.ml import AnswerResult, StubML
+
+    class ClarifyingML(StubML):
+        def answer(self, payload):
+            return AnswerResult(status="clarification", answer="Уточните систему", processor_version="test/1")
+
+    runtime.ml = ClarifyingML()
     employee(runtime)
     scenario(runtime)
     Worker(runtime).tick()

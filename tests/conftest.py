@@ -21,6 +21,9 @@ BOOTSTRAP = "test-bootstrap-token-00000000000000000000"
 def runtime(tmp_path):
     settings = Settings(
         environment="test",
+        transport="mock",
+        ml_mode="stub",
+        max_ca_file=None,
         bootstrap_token=BOOTSTRAP,
         database_url="sqlite:///" + str(tmp_path / "db.sqlite"),
         data_dir=tmp_path / "data",

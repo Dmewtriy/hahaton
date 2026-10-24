@@ -75,12 +75,14 @@ class MockMAX:
 
 class MAXClient:
     def __init__(self, settings, client=None):
-        verify = ssl.create_default_context(cafile=settings.max_ca_file) if settings.max_ca_file else True
+        self.verify = ssl.create_default_context()
+        if settings.max_ca_file:
+            self.verify.load_verify_locations(cafile=settings.max_ca_file)
         self.client = client or httpx.Client(
             base_url=settings.max_base_url.rstrip("/"),
             headers={"Authorization": settings.max_token},
             timeout=httpx.Timeout(20, connect=5),
-            verify=verify,
+            verify=self.verify,
         )
 
     def send(self, user_id, body, attachments=None):
@@ -92,7 +94,13 @@ class MAXClient:
                     "type": "inline_keyboard",
                     "payload": {
                         "buttons": [
-                            [{"type": "callback", "text": b["text"], "payload": b["payload"]}]
+                            [
+                                (
+                                    {"type": "link", "text": b["text"], "url": b["url"]}
+                                    if b.get("type") == "link"
+                                    else {"type": "callback", "text": b["text"], "payload": b["payload"]}
+                                )
+                            ]
                             for b in body["buttons"]
                         ]
                     },
@@ -142,7 +150,10 @@ class MAXClient:
         ):
             raise DeliveryError("untrusted_upload_host")
         # Signed upload URL is used without leaking the bot authorization header.
-        with path.open("rb") as stream, httpx.Client(timeout=60, follow_redirects=False) as client:
+        with (
+            path.open("rb") as stream,
+            httpx.Client(timeout=60, follow_redirects=False, verify=self.verify) as client,
+        ):
             uploaded = client.post(url, files={"data": (path.name, stream)})
         uploaded.raise_for_status()
         data = uploaded.json()
@@ -162,6 +173,16 @@ class MAXClient:
         if marker is not None:
             params["marker"] = marker
         response = self.client.get("/updates", params=params, timeout=40)
+        response.raise_for_status()
+        return response.json()
+
+    def set_commands(self, commands):
+        response = self.client.patch("/me/commands", json={"commands": commands})
+        response.raise_for_status()
+        return response.json()
+
+    def get_info(self):
+        response = self.client.get("/me")
         response.raise_for_status()
         return response.json()
 

@@ -62,6 +62,20 @@ class Worker:
             for step in due:
                 enqueue(session, "step", {"step_id": step.id}, f"step:{step.id}", at)
                 step.status = "enqueued"
+            queued_employees = session.scalars(
+                select(Employee)
+                .where(
+                    Employee.active.is_(True),
+                    Employee.status == "active",
+                    Employee.id.in_(
+                        select(ScheduledStep.employee_id).where(ScheduledStep.status == "queued")
+                    ),
+                )
+                .limit(500)
+                .with_for_update()
+            )
+            for employee in queued_employees:
+                scenarios.drain_dialogue_queue(session, employee)
             self.schedule_digests(session, at)
 
     def schedule_digests(self, session, at):
@@ -172,13 +186,7 @@ class Worker:
             run = session.get(SurveyRun, data["run_id"])
             if run and run.status == "active":
                 employee = session.get(Employee, run.employee_id)
-                from .tickets import active_human_ticket
-
-                if (
-                    employee.active
-                    and employee.status == "active"
-                    and not active_human_ticket(session, employee)
-                ):
+                if employee.active and employee.status == "active":
                     send(
                         session,
                         employee.identity_id,
@@ -414,9 +422,8 @@ def poll(runtime):
                     marker = State(key="max_marker", value={})
                     session.add(marker)
                 marker.value = {"marker": response.get("marker")}
-            for update in response.get("updates", []):
-                if update.get("callback", {}).get("callback_id"):
-                    runtime.transport.acknowledge(update["callback"]["callback_id"])
         except Exception as exc:
-            log.warning("poll_failed error=%s", type(exc).__name__)
-            time.sleep(5)
+            response = getattr(exc, "response", None)
+            status = response.status_code if response is not None else None
+            log.warning("poll_failed error=%s http_status=%s", type(exc).__name__, status)
+            time.sleep(15 if status in {429, 502, 503, 504} else 5)

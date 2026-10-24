@@ -20,7 +20,7 @@ def test_numeric_analytics_uses_persisted_answers(client, runtime):
     assert "ratings" not in manager
 
 
-def test_structured_and_ml_signal_share_ticket_and_keep_explanation(runtime):
+def test_structured_and_ml_signal_share_ticket_and_keep_explanation(runtime, client):
     employee(runtime)
     scenario(
         runtime,
@@ -40,3 +40,7 @@ def test_structured_and_ml_signal_share_ticket_and_keep_explanation(runtime):
         rows = list(session.scalars(select(Ticket)))
         assert len(rows) == 1
         assert rows[0].context["analysis"]["explanation"]
+        ticket_id = rows[0].id
+    context = client.get(f"/api/tickets/{ticket_id}", headers=auth("hr-a-key")).json()["context"]
+    assert context["question"] == "Есть проблема?"
+    assert "DEMO:RED_FLAG" in context["message"]

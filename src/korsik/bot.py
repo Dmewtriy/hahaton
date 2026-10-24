@@ -1,15 +1,15 @@
 from sqlalchemy import select
 
-from . import documents, employees, surveys, tickets
-from .access import can_support
+from . import documents, employees, inbox, surveys, tickets
+from .access import can_support, is_admin, is_hr
 from .calendar import now
 from .ml import MLUnavailable
-from .models import ConversationMessage, Employee, Identity, Outbox, QuestionLog, Ticket
+from .models import ConversationMessage, Employee, Identity, Outbox, QuestionLog, ScheduledStep, Ticket
 from .queue import send
 from .scenarios import drain_dialogue_queue
 
 MENU = (
-    "Я Корсик. /menu — меню, /ask вопрос — спросить по документам, /hr — рекрутер, "
+    "Я Корсик. /menu — меню, /ask вопрос — спросить по документам, /hr текст — сообщение HR, "
     "/resume — продолжить опрос, /food — питание, /materials — материалы."
 )
 
@@ -52,21 +52,27 @@ def receive(runtime, session, event):
     if event["kind"] == "start" or text.startswith("/start"):
         if employee and employee.active:
             employee.status = "active"
+        buttons = (
+            [
+                {"text": "На ты", "payload": "style:informal"},
+                {"text": "На вы", "payload": "style:formal"},
+            ]
+            if employee
+            else []
+        )
+        buttons.extend(admin_buttons(runtime, identity))
         send(
             session,
             identity.id,
             f"Здравствуйте, {identity.name}! " + MENU,
             f"welcome:{key}",
             at,
-            buttons=[
-                {"text": "На ты", "payload": "style:informal"},
-                {"text": "На вы", "payload": "style:formal"},
-            ],
+            buttons=buttons,
         )
         if employee:
             drain_dialogue_queue(session, employee)
         return
-    if staff_command(session, identity, text, key):
+    if staff_command(runtime, session, identity, text, key):
         return
     if not employee or not employee.active or employee.status != "active" or "employee" not in identity.roles:
         send(
@@ -87,57 +93,48 @@ def receive(runtime, session, event):
     if callback == "hr":
         text = "/hr"
         callback = None
-    human = tickets.active_human_ticket(session, employee)
-    if human:
-        if text.lower() in {"/menu", "/resume"}:
-            send(
-                session,
-                identity.id,
-                "В диалоге участвует HR. Опрос продолжится после закрытия обращения.",
-                f"human:{key}",
-                at,
-            )
-        elif text:
-            tickets.employee_message(session, employee, human, text, key)
-        return
     run = surveys.active_run(session, employee)
     if callback:
         if run:
+            employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "awaiting_hr_message"}
             surveys.consume_answer(session, employee, run, "", key, callback=callback)
         else:
             send(session, identity.id, "Эта кнопка больше не активна.", f"inactive-button:{key}", at)
         return
     command = text.split(maxsplit=1)[0].lower() if text else ""
     if command == "/hr":
-        detail = text.partition(" ")[2] or "Сотрудник запросил связь с HR"
-        recent = list(
-            session.scalars(
-                select(ConversationMessage)
-                .where(ConversationMessage.employee_id == employee.id)
-                .order_by(ConversationMessage.created_at.desc())
-                .limit(6)
+        detail = text.partition(" ")[2].strip()
+        if detail:
+            route_hr_message(session, employee, detail, key, run)
+        else:
+            pending = employee.dialogue.get("awaiting_hr_message", {})
+            employee.dialogue = {
+                **employee.dialogue,
+                "awaiting_ai_question": False,
+                "awaiting_hr_message": {
+                    "step_id": pending.get("step_id"),
+                    "survey_run_id": run.id if run else None,
+                },
+            }
+            send(
+                session,
+                identity.id,
+                "Напишите одно сообщение для HR. Оно не попадёт в ИИ или ответы опроса. "
+                "Для отмены: /cancel. После отправки бот вернётся к обычной работе.",
+                "hr-compose:" + key,
+                at,
             )
-        )
-        tickets.open_ticket(
-            session,
-            employee,
-            "Запрос сотрудника",
-            {
-                "message": detail,
-                "history": [{"role": m.role, "text": m.text} for m in reversed(recent)],
-                "survey_run_id": run.id if run else None,
-            },
-            f"manual:{key}",
-        )
-        send(
-            session,
-            identity.id,
-            "Обращение создано. Следующие сообщения будут переданы рекрутеру.",
-            f"hr-ack:{key}",
-            at,
-        )
-    elif command in {"/menu", "/help"}:
-        send(session, identity.id, MENU, f"menu:{key}", at)
+    elif command == "/cancel":
+        employee.dialogue = {
+            k: v
+            for k, v in employee.dialogue.items()
+            if k not in {"awaiting_hr_message", "awaiting_ai_question"}
+        }
+        send(session, identity.id, "Ввод сообщения отменён.", "cancel-compose:" + key, at)
+        if run:
+            surveys.prompt(session, employee, run, "cancel:" + key)
+    elif command in {"/menu", "/help", "/"}:
+        send(session, identity.id, MENU, f"menu:{key}", at, buttons=admin_buttons(runtime, identity))
     elif command in {"/food", "/materials"}:
         from .models import Branch
 
@@ -154,11 +151,14 @@ def receive(runtime, session, event):
         )
     elif command == "/resume":
         if run:
+            employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "awaiting_hr_message"}
             surveys.prompt(session, employee, run, key)
         else:
             drain_dialogue_queue(session, employee)
             send(session, identity.id, "Активного опроса нет.", f"resume:{key}", at)
     elif command == "/ask":
+        employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "awaiting_hr_message"}
+        employee.dialogue = {**employee.dialogue, "awaiting_ai_question": False}
         question = text.partition(" ")[2].strip()
         if question:
             ask(runtime, session, employee, question, key, run)
@@ -171,13 +171,53 @@ def receive(runtime, session, event):
                 f"ask-prompt:{key}",
                 at,
             )
+    elif employee.dialogue.get("awaiting_hr_message") and not command.startswith("/"):
+        pending = employee.dialogue["awaiting_hr_message"]
+        if not run or pending.get("survey_run_id") == run.id:
+            route_hr_message(session, employee, text, key, run)
+        else:
+            employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "awaiting_hr_message"}
+            surveys.consume_answer(session, employee, run, text, key)
     elif employee.dialogue.get("awaiting_ai_question"):
         employee.dialogue = {**employee.dialogue, "awaiting_ai_question": False}
         ask(runtime, session, employee, text, key, run)
     elif run:
         surveys.consume_answer(session, employee, run, text, key)
+    elif command.startswith("/"):
+        send(
+            session,
+            identity.id,
+            "Эта команда сейчас недоступна. Список команд: /menu.",
+            "unknown-command:" + key,
+            at,
+        )
     elif text:
         ask(runtime, session, employee, text, key, None)
+
+
+def route_hr_message(session, employee, text, key, run):
+    if not text.strip():
+        return
+    pending = employee.dialogue.get("awaiting_hr_message", {})
+    employee.dialogue = {
+        k: v for k, v in employee.dialogue.items() if k not in {"awaiting_hr_message", "awaiting_ai_question"}
+    }
+    step = session.get(ScheduledStep, pending.get("step_id")) if pending.get("step_id") else None
+    if step and step.employee_id == employee.id and step.status == "dispatched":
+        step.status = "completed"
+    inbox.send_employee_message(
+        session, employee, text, key, "Ответ на шаг адаптации" if step else "Сообщение сотрудника"
+    )
+    send(
+        session,
+        employee.identity_id,
+        "Сообщение передано HR. Для следующего сообщения используйте /hr. "
+        "Опросы и рассылки продолжают работать.",
+        "hr-ack:" + key,
+        now(session),
+    )
+    if run:
+        surveys.prompt(session, employee, run, "after-hr:" + key)
 
 
 def ask(runtime, session, employee, question, key, run):
@@ -206,6 +246,7 @@ def ask(runtime, session, employee, question, key, run):
     }
     at = now(session)
     session.add(ConversationMessage(employee_id=employee.id, role="user", text=question, created_at=at))
+    automatic_hr = False
     try:
         result = runtime.ml.answer(payload)
         # A document may have been revoked while the ML request was in flight.
@@ -221,11 +262,15 @@ def ask(runtime, session, employee, question, key, run):
         )
         if (result.status == "answered" and not valid) or (result.sources and not valid):
             text, status = (
-                "Не удалось подтвердить ответ разрешёнными документами. Обратитесь к HR: /hr.",
+                "Не удалось подтвердить ответ разрешёнными документами.",
                 "blocked",
             )
         else:
             text, status = result.answer, result.status
+            if status == "not_found":
+                text = "В доступных документах я не нашёл подтверждённого ответа."
+                if runtime.settings.ml_mode == "stub":
+                    text += " Сейчас подключён демонстрационный ML-модуль."
             if result.status == "answered":
                 text += "\nИсточники:\n" + "\n".join(
                     f"{by_id[s.document_id].title}, версия {s.version}"
@@ -233,16 +278,33 @@ def ask(runtime, session, employee, question, key, run):
                     for s in result.sources
                 )
         version, topics = result.processor_version, result.topics
-        if result.needs_hr:
-            tickets.open_ticket(
-                session, employee, "ИИ запросил участие HR", {"question": question}, f"rag:{key}", human=False
-            )
+        automatic_hr = result.needs_hr or status in {"not_found", "blocked"}
     except MLUnavailable:
         text, status, version, topics = (
-            "Сервис ответов временно недоступен. Повторите позже или напишите /hr.",
+            "Сервис ответов временно недоступен. Я не могу дать подтверждённый ответ.",
             "unavailable",
             "unavailable",
             [],
+        )
+        automatic_hr = True
+    if automatic_hr:
+        tickets.open_ticket(
+            session,
+            employee,
+            "Вопрос без подтверждённого ответа",
+            {
+                "question": question,
+                "answer_status": status,
+                "processor_version": version,
+                "history": [{"role": m.role, "text": m.text} for m in reversed(history)],
+                "survey_run_id": run.id if run else None,
+            },
+            "rag:" + key,
+            human=True,
+        )
+        text += (
+            "\nПередал ваш вопрос закреплённому HR. Дополнить: /hr ваше сообщение. "
+            "Опросы и рассылки продолжат приходить."
         )
     session.add(
         QuestionLog(
@@ -267,16 +329,63 @@ def ask(runtime, session, employee, question, key, run):
         surveys.prompt(session, employee, run, "return:" + key)
 
 
-def staff_command(session, actor, text, key):
+def admin_buttons(runtime, actor):
+    settings = runtime.settings
+    if not is_admin(actor) or not settings.webapp_public_url or not settings.max_bot_name:
+        return []
+    return [
+        {
+            "type": "link",
+            "text": "Кабинет HR",
+            "url": f"https://max.ru/{settings.max_bot_name.lstrip('@')}?startapp=admin",
+        }
+    ]
+
+
+def staff_command(runtime, session, actor, text, key):
     command, _, rest = text.partition(" ")
     command = command.lower()
+    if command == "/admin":
+        if not is_admin(actor):
+            send(
+                session,
+                actor.id,
+                "Кабинет доступен только администраторам и HR.",
+                "admin-denied:" + key,
+                now(session),
+            )
+        else:
+            buttons = admin_buttons(runtime, actor)
+            text = (
+                "Откройте кабинет управления."
+                if buttons
+                else "Мини-приложение пока не подключено. Кабинет доступен локально на сервере."
+            )
+            send(session, actor.id, text, "admin:" + key, now(session), buttons=buttons)
+        return True
+    if command in {"/menu", "/help"} and is_admin(actor):
+        send(
+            session,
+            actor.id,
+            "Команды HR: /admin — кабинет, /dashboard — сводка, "
+            "/reply ID текст — ответ, /close ID — закрыть обращение.",
+            "staff-menu:" + key,
+            now(session),
+            buttons=admin_buttons(runtime, actor),
+        )
+        return True
     if command == "/dashboard" and set(actor.roles) & {"hr", "manager", "hr_head"}:
         from .analytics import dashboard, digest_text
 
         data = dashboard(session, actor)
-        send(session, actor.id, digest_text(data), f"dashboard:{key}", now(session))
+        report = digest_text(data)
+        if "manager" in actor.roles and not is_hr(actor):
+            report += "\nСтатус сотрудников:\n" + "\n".join(
+                f"{e['name']} — {e['stage']}; выход: {e['hire_date']}" for e in data["employees"]
+            )
+        send(session, actor.id, report, f"dashboard:{key}", now(session))
         return True
-    if command not in {"/reply", "/close"} or "hr" not in actor.roles:
+    if command not in {"/reply", "/close"} or not is_hr(actor):
         return False
     ticket_id, _, answer = rest.partition(" ")
     ticket = session.get(Ticket, ticket_id)

@@ -300,7 +300,8 @@
       "resource_keys": [],
       "document_ids": [],
       "survey_id": null,
-      "manual": true
+      "manual": true,
+      "reply_to": "hr"
     },
     {
       "id": "adaptation_plan",

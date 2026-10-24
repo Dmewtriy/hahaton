@@ -29,6 +29,10 @@ if context.is_offline_mode():
 else:
     database = Database(settings.database_url)
     with database.engine.connect() as connection:
+        sqlite = connection.dialect.name == "sqlite"
+        if sqlite:
+            connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+            connection.commit()
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
@@ -38,4 +42,11 @@ else:
         )
         with context.begin_transaction():
             context.run_migrations()
+        if sqlite:
+            connection.commit()
+            connection.exec_driver_sql("PRAGMA foreign_keys=ON")
+            violations = connection.exec_driver_sql("PRAGMA foreign_key_check").fetchall()
+            if violations:
+                raise RuntimeError("SQLite migration left invalid foreign-key references")
+            connection.commit()
     database.engine.dispose()

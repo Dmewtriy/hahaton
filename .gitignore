@@ -4,6 +4,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .env
+.env.*
+!.env.example
 data/
 *.egg-info/
 coverage.xml
@@ -11,3 +13,10 @@ coverage.xml
 .test-runs/
 build/
 dist/
+
+# Private handoff materials and comparison reports stay outside Git.
+/handoff-private/
+/outputs/
+/docs/case-audit.md
+/docs/system-analysis-audit.md
+/system-analysis-audit.md

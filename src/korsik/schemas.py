@@ -9,7 +9,7 @@ Role = Literal["employee", "hr", "manager", "hr_head"]
 
 
 class StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
 
 class IdentityCreate(StrictModel):
@@ -20,6 +20,7 @@ class IdentityCreate(StrictModel):
 
 
 class IdentityUpdate(StrictModel):
+    name: str | None = Field(default=None, min_length=1, max_length=200)
     roles: list[Role]
     manage_access: bool = False
     branch_codes: list[str]
@@ -112,6 +113,8 @@ class Question(StrictModel):
             raise ValueError("Choice questions require options")
         if len({o.id for o in self.options}) != len(self.options):
             raise ValueError("Option IDs must be unique")
+        if self.kind == "multiple" and any(o.id == "done" for o in self.options):
+            raise ValueError("Option ID 'done' is reserved for completing a multiple choice")
         if not 0 <= self.minimum < self.maximum <= 100:
             raise ValueError("Rating bounds must satisfy 0 <= minimum < maximum <= 100")
         if self.comment_below is not None and not self.minimum <= self.comment_below <= self.maximum:
@@ -155,6 +158,7 @@ class StepDefinition(StrictModel):
     document_ids: list[str] = Field(default_factory=list)
     survey_id: str | None = None
     manual: bool = False
+    reply_to: Literal["none", "hr"] = "none"
 
     @field_validator("text", "informal_text")
     @classmethod

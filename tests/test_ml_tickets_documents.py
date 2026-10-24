@@ -142,14 +142,14 @@ def test_analysis_version_and_signal_are_persisted_once(runtime):
         assert len(tickets) == 1 and tickets[0].recruiter_id == "hr-a"
 
 
-def test_human_mode_suspends_ai_and_returns_to_survey(client, runtime):
+def test_explicit_hr_message_keeps_survey_independent(client, runtime):
     employee(runtime)
     scenario(runtime)
     Worker(runtime).tick()
     event(runtime, "/hr Нужна помощь")
     with runtime.db.transaction() as session:
         ticket_id = session.scalar(select(Ticket.id))
-    event(runtime, "Вопрос для человека")
+    event(runtime, "/hr Вопрос для человека")
     with runtime.db.transaction() as session:
         assert not list(session.scalars(select(QuestionLog)))
         assert len(list(session.scalars(select(TicketMessage)))) == 1

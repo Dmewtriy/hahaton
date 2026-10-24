@@ -20,6 +20,9 @@ with tempfile.TemporaryDirectory(prefix="korsik-load-") as folder:
     runtime = Runtime(
         Settings(
             environment="test",
+            transport="mock",
+            ml_mode="stub",
+            max_ca_file=None,
             bootstrap_token="load-test-only-000000000000000000000000",
             data_dir=root,
             database_url="sqlite:///" + str(root / "db.sqlite"),

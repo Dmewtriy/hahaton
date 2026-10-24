@@ -9,6 +9,7 @@ COPY src ./src
 COPY migrations ./migrations
 COPY examples ./examples
 COPY scripts ./scripts
+COPY certs ./certs
 COPY tests ./tests
 RUN pip install --no-cache-dir --no-deps . && mkdir /app/data && chown -R korsik:korsik /app/data
 USER korsik

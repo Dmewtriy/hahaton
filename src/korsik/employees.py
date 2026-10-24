@@ -11,14 +11,17 @@ from .schemas import EmployeeCreate
 
 def create_employee(session, actor, data: EmployeeCreate):
     require(bool(set(actor.roles) & {"hr", "hr_head"}) and in_scope(actor, data.branch_code))
-    if "hr_head" not in actor.roles:
-        require(data.recruiter_id == actor.id)
     branch = session.get(Branch, data.branch_code)
     if not branch or not branch.active:
         raise HTTPException(422, "Площадка не найдена или выключена")
     recruiter = session.get(Identity, data.recruiter_id)
     require(
-        bool(recruiter and recruiter.active and "hr" in recruiter.roles and in_scope(recruiter, branch.code)),
+        bool(
+            recruiter
+            and recruiter.active
+            and set(recruiter.roles) & {"hr", "hr_head"}
+            and in_scope(recruiter, branch.code)
+        ),
         "Рекрутер должен иметь доступ к площадке",
     )
     if data.manager_id:

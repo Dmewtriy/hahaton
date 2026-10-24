@@ -3,11 +3,12 @@ from datetime import timedelta
 from sqlalchemy import select
 
 from .calendar import now
-from .models import ScheduledStep, SurveyAnswer, SurveyRun
+from .models import CampaignRecipient, ScheduledStep, SurveyAnswer, SurveyRun
 from .queue import enqueue, send
 
 
 def start_survey(session, employee, step):
+    employee.dialogue = {k: v for k, v in employee.dialogue.items() if k != "awaiting_hr_message"}
     run = SurveyRun(
         employee_id=employee.id,
         scheduled_step_id=step.id,
@@ -51,13 +52,23 @@ def prompt(session, employee, run, suffix):
                 buttons.append(
                     {"text": mark + option["label"], "payload": f"a:{run.id}:{run.position}:{option['id']}"}
                 )
-            text += "\n" + "\n".join(f"{o['id']}: {o['label']}" for o in question["options"])
+            text += "\n" + "\n".join(
+                f"{index}. {'✓ ' if option['id'] in run.selection else ''}{option['label']}"
+                for index, option in enumerate(question["options"], start=1)
+            )
             if question["kind"] == "multiple":
-                text += "\nВыберите несколько вариантов и нажмите «Готово» или отправьте /done."
+                text += (
+                    "\nВыберите варианты кнопками или отправляйте их номера по одному. "
+                    "Затем нажмите «Готово» или напишите это слово."
+                )
                 buttons.append({"text": "Готово", "payload": f"a:{run.id}:{run.position}:done"})
+            else:
+                text += "\nНажмите вариант ответа или отправьте его номер."
         elif question["kind"] == "rating":
             text += f"\nВведите число от {question['minimum']} до {question['maximum']}."
-    text += "\nДля отдельного вопроса: /ask ваш вопрос. Прогресс опроса сохранится."
+    text += (
+        "\nДля отдельного вопроса: /ask ваш вопрос. Прогресс опроса сохранится. Сообщение HR: /hr ваш текст."
+    )
     send(
         session,
         employee.identity_id,
@@ -103,6 +114,20 @@ def consume_answer(session, employee, run, text, event_key, callback=None):
     needs_comment = False
     notify_hr = False
     if kind in {"single", "multiple"}:
+        if not callback:
+            entered = text.strip()
+            if kind == "multiple" and entered.casefold() in {"готово", "done", "/done"}:
+                text = "done"
+            elif (
+                entered.isascii()
+                and entered.isdigit()
+                and len(entered) <= 2
+                and 1 <= int(entered) <= len(options)
+            ):
+                text = question["options"][int(entered) - 1]["id"]
+            else:
+                matching = [o["id"] for o in options.values() if o["label"].casefold() == entered.casefold()]
+                text = matching[0] if len(matching) == 1 else entered
         if kind == "multiple" and text in {"done", "/done"}:
             if not run.selection:
                 prompt(session, employee, run, event_key)
@@ -191,6 +216,11 @@ def advance(session, employee, run, event_key):
         run.status = "completed"
         run.completed_at = now(session)
         session.get(ScheduledStep, run.scheduled_step_id).status = "completed"
+        recipient = session.scalar(
+            select(CampaignRecipient).where(CampaignRecipient.scheduled_step_id == run.scheduled_step_id)
+        )
+        if recipient:
+            recipient.status = "completed"
         send(
             session,
             employee.identity_id,

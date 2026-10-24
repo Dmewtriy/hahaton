@@ -8,7 +8,7 @@ from .access import new_token, token_hash
 from .calendar import add_months, now
 from .documents import store
 from .employees import invite
-from .models import Branch, Employee, Identity, Scenario
+from .models import Branch, Employee, Identity, Scenario, SurveyTemplate, uid
 from .scenarios import rebuild_schedule
 from .schemas import ScenarioDefinition
 
@@ -239,6 +239,7 @@ def definition():
         categories=None,
         branches=None,
         kind="message",
+        reply_to="none",
         anchor="hire",
     ):
         steps.append(
@@ -246,6 +247,7 @@ def definition():
                 "id": key,
                 "text": text,
                 "kind": "survey" if survey else kind,
+                "reply_to": reply_to,
                 "schedule": {
                     "anchor": anchor,
                     "days": days,
@@ -336,6 +338,7 @@ def definition():
     step(
         "introduction",
         "Расскажите рекрутеру о своём опыте и навыках для представления коллегам.",
+        reply_to="hr",
         at="10:00",
         working_day=2,
         manual=True,
@@ -472,6 +475,21 @@ def seed_demo(runtime):
         )
         session.add(employee)
         session.flush()
+        from .admin_service import ensure_department
+
+        employee.department_id = ensure_department(session, employee.department, employee.branch_code).id
+        for survey in data["surveys"]:
+            template_id = uid()
+            session.add(
+                SurveyTemplate(
+                    id=template_id,
+                    title=survey["title"],
+                    description="Опрос адаптации",
+                    definition={**survey, "id": template_id},
+                    branch_codes=["*"],
+                    created_by=actors["hr"].id,
+                )
+            )
         rebuild_schedule(session, employee)
         invitation = invite(session, identity.id, runtime.settings.invitation_hours)
         doc = store(

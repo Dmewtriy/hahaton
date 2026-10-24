@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     max_bot_name: str = ""
     max_webhook_secret: str = ""
     max_ca_file: str | None = None
+    webapp_public_url: str = ""
+    webapp_auth_max_age_seconds: int = 3600
+    allow_local_admin_login: bool = True
     ml_mode: Literal["stub", "http"] = "stub"
     ml_base_url: str = "http://localhost:9000"
     ml_token: str = ""
@@ -31,6 +34,14 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_environment(self):
+        if self.webapp_public_url:
+            from urllib.parse import urlparse
+
+            url = urlparse(self.webapp_public_url)
+            if url.scheme != "https" or not url.hostname or url.username or url.fragment:
+                raise ValueError("Mini-app public URL must be an HTTPS URL without credentials or fragment")
+        if not 60 <= self.webapp_auth_max_age_seconds <= 3600:
+            raise ValueError("Mini-app launch validity must be 60..3600 seconds")
         if len(self.bootstrap_token) < 32:
             raise ValueError(
                 "Set KORSIK_BOOTSTRAP_TOKEN (at least 32 characters), or run python -m korsik.cli init"

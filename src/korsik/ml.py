@@ -108,8 +108,7 @@ class StubML:
             )
         return AnswerResult(
             status="not_found",
-            answer="Работает ML-заглушка. Подтверждённого ответа нет. "
-            "Могу передать вопрос рекрутеру командой /hr.",
+            answer="Работает ML-заглушка. Подтверждённого ответа нет.",
             processor_version="stub/1",
         )
 
