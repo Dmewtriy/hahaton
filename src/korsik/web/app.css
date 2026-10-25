@@ -829,6 +829,18 @@ input[type="checkbox"] {
 .form-error:empty {
   display: none;
 }
+.upload-progress {
+  color: #2f4f6f;
+  background: #eef4fb;
+  border: 1px solid #d5e3f2;
+  padding: 11px 13px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 13px 0;
+}
+.upload-progress:empty {
+  display: none;
+}
 .question-card,
 .step-card {
   border: 1px solid #dde5f0;

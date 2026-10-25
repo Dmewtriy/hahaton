@@ -56,12 +56,20 @@ class Source(StrictModel):
     page: int | None = Field(default=None, ge=1)
 
 
+class AnswerImage(StrictModel):
+    media_id: str = Field(min_length=1, max_length=200)
+    url: str = Field(min_length=1, max_length=2000)
+    page: int | None = Field(default=None, ge=1)
+    document_id: str | None = None
+
+
 class AnswerResult(StrictModel):
     status: Literal["answered", "not_found", "clarification"]
     answer: str = Field(min_length=1, max_length=12000)
     sources: list[Source] = Field(default_factory=list, max_length=20)
     topics: list[str] = Field(default_factory=list, max_length=20)
     needs_hr: bool = False
+    images: list[AnswerImage] = Field(default_factory=list, max_length=5)
     processor_version: str = Field(min_length=1, max_length=100)
 
 

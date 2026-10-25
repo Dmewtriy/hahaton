@@ -53,3 +53,27 @@ def resolve(
     support.resolution(session, actor, ticket, data.text, f"{actor.id}:{ticket.id}:{idempotency_key}")
     audit(session, actor, "ticket.resolution", ticket.id)
     return {"status": ticket.status, "revision": ticket.resolution_revision}
+
+
+@router.post("/{ticket_id}/close")
+def close_case(
+    ticket_id: str,
+    session: Session,
+    actor: Actor,
+    idempotency_key: Annotated[str, Header(min_length=1, max_length=120)],
+    data: TextInput | None = None,
+):
+    """Закрытие обращения HR или руководителем из веб-кабинета."""
+    ticket = session.get(Ticket, ticket_id)
+    if not ticket:
+        raise HTTPException(404, "Обращение не найдено")
+    note = (data.text if data else "") or None
+    support.close_by_staff(
+        session,
+        actor,
+        ticket,
+        f"{actor.id}:{ticket.id}:close:{idempotency_key}",
+        note=note,
+    )
+    audit(session, actor, "ticket.staff_close", ticket.id)
+    return {"status": ticket.status, "outcome": ticket.outcome}

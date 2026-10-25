@@ -17,7 +17,7 @@ class Action:
 
 
 ACTIONS = (
-    Action("menu", "☰ Меню", "Показать доступные действия", "all"),
+    Action("menu", "Меню", "Показать доступные действия", "all"),
     Action("ask", "Задать вопрос", "Вопрос по документам компании"),
     Action("hr", "Связаться с HR", "Написать HR или продолжить обращение"),
     Action("resume", "Продолжить опрос", "Показать текущий вопрос"),
@@ -126,7 +126,7 @@ def resolve(runtime, session, actor, employee, event, key):
             )
             return True, None
         return False, "/" + action.id
-    if text.lower() in {"/menu", "/help", "/", "☰ меню"}:
+    if text.lower() in {"/menu", "/help", "/", "☰ меню", "меню"}:
         show(runtime, session, actor, employee, key)
         return True, None
     return False, None

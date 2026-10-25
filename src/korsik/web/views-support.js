@@ -22,7 +22,96 @@ const unreadDot = (count) =>
     ? `<span class="unread-dot" role="img" aria-label="Новых сообщений: ${count}" title="Новых сообщений: ${count}"></span>`
     : "";
 
+async function managerTicketsPage(ctx) {
+  const state = (ctx.states.managerTickets ||= { search: "", page: 0, openOnly: true });
+  let rows = (await ctx.api.get("/api/tickets")).filter((t) => t.status !== "closed" || !state.openOnly),
+    container;
+  const statusLabel = {
+    open: "Новое",
+    in_progress: "В работе",
+    awaiting_confirmation: "Ожидает подтверждения",
+    closed: "Закрыто",
+  };
+  const render = () => {
+    const filtered = rows.filter((row) =>
+      `${row.employee_name || ""} ${row.reason}`
+        .toLowerCase()
+        .includes(state.search.toLowerCase()),
+    );
+    const list = container.querySelector("[data-list]");
+    list.innerHTML = table(
+      [
+        [
+          "Сотрудник",
+          (row) =>
+            `<strong>${e(row.employee_name || "—")}</strong><span class="cell-sub">№${e(row.id.slice(0, 8))}</span>`,
+        ],
+        ["Тема", (row) => e(row.reason)],
+        [
+          "Статус",
+          (row) =>
+            badge(row.status) +
+            `<span class="cell-sub">${e(statusLabel[row.status] || row.status)}</span>`,
+        ],
+        [
+          "",
+          (row) =>
+            row.can_close && row.status !== "closed"
+              ? button("Открыть / закрыть", "open", row.id, "primary")
+              : button("Открыть", "open", row.id),
+        ],
+      ],
+      filtered,
+      state,
+      empty(
+        "Открытых обращений нет",
+        "Здесь появятся обращения ваших подчинённых. Закрыть можно прямо из карточки.",
+      ),
+    );
+    bindPagination(list, state, render);
+  };
+  const reload = async () => {
+    rows = (await ctx.api.get("/api/tickets")).filter((t) => t.status !== "closed" || !state.openOnly);
+    if (container.isConnected) render();
+  };
+  return {
+    html:
+      heading(
+        "Обращения команды",
+        "Обращения подчинённых. Закрытие уведомляет сотрудника в MAX.",
+        button("Обновить", "refresh"),
+      ) +
+      `<div class="inbox-controls"><div class="search-box">${icon("search")}<input aria-label="Поиск" data-search placeholder="Имя или тема" value="${e(state.search || "")}"></div><label class="check"><input type="checkbox" data-open-only ${state.openOnly ? "checked" : ""}>Только открытые</label></div>` +
+      "<div data-list></div>",
+    bind: (target) => {
+      container = target;
+      render();
+      target.querySelector("[data-search]").oninput = (event) => {
+        state.search = event.target.value;
+        state.page = 0;
+        render();
+      };
+      target.querySelector("[data-open-only]").onchange = (event) => {
+        state.openOnly = event.target.checked;
+        state.page = 0;
+        reload();
+      };
+      delegate(target, async (action, id) => {
+        if (action === "open") {
+          await ticketDetail(ctx, id);
+          await reload();
+        }
+        if (action === "refresh") await reload();
+      });
+      ctx.onInboxPoll = reload;
+    },
+  };
+}
+
 export async function ticketsPage(ctx) {
+  if (!ctx.me.capabilities.manage_hr && ctx.me.capabilities.view_team) {
+    return managerTicketsPage(ctx);
+  }
   const state = (ctx.states.tickets ||= {
     search: "",
     branch: "",
@@ -131,9 +220,29 @@ export async function ticketsPage(ctx) {
 export async function ticketDetail(ctx, ticketId) {
   const ticket = await ctx.api.get(`/api/tickets/${ticketId}`);
   if (!ticket.can_reply) {
+    const notice = ticket.can_close
+      ? "Вы можете просмотреть и закрыть это обращение. Сотрудник получит уведомление в MAX."
+      : "Сохранён доступ только к этому обращению. Для работы с другими данными нужна действующая область HR.";
     drawer(
       "История обращения №" + ticket.id.slice(0, 8),
-      `<div class="notice">Сохранён доступ только к этому обращению. Для работы с другими данными нужна действующая область HR.</div><h3>${e(ticket.reason)}</h3><p>${badge(ticket.status)}</p><div class="code">${e(ticket.context.question || ticket.context.message || "")}</div>${ticket.messages.map((m) => `<article class="bubble"><small>${dateTime(m.at)}</small><div>${e(m.text)}</div></article>`).join("")}${ticket.resolution ? `<h3>Предложенное решение</h3><p>${e(ticket.resolution)}</p>` : ""}`,
+      `<div class="notice">${notice}</div><h3>${e(ticket.reason)}</h3><p>${badge(ticket.status)}</p><div class="code">${e(ticket.context.question || ticket.context.message || "")}</div>${ticket.messages.map((m) => `<article class="bubble"><small>${dateTime(m.at)}</small><div>${e(m.text)}</div></article>`).join("")}${ticket.resolution ? `<h3>Предложенное решение</h3><p>${e(ticket.resolution)}</p>` : ""}${ticket.can_close && ticket.status !== "closed" ? `<div class="spacer"></div>${button("Закрыть обращение", "close-ticket", ticket.id, "primary")}` : ""}`,
+      {
+        bind: (form) => {
+          delegate(form, async (action, id) => {
+            if (action === "close-ticket") {
+              if (!(await ctx.confirm("Закрыть обращение", "Сотрудник получит уведомление. Продолжить?"))) return;
+              await ctx.api.post(
+                `/api/support/${id}/close`,
+                { text: "Закрыто руководителем из кабинета." },
+                { "Idempotency-Key": crypto.randomUUID() },
+              );
+              notify("Обращение закрыто");
+              document.querySelector("#drawer")?.close();
+              await ctx.refresh?.();
+            }
+          });
+        },
+      },
     );
     return;
   }
@@ -214,7 +323,7 @@ export async function threadDetail(ctx, employeeId) {
   };
   form = drawer(
     initial.name,
-    `<p class="muted">${e(initial.department)} · вся история общения с HR</p><div class="inbox-thread-actions">${button("Обновить переписку", "refresh-thread")}${button("Загрузить предыдущие", "older")}<span data-new-messages hidden>${button("Новые сообщения ↓", "bottom")}</span>${initial.active ? button("Предложить решение", "resolve") : ""}</div>${select(
+    `<p class="muted">${e(initial.department)} · вся история общения с HR</p><div class="inbox-thread-actions">${button("Обновить переписку", "refresh-thread")}${button("Загрузить предыдущие", "older")}<span data-new-messages hidden>${button("Новые сообщения ↓", "bottom")}</span>${initial.active ? button("Предложить решение", "resolve") + button("Закрыть обращение", "close-case") : ""}</div>${select(
       "ticket_id",
       "Обращение для ответа",
       initial.cases
@@ -227,7 +336,7 @@ export async function threadDetail(ctx, employeeId) {
         ? initial.cases.find((t) => t.status !== "closed").id
         : "",
       "Выберите обращение",
-    )}<div class="inbox-history chat" data-history></div>${initial.active ? textarea("reply", "Сообщение сотруднику", "", 'required placeholder="Напишите ответ…"') : '<div class="notice">Сотрудник в архиве. История доступна для просмотра.</div>'}<p class="draft-note">Ответ отправится в MAX. Сотрудник сможет ответить через /hr. Его опросы продолжатся независимо от переписки.</p>`,
+    )}<div class="inbox-history chat" data-history></div>${initial.active ? textarea("reply", "Сообщение сотруднику", "", 'required placeholder="Напишите ответ…"') : '<div class="notice">Сотрудник в архиве. История доступна для просмотра.</div>'}<p class="draft-note">Ответ отправится в MAX. Сотрудник сможет ответить через /hr. Его опросы продолжатся независимо от переписки. «Закрыть обращение» завершает выбранное обращение сразу.</p>`,
     {
       submitLabel: "Отправить",
       closeOnSubmit: false,
@@ -289,6 +398,27 @@ export async function threadDetail(ctx, employeeId) {
             await fetchNew();
             await ctx.syncInbox();
             notify("Решение отправлено. Закрытие подтвердит сотрудник");
+          }
+          if (action === "close-case") {
+            const ticketId = currentForm.elements.ticket_id.value;
+            if (!ticketId) throw new Error("Выберите одно обращение");
+            if (
+              !(await ctx.confirm(
+                "Закрыть обращение",
+                "Обращение будет закрыто сразу, сотрудник получит уведомление в MAX.",
+              ))
+            )
+              return;
+            const note = currentForm.elements.reply.value.trim();
+            await ctx.api.post(
+              `/api/support/${ticketId}/close`,
+              { text: note || "Закрыто из кабинета HR." },
+              { "Idempotency-Key": crypto.randomUUID() },
+            );
+            currentForm.elements.reply.value = "";
+            await fetchNew();
+            await ctx.syncInbox();
+            notify("Обращение закрыто");
           }
         });
         currentForm.querySelector("[data-history]").onscroll = () => {

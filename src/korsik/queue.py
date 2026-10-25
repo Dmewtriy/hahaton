@@ -14,14 +14,19 @@ def enqueue(session, kind, payload, key, due_at):
     return job
 
 
-def send(session, recipient_id, text, key, at, *, buttons=None, document_ids=None):
+def send(session, recipient_id, text, key, at, *, buttons=None, document_ids=None, media_urls=None):
     existing = session.scalar(select(Outbox).where(Outbox.dedupe_key == key))
     if existing:
         return existing
     item = Outbox(
         recipient_id=recipient_id,
         dedupe_key=key,
-        body={"text": text, "buttons": buttons or [], "document_ids": document_ids or []},
+        body={
+            "text": text,
+            "buttons": buttons or [],
+            "document_ids": document_ids or [],
+            "media_urls": media_urls or [],
+        },
         retry_at=at,
         created_at=utcnow(),
     )

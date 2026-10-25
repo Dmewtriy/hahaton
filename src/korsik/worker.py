@@ -289,7 +289,8 @@ class Worker:
         session.flush()
         from .feedback import apply_policy
 
-        apply_policy(session, employee, analysis, result)
+        manager_signal = "manager_support" in set(result.topics or [])
+        apply_policy(session, employee, analysis, result, manager_signal=manager_signal)
 
     def index_document(self, session, job):
         doc = session.get(Document, job.payload["document_id"])
@@ -339,6 +340,45 @@ class Worker:
                 f"index-poll:{doc.id}:{poll}",
                 now(session) + timedelta(seconds=30),
             )
+
+    def _upload_remote_media(self, url: str):
+        """Скачивает картинку с ML-моста и загружает в MAX."""
+        from pathlib import Path
+        from urllib.parse import urlparse
+
+        import httpx
+
+        parsed = urlparse(str(url or ""))
+        if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+            return None
+        allowed_hosts = {"127.0.0.1", "localhost", "host.docker.internal"}
+        base_host = urlparse(self.runtime.settings.ml_base_url).hostname
+        if base_host:
+            allowed_hosts.add(base_host)
+        if parsed.hostname not in allowed_hosts:
+            log.warning("reject_media_host host=%s", parsed.hostname)
+            return None
+        suffix = Path(parsed.path).suffix.lower() or ".jpg"
+        if suffix not in {".png", ".jpg", ".jpeg", ".webp"}:
+            suffix = ".jpg"
+        directory = self.runtime.settings.data_dir / "ml-media"
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / f"{uid()}{suffix}"
+        try:
+            with httpx.Client(
+                timeout=httpx.Timeout(30, connect=5),
+                trust_env=False,
+                headers={"Authorization": f"Bearer {self.runtime.settings.ml_token}"},
+            ) as client:
+                response = client.get(url)
+                response.raise_for_status()
+                path.write_bytes(response.content)
+            return self.runtime.transport.upload(path, "image")
+        except Exception as exc:  # noqa: BLE001
+            log.warning("ml_media_upload_failed error=%s", type(exc).__name__)
+            return None
+        finally:
+            path.unlink(missing_ok=True)
 
     def extension_delivery_allowed(self, session, item):
         from . import access, management, optional
@@ -517,6 +557,7 @@ class Worker:
                     continue
                 state = session.get(State, "max-media:" + doc.id)
                 media.append((doc.id, doc.storage_name, state.value if state else None))
+            media_urls = list(body.get("media_urls") or [])
         try:
             attachments = []
             for doc_id, filename, cached in media:
@@ -530,6 +571,10 @@ class Worker:
                         if not state:
                             session.add(State(key="max-media:" + doc_id, value=cached))
                 attachments.append(cached)
+            for url in media_urls[:5]:
+                uploaded = self._upload_remote_media(url)
+                if uploaded:
+                    attachments.append(uploaded)
             chunks = body["message_chunks"]
             for index in range(body.get("next_chunk", 0), len(chunks)):
                 with db.transaction(write_lock=True) as session:

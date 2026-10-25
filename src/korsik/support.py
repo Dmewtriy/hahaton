@@ -23,6 +23,8 @@ def allowed_recipients(session, employee):
 
 
 def can_read(session, actor, ticket):
+    from .access import in_scope
+
     employee = session.get(Employee, ticket.employee_id)
     grant = session.get(TicketParticipant, (ticket.id, actor.id))
     return bool(
@@ -30,6 +32,11 @@ def can_read(session, actor, ticket):
         and (
             employee.identity_id == actor.id
             or can_support(actor, employee)
+            or (
+                "manager" in actor.roles
+                and employee.manager_id == actor.id
+                and in_scope(actor, employee.branch_code)
+            )
             or is_hr(actor)
             and grant
             and grant.kind in {"former", "original"}
@@ -40,6 +47,22 @@ def can_read(session, actor, ticket):
 def can_write(session, actor, ticket):
     employee = session.get(Employee, ticket.employee_id)
     return bool(actor.active and is_hr(actor) and can_support(actor, employee))
+
+
+def can_close(session, actor, ticket):
+    """Закрытие: сам сотрудник, HR своей области или непосредственный руководитель."""
+    from .access import in_scope
+
+    employee = session.get(Employee, ticket.employee_id)
+    if not actor.active or not employee or ticket.status == "closed":
+        return False
+    if employee.identity_id == actor.id:
+        return True
+    if is_hr(actor) and can_support(actor, employee):
+        return True
+    if "manager" in actor.roles and employee.manager_id == actor.id and in_scope(actor, employee.branch_code):
+        return True
+    return False
 
 
 def participant(session, ticket, identity_id, kind):
@@ -165,6 +188,7 @@ def submit(session, employee, text, key, *, context=None):
         buttons=[
             {"text": "Дополнить это обращение", "payload": "case-reply:" + ticket.id},
             {"text": "Другой ответственный", "payload": "case-owner:" + ticket.id},
+            {"text": "Закрыть обращение", "payload": "case-close:" + ticket.id},
         ],
     )
     return ticket
@@ -232,6 +256,89 @@ def resolution(session, actor, ticket, text, key):
             },
         ],
     )
+
+
+def close_by_employee(session, employee, ticket_id, key, *, note: str | None = None):
+    """Сотрудник сам закрывает обращение в чате MAX."""
+    from . import inbox
+
+    ticket = session.get(Ticket, ticket_id)
+    require(bool(ticket and ticket.employee_id == employee.id), "Обращение не найдено")
+    if ticket.status == "closed":
+        send(
+            session,
+            employee.identity_id,
+            "Это обращение уже закрыто.",
+            "case-already-closed:" + key,
+            now(session),
+        )
+        return
+    ticket.status = "closed"
+    ticket.confirmed_by = employee.identity_id
+    ticket.confirmed_at = now(session)
+    ticket.closed_at = now(session)
+    ticket.outcome = "employee_closed"
+    if note:
+        ticket.resolution = (ticket.resolution or note)[:4000]
+    text = "Сотрудник закрыл обращение" + (f": {note}" if note else ".")
+    inbox.append(session, employee, ticket, "system", text, "case-employee-close:" + key, employee.identity_id)
+    send(
+        session,
+        employee.identity_id,
+        f"Обращение №{ticket.id} закрыто.",
+        "case-closed-ack:" + key,
+        now(session),
+    )
+    send(
+        session,
+        ticket.recruiter_id,
+        f"Обращение №{ticket.id}: сотрудник закрыл обращение самостоятельно.",
+        "case-closed-notify:" + key,
+        now(session),
+    )
+
+
+def close_by_staff(session, actor, ticket, key, *, note: str | None = None):
+    """HR или руководитель закрывает обращение из кабинета / по команде."""
+    from . import inbox
+
+    require(can_close(session, actor, ticket), "Недостаточно прав для закрытия")
+    require(ticket.status != "closed", "Обращение уже закрыто")
+    employee = session.get(Employee, ticket.employee_id)
+    ticket.status = "closed"
+    ticket.closed_at = now(session)
+    ticket.confirmed_by = actor.id
+    ticket.confirmed_at = now(session)
+    ticket.outcome = "staff_closed"
+    if note:
+        ticket.resolution = note[:4000]
+    elif not ticket.resolution:
+        ticket.resolution = "Закрыто ответственным без отдельного текста решения."
+    inbox.append(
+        session,
+        employee,
+        ticket,
+        "system",
+        "Обращение закрыто: " + (note or actor.name),
+        "case-staff-close:" + key,
+        actor.id,
+    )
+    send(
+        session,
+        employee.identity_id,
+        f"Обращение №{ticket.id} закрыто."
+        + (f"\nКомментарий: {note}" if note else ""),
+        "case-staff-closed:" + key,
+        now(session),
+    )
+    if ticket.recruiter_id != actor.id:
+        send(
+            session,
+            ticket.recruiter_id,
+            f"Обращение №{ticket.id} закрыто ({actor.name}).",
+            "case-staff-closed-hr:" + key,
+            now(session),
+        )
 
 
 def confirm(session, employee, ticket_id, revision, value, key):
@@ -381,6 +488,35 @@ def callback(session, employee, payload, key):
         _, ticket_id, revision, value = payload.split(":", 3)
         confirm(session, employee, ticket_id, int(revision), value, key)
         return True
+    if payload.startswith("case-close:"):
+        parts = payload.split(":")
+        ticket_id = parts[1]
+        if len(parts) >= 3 and parts[2] == "yes":
+            close_by_employee(session, employee, ticket_id, key)
+        elif len(parts) >= 3 and parts[2] == "no":
+            send(
+                session,
+                employee.identity_id,
+                "Закрытие отменено. Обращение остаётся открытым.",
+                "case-close-cancel:" + key,
+                now(session),
+            )
+        else:
+            ticket = session.get(Ticket, ticket_id)
+            require(bool(ticket and ticket.employee_id == employee.id and ticket.status != "closed"))
+            send(
+                session,
+                employee.identity_id,
+                f"Закрыть обращение №{ticket.id} («{ticket.reason}»)? "
+                "Если вопрос ещё актуален, нажмите «Оставить открытым».",
+                "case-close-ask:" + key,
+                now(session),
+                buttons=[
+                    {"text": "Да, закрыть", "payload": f"case-close:{ticket.id}:yes"},
+                    {"text": "Оставить открытым", "payload": f"case-close:{ticket.id}:no"},
+                ],
+            )
+        return True
     return False
 
 
@@ -398,19 +534,30 @@ def list_cases(session, employee, key, text=None):
         "in_progress": "В работе",
         "awaiting_confirmation": "Ожидает вашего подтверждения",
     }
-    send(
-        session,
-        employee.identity_id,
-        "Выберите обращение:\n"
-        + "\n".join(f"№{t.id}: {t.reason} — {labels.get(t.status, t.status)}" for t in rows),
-        "case-list:" + key,
-        now(session),
-        buttons=[
+    buttons = []
+    for t in rows[:10]:
+        buttons.append(
             {
                 "text": "№" + t.id[:8] + " · " + labels.get(t.status, t.status),
                 "payload": "case-target:" + t.id,
             }
-            for t in rows[:15]
-        ]
-        + [{"text": "Новое обращение", "payload": "case-new"}],
+        )
+        buttons.append(
+            {
+                "text": "Закрыть №" + t.id[:8],
+                "payload": "case-close:" + t.id,
+            }
+        )
+    buttons.append({"text": "Новое обращение", "payload": "case-new"})
+    send(
+        session,
+        employee.identity_id,
+        "Выберите обращение или закройте ненужное:\n"
+        + (
+            "\n".join(f"№{t.id}: {t.reason} — {labels.get(t.status, t.status)}" for t in rows)
+            or "Открытых обращений нет."
+        ),
+        "case-list:" + key,
+        now(session),
+        buttons=buttons,
     )

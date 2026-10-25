@@ -55,7 +55,7 @@ const definitions = [
   ["processing", "Обработка", "clock", processingPage],
   ["campaigns", "Рассылки", "send", campaignsPage],
   ["scenarios", "Адаптация", "scenario", scenariosPage],
-  ["tickets", "Переписка HR", "ticket", ticketsPage],
+  ["tickets", "Обращения", "ticket", ticketsPage],
   ["access", "Доступ и роли", "lock", accessPage],
   ["settings", "Настройки", "settings", settingsPage],
   ["team", "Моя команда", "users", teamPage],
@@ -143,6 +143,8 @@ function shell() {
     ([name]) =>
       (name === "overview" && ctx.me.is_admin) ||
       (name === "team" && ctx.me.capabilities.view_team) ||
+      (name === "tickets" &&
+        (ctx.me.capabilities.manage_hr || ctx.me.capabilities.view_team)) ||
       (name === "meetings" &&
         (ctx.me.capabilities.view_team || ctx.me.capabilities.manage_hr)) ||
       (name === "digests" && ctx.me.roles.includes("hr_head")) ||
@@ -150,7 +152,7 @@ function shell() {
         ? ctx.me.capabilities.manage_people
         : name === "settings"
           ? ctx.me.capabilities.manage_hr || ctx.me.capabilities.manage_access
-          : !["team", "meetings", "digests"].includes(name) &&
+          : !["team", "meetings", "digests", "tickets"].includes(name) &&
             ctx.me.capabilities.manage_hr),
   );
   const groups = [

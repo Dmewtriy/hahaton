@@ -24,7 +24,7 @@ MENU = (
     "Вопросы и поддержка:\n"
     "/ask вопрос — спросить по документам\n"
     "/hr текст — написать HR\n"
-    "/cases — мои обращения\n\n"
+    "/cases — мои обращения (можно закрыть кнопкой)\n\n"
     "Адаптация и материалы:\n"
     "/resume — продолжить опрос\n"
     "/food — питание\n"
@@ -84,16 +84,16 @@ def receive(runtime, session, event):
     if event["kind"] == "start" or text.startswith("/start"):
         if employee and employee.active:
             employee.status = "active"
-        buttons = (
-            [
-                {"text": "На ты", "payload": "style:informal"},
-                {"text": "На вы", "payload": "style:formal"},
-            ]
-            if employee
-            else []
-        )
+        # Меню — первая кнопка в приветствии, чтобы сразу было видно в MAX.
+        buttons = [{"text": "Меню", "payload": "nav:page:0"}]
+        if employee:
+            buttons.extend(
+                [
+                    {"text": "На ты", "payload": "style:informal"},
+                    {"text": "На вы", "payload": "style:formal"},
+                ]
+            )
         buttons.extend(admin_buttons(runtime, identity))
-        buttons.append({"text": "☰ Меню", "payload": "nav:page:0"})
         send(
             session,
             identity.id,
@@ -504,7 +504,9 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
                     for s in result.sources
                 )
         version, topics = result.processor_version, result.topics
+        media_urls = [image.url for image in (result.images or []) if getattr(image, "url", None)]
         automatic_hr = status in {"not_found", "blocked"}
+        needs_manager = "manager_support" in set(topics or [])
     except MLUnavailable:
         text, status, version, topics = (
             "Сервис ответов временно недоступен. Я не могу дать подтверждённый ответ.",
@@ -512,7 +514,9 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
             "unavailable",
             [],
         )
+        media_urls = []
         automatic_hr = True
+        needs_manager = False
     if automatic_hr:
         ticket = tickets.open_ticket(
             session,
@@ -533,6 +537,38 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
             "\nПередал ваш вопрос закреплённому HR. Дополнить: /hr ваше сообщение. "
             "Опросы и рассылки продолжат приходить."
         )
+    if needs_manager:
+        from .meetings import manager_for
+
+        manager = manager_for(session, employee)
+        if manager:
+            send(
+                session,
+                manager.id,
+                f"Сотрудник {employee.name} ({employee.department}) запросил поддержку руководителя. "
+                "Обсудите ситуацию лично; детали вопроса сотруднику уже отправлены в чат. "
+                "Это сигнал внимания, а не кадровое решение.",
+                f"manager-support:{help.id}:{manager.id}",
+                at,
+            )
+            if "Передам сигнал руководителю" not in text and "руководителю" not in text.lower():
+                text += "\nПередал сигнал вашему руководителю."
+        elif not automatic_hr:
+            ticket = tickets.open_ticket(
+                session,
+                employee,
+                "Нужна поддержка руководителя",
+                {
+                    "question": question,
+                    "answer_status": status,
+                    "processor_version": version,
+                    "topics": topics,
+                },
+                "manager-help:" + help.id,
+                human=True,
+            )
+            help.ticket_id = ticket.id
+            text += "\nРуководитель пока не назначен — передал сигнал HR."
     session.add(
         QuestionLog(
             employee_id=employee.id,
@@ -551,6 +587,7 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
         f"answer:{key}",
         at,
         buttons=[{"text": "Связаться с HR", "payload": "hr"}],
+        media_urls=media_urls,
     )
     if run:
         surveys.prompt(session, employee, run, "return:" + key)

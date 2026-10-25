@@ -507,19 +507,23 @@ def create_app(runtime=None):
 
     @app.get("/api/tickets", tags=["Tickets"])
     def list_tickets(session: Session, actor: Actor):
+        from .support import can_close, can_read
+
         result = []
         for ticket in session.scalars(select(Ticket).order_by(Ticket.created_at.desc())):
             employee = session.get(Employee, ticket.employee_id)
-            if access.can_support(actor, employee) or employee.identity_id == actor.id:
+            if can_read(session, actor, ticket):
                 result.append(
                     {
                         "id": ticket.id,
                         "employee_id": employee.id,
+                        "employee_name": employee.name,
                         "reason": ticket.reason,
                         "status": ticket.status,
                         "human_mode": ticket.human_mode,
                         "recruiter_id": ticket.recruiter_id,
                         "created_at": ticket.created_at,
+                        "can_close": can_close(session, actor, ticket),
                     }
                 )
         return result
@@ -527,7 +531,7 @@ def create_app(runtime=None):
     @app.get("/api/tickets/{ticket_id}", tags=["Tickets"])
     def get_ticket(ticket_id: str, session: Session, actor: Actor):
         ticket, employee = ticket_for(session, actor, ticket_id)
-        from .support import can_write
+        from .support import can_close, can_write
 
         return {
             "id": ticket.id,
@@ -535,6 +539,7 @@ def create_app(runtime=None):
             "status": ticket.status,
             "reason": ticket.reason,
             "can_reply": can_write(session, actor, ticket),
+            "can_close": can_close(session, actor, ticket),
             "resolution": ticket.resolution,
             "outcome": ticket.outcome,
             "context": tickets.ticket_context(session, ticket),
