@@ -21,16 +21,16 @@ from .scenarios import drain_dialogue_queue
 
 MENU = (
     "Я Корсик — помогу освоиться на новом месте.\n\n"
-    "Вопросы и поддержка:\n"
-    "/ask вопрос — спросить по документам\n"
-    "/hr текст — написать HR\n"
+    "Вопросы и поддержка\n"
+    "/ask … — спросить по документам компании\n"
+    "/hr … — написать HR\n"
     "/cases — мои обращения (можно закрыть кнопкой)\n\n"
-    "Адаптация и материалы:\n"
+    "Адаптация и материалы\n"
     "/resume — продолжить опрос\n"
-    "/food — питание\n"
-    "/places запрос — места рядом с работой\n"
-    "/materials — материалы\n\n"
-    "/menu — открыть меню с кнопками"
+    "/food — питание на площадке\n"
+    "/places … — места рядом с работой\n"
+    "/materials — полезные материалы\n\n"
+    "Или откройте /menu — те же действия кнопками."
 )
 
 
@@ -97,7 +97,7 @@ def receive(runtime, session, event):
         send(
             session,
             identity.id,
-            f"Здравствуйте, {identity.name}! " + MENU,
+            f"Здравствуйте, {identity.name}!\n\n" + MENU,
             f"welcome:{key}",
             at,
             buttons=buttons,
@@ -111,7 +111,12 @@ def receive(runtime, session, event):
         send(
             session,
             identity.id,
-            "Используйте /dashboard. Рекрутер: /reply ID текст, /close ID.",
+            "Этот чат для сотрудников.\n\n"
+            "Для HR и руководителей:\n"
+            "/dashboard — сводка\n"
+            "/reply код текст — ответить на обращение\n"
+            "/close код текст — предложить решение\n\n"
+            "Код обращения приходит в уведомлении о новом сообщении.",
             f"staff-help:{key}",
             at,
         )
@@ -403,7 +408,7 @@ def receive(runtime, session, event):
         send(
             session,
             identity.id,
-            "Эта команда сейчас недоступна. Список команд: /menu.",
+            "Этой команды сейчас нет.\n\nСписок доступных действий: /menu.",
             "unknown-command:" + key,
             at,
         )
@@ -429,8 +434,9 @@ def route_hr_message(session, employee, text, key, run):
     send(
         session,
         employee.identity_id,
-        "Сообщение передано HR. Для следующего сообщения используйте /hr. "
-        "Опросы и рассылки продолжают работать.",
+        "Сообщение передано HR.\n\n"
+        "Чтобы написать ещё — /hr.\n"
+        "Опросы и рассылки продолжают работать как обычно.",
         "hr-ack:" + key,
         now(session),
     )
@@ -498,11 +504,11 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
                     if runtime.settings.ml_mode == "stub":
                         text += " Сейчас подключён демонстрационный ML-модуль."
             if result.status == "answered":
-                text += "\nИсточники:\n" + "\n".join(
-                    f"{by_id[s.document_id].title}, версия {s.version}"
-                    + (f", стр. {s.page}" if s.page else "")
+                sources = "\n".join(
+                    f"• {by_id[s.document_id].title}" + (f", стр. {s.page}" if s.page else "")
                     for s in result.sources
                 )
+                text += f"\n\nОткуда ответ:\n{sources}"
         version, topics = result.processor_version, result.topics
         media_urls = [image.url for image in (result.images or []) if getattr(image, "url", None)]
         automatic_hr = status in {"not_found", "blocked"}
@@ -534,7 +540,8 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
         )
         help.ticket_id = ticket.id
         text += (
-            "\nПередал ваш вопрос закреплённому HR. Дополнить: /hr ваше сообщение. "
+            "\n\nПередал ваш вопрос закреплённому HR.\n"
+            "Дополнить обращение: /hr ваше сообщение.\n"
             "Опросы и рассылки продолжат приходить."
         )
     if needs_manager:
@@ -545,14 +552,15 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
             send(
                 session,
                 manager.id,
-                f"Сотрудник {employee.name} ({employee.department}) запросил поддержку руководителя. "
-                "Обсудите ситуацию лично; детали вопроса сотруднику уже отправлены в чат. "
+                f"Сотрудник просит поддержки руководителя\n\n"
+                f"{employee.name} · {employee.department}\n\n"
+                "Обсудите ситуацию лично. Детали сотруднику уже отправлены в чат.\n"
                 "Это сигнал внимания, а не кадровое решение.",
                 f"manager-support:{help.id}:{manager.id}",
                 at,
             )
             if "Передам сигнал руководителю" not in text and "руководителю" not in text.lower():
-                text += "\nПередал сигнал вашему руководителю."
+                text += "\n\nПередал сигнал вашему руководителю."
         elif not automatic_hr:
             ticket = tickets.open_ticket(
                 session,
@@ -568,7 +576,7 @@ def ask(runtime, session, employee, question, key, run, *, help_id=None):
                 human=True,
             )
             help.ticket_id = ticket.id
-            text += "\nРуководитель пока не назначен — передал сигнал HR."
+            text += "\n\nРуководитель пока не назначен — передал сигнал HR."
     session.add(
         QuestionLog(
             employee_id=employee.id,
@@ -638,9 +646,14 @@ def staff_command(runtime, session, actor, text, key):
             session,
             actor.id,
             (
-                "Команды HR: /admin — кабинет, /dashboard — сводка, /reply ID текст — ответ, /close ID решение — предложить решение сотруднику."
+                "Команды для HR\n\n"
+                "/admin — кабинет\n"
+                "/dashboard — сводка\n"
+                "/reply код текст — ответить на обращение\n"
+                "/close код текст — предложить решение\n\n"
+                "Код есть в уведомлении о обращении. В кабинете отвечать удобнее."
                 if is_admin(actor)
-                else "Моя команда: /dashboard — статус подчинённых и рекомендации личных встреч."
+                else "Моя команда\n\n/dashboard — статус подчинённых и рекомендации личных встреч."
             ),
             "staff-menu:" + key,
             now(session),
@@ -653,11 +666,14 @@ def staff_command(runtime, session, actor, text, key):
         data = dashboard(session, actor)
         report = digest_text(data)
         if "manager" in actor.roles and not is_hr(actor):
+            people = "\n".join(
+                f"• {e['name']} — {e['stage_label']} (выход: {e['hire_date']})" for e in data["employees"]
+            )
             report = (
-                f"Моя команда\nСотрудников: {data['totals']['employees']}\n"
-                f"Незавершённых опросов: {data['totals']['active_surveys']}\nСтатус сотрудников:\n"
-            ) + "\n".join(
-                f"{e['name']} — {e['stage_label']}; выход: {e['hire_date']}" for e in data["employees"]
+                f"Моя команда\n\n"
+                f"Сотрудников: {data['totals']['employees']}\n"
+                f"Незавершённых опросов: {data['totals']['active_surveys']}\n\n"
+                f"Статус:\n{people or 'Пока никого нет в списке.'}"
             )
         send(
             session, actor.id, report, f"dashboard:{key}", now(session), buttons=admin_buttons(runtime, actor)
@@ -685,10 +701,18 @@ def staff_command(runtime, session, actor, text, key):
             send(
                 session,
                 actor.id,
-                "Укажите решение: /close ID текст решения. Обращение закроется после подтверждения сотрудником.",
+                "Укажите решение так:\n\n"
+                "/close код текст решения\n\n"
+                "Код есть в уведомлении. Обращение закроется после подтверждения сотрудником.",
                 "close-help:" + key,
                 now(session),
             )
     else:
-        send(session, actor.id, "Формат: /reply ID текст ответа", f"reply-help:{key}", now(session))
+        send(
+            session,
+            actor.id,
+            "Формат:\n\n/reply код текст ответа\n\nКод есть в уведомлении об обращении.",
+            f"reply-help:{key}",
+            now(session),
+        )
     return True

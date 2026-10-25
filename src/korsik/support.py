@@ -8,6 +8,50 @@ from .calendar import now
 from .models import Branch, Employee, HRMessage, Identity, SurveyAnswer, SurveyRun, Ticket, TicketParticipant
 from .queue import send
 
+STATUS_LABELS = {
+    "open": "новое",
+    "in_progress": "в работе",
+    "awaiting_confirmation": "ждёт вашего ответа",
+    "closed": "закрыто",
+}
+
+
+def clip_reason(reason, limit=42):
+    text = " ".join((reason or "Обращение").split()) or "Обращение"
+    return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
+def open_case_numbers(session, employee_id):
+    """Stable 1…N numbers among open cases (oldest first) so people can tell them apart."""
+    rows = list(
+        session.scalars(
+            select(Ticket)
+            .where(Ticket.employee_id == employee_id, Ticket.status != "closed")
+            .order_by(Ticket.created_at.asc())
+        )
+    )
+    return {ticket.id: index for index, ticket in enumerate(rows, 1)}, rows
+
+
+def case_label(ticket, number=None):
+    """Employee-facing title without technical IDs."""
+    reason = clip_reason(ticket.reason)
+    if number is not None:
+        return f"Обращение {number} · {reason}"
+    day = ticket.created_at.strftime("%d.%m") if ticket.created_at else ""
+    return f"Обращение · {reason}" + (f" · с {day}" if day else "")
+
+
+def case_button_label(ticket, number, *, close=False):
+    reason = clip_reason(ticket.reason, 26)
+    text = f"Закрыть {number} · {reason}" if close else f"{number} · {reason}"
+    return text[:64]
+
+
+def case_staff_title(ticket, employee):
+    """HR/manager title: topic + person; command id stays only in the /reply line."""
+    return f"{clip_reason(ticket.reason, 48)} · {employee.name}"
+
 
 def allowed_recipients(session, employee):
     branch = session.get(Branch, employee.branch_code)
@@ -90,14 +134,15 @@ def choose_recipient(session, employee, key, *, text=None, context=None, ticket_
         send(
             session,
             employee.identity_id,
-            "Нет действующего получателя HR. Требуется исправить назначение сотрудника.",
+            "Сейчас нет доступного HR для вашего обращения.\n\n"
+            "Напишите закреплённому рекрутеру или попробуйте позже.",
             "support-no-owner:" + key,
             now(session),
         )
         return
     buttons = [
         {
-            "text": actor.name + (" (закреплённый HR)" if actor.id == employee.recruiter_id else ""),
+            "text": actor.name + (" (ваш рекрутер)" if actor.id == employee.recruiter_id else ""),
             "payload": "support-to:" + actor.id,
         }
         for actor in recipients
@@ -105,7 +150,8 @@ def choose_recipient(session, employee, key, *, text=None, context=None, ticket_
     send(
         session,
         employee.identity_id,
-        "Выберите ответственного. Закреплённый и прежний HR сохраняют доступ к этому обращению; оно не является анонимным.",
+        "Кому отправить обращение?\n\n"
+        "Выберите человека из списка. Обращение именное: HR увидит, от кого оно пришло.",
         "support-recipients:" + key,
         now(session),
         buttons=buttons,
@@ -132,7 +178,7 @@ def select_recipient(session, employee, identity_id, key):
         send(
             session,
             employee.identity_id,
-            "Напишите одно сообщение для выбранного HR. Опрос сохранён; отмена: /cancel.",
+            "Напишите одно сообщение для выбранного HR.\n\nОпрос при этом не прервётся. Отмена: /cancel.",
             "support-text:" + key,
             now(session),
         )
@@ -179,16 +225,21 @@ def submit(session, employee, text, key, *, context=None):
         if k not in {"support_compose", "awaiting_hr_message", "awaiting_ai_question"}
     }
     actor = session.get(Identity, ticket.recruiter_id)
+    numbers, _ = open_case_numbers(session, employee.id)
+    label = case_label(ticket, numbers.get(ticket.id))
     send(
         session,
         employee.identity_id,
-        f"Обращение №{ticket.id} зарегистрировано. Ответственный: {actor.name}. Закреплённый и прежний HR сохраняют доступ к этому обращению; оно не анонимное. Доставка и прочтение HR учитываются отдельно. Опросы продолжают работать.",
+        f"{label} принято.\n\n"
+        f"Ответственный: {actor.name}.\n\n"
+        "Обращение именное — HR видит, кто написал. "
+        "Опросы и рассылки продолжают работать как обычно.",
         "support-registered:" + key,
         now(session),
         buttons=[
-            {"text": "Дополнить это обращение", "payload": "case-reply:" + ticket.id},
+            {"text": "Дополнить", "payload": "case-reply:" + ticket.id},
             {"text": "Другой ответственный", "payload": "case-owner:" + ticket.id},
-            {"text": "Закрыть обращение", "payload": "case-close:" + ticket.id},
+            {"text": "Закрыть", "payload": "case-close:" + ticket.id},
         ],
     )
     return ticket
@@ -237,12 +288,16 @@ def resolution(session, actor, ticket, text, key):
     from .tickets import reply_question
 
     question = reply_question(session, employee, ticket)
+    numbers, _ = open_case_numbers(session, employee.id)
+    label = case_label(ticket, numbers.get(ticket.id))
+    parts = [label, ""]
+    if question:
+        parts += [f"Ваш вопрос:\n{question}", ""]
+    parts += [f"Предложенное решение:\n{text}", "", "Вопрос решён?"]
     send(
         session,
         employee.identity_id,
-        f"Обращение №{ticket.id}\n"
-        + (f"Ваш вопрос: {question}\n" if question else "")
-        + f"Ответ HR: {text}\nВопрос решён?",
+        "\n".join(parts),
         f"resolution:{ticket.id}:{ticket.resolution_revision}",
         now(session),
         buttons=[
@@ -281,18 +336,21 @@ def close_by_employee(session, employee, ticket_id, key, *, note: str | None = N
     if note:
         ticket.resolution = (ticket.resolution or note)[:4000]
     text = "Сотрудник закрыл обращение" + (f": {note}" if note else ".")
-    inbox.append(session, employee, ticket, "system", text, "case-employee-close:" + key, employee.identity_id)
+    inbox.append(
+        session, employee, ticket, "system", text, "case-employee-close:" + key, employee.identity_id
+    )
+    label = case_label(ticket)
     send(
         session,
         employee.identity_id,
-        f"Обращение №{ticket.id} закрыто.",
+        f"{label} закрыто.\n\nЕсли понадобится помощь снова — напишите /hr.",
         "case-closed-ack:" + key,
         now(session),
     )
     send(
         session,
         ticket.recruiter_id,
-        f"Обращение №{ticket.id}: сотрудник закрыл обращение самостоятельно.",
+        f"Сотрудник закрыл обращение самостоятельно.\n\n{case_staff_title(ticket, employee)}",
         "case-closed-notify:" + key,
         now(session),
     )
@@ -323,11 +381,14 @@ def close_by_staff(session, actor, ticket, key, *, note: str | None = None):
         "case-staff-close:" + key,
         actor.id,
     )
+    label = case_label(ticket)
+    employee_text = f"{label} закрыто."
+    if note:
+        employee_text += f"\n\nКомментарий:\n{note}"
     send(
         session,
         employee.identity_id,
-        f"Обращение №{ticket.id} закрыто."
-        + (f"\nКомментарий: {note}" if note else ""),
+        employee_text,
         "case-staff-closed:" + key,
         now(session),
     )
@@ -335,7 +396,7 @@ def close_by_staff(session, actor, ticket, key, *, note: str | None = None):
         send(
             session,
             ticket.recruiter_id,
-            f"Обращение №{ticket.id} закрыто ({actor.name}).",
+            f"Обращение закрыто ({actor.name}).\n\n{case_staff_title(ticket, employee)}",
             "case-staff-closed-hr:" + key,
             now(session),
         )
@@ -375,23 +436,24 @@ def confirm(session, employee, ticket_id, revision, value, key):
         "case-confirm:" + key,
         employee.identity_id,
     )
+    label = case_label(ticket)
     send(
         session,
         employee.identity_id,
-        "Обращение закрыто по вашему подтверждению."
+        f"{label} закрыто — спасибо за подтверждение."
         if value == "yes"
-        else "Обращение возвращено HR в работу под тем же номером.",
+        else f"{label} снова у HR.\n\nМы передали, что вопрос ещё не решён. Можно дополнить сообщение через /hr.",
         "case-confirm-ack:" + key,
         now(session),
     )
+    staff = case_staff_title(ticket, employee)
     send(
         session,
         ticket.recruiter_id,
-        f"Обращение №{ticket.id}: "
-        + (
-            "сотрудник подтвердил решение."
+        (
+            f"Сотрудник подтвердил решение.\n\n{staff}"
             if value == "yes"
-            else "проблема осталась, требуется доработать решение."
+            else f"Сотрудник ответил: проблема осталась.\n\n{staff}\n\nНужно доработать решение."
         ),
         "case-confirm-notify:" + key,
         now(session),
@@ -423,7 +485,7 @@ def callback(session, employee, payload, key):
             send(
                 session,
                 employee.identity_id,
-                "Напишите сообщение для обращения. Отмена: /cancel.",
+                "Напишите сообщение для обращения.\n\nОтмена: /cancel.",
                 "case-text:" + key,
                 now(session),
             )
@@ -457,7 +519,7 @@ def callback(session, employee, payload, key):
                 send(
                     session,
                     employee.identity_id,
-                    "Личный контакт рекрутера. Передайте ему причину выбранного ответа.",
+                    "Можно написать рекрутеру напрямую.\n\nКратко объясните, почему выбрали этот ответ.",
                     "personal-contact:" + key,
                     now(session),
                     buttons=[{"type": "link", "text": hr.name, "url": hr.contact_url}],
@@ -476,10 +538,12 @@ def callback(session, employee, payload, key):
                 **employee.dialogue,
                 "support_compose": {"ticket_id": ticket.id, "recipient_id": ticket.recruiter_id},
             }
+            numbers, _ = open_case_numbers(session, employee.id)
             send(
                 session,
                 employee.identity_id,
-                f"Напишите дополнение к обращению №{ticket.id}. Отмена: /cancel.",
+                f"Напишите дополнение к обращению:\n{case_label(ticket, numbers.get(ticket.id))}\n\n"
+                "Отмена: /cancel.",
                 "case-compose:" + key,
                 now(session),
             )
@@ -504,11 +568,12 @@ def callback(session, employee, payload, key):
         else:
             ticket = session.get(Ticket, ticket_id)
             require(bool(ticket and ticket.employee_id == employee.id and ticket.status != "closed"))
+            numbers, _ = open_case_numbers(session, employee.id)
             send(
                 session,
                 employee.identity_id,
-                f"Закрыть обращение №{ticket.id} («{ticket.reason}»)? "
-                "Если вопрос ещё актуален, нажмите «Оставить открытым».",
+                f"Закрыть это обращение?\n\n{case_label(ticket, numbers.get(ticket.id))}\n\n"
+                "Если вопрос ещё актуален — нажмите «Оставить открытым».",
                 "case-close-ask:" + key,
                 now(session),
                 buttons=[
@@ -521,42 +586,44 @@ def callback(session, employee, payload, key):
 
 
 def list_cases(session, employee, key, text=None):
-    rows = list(
-        session.scalars(
-            select(Ticket)
-            .where(Ticket.employee_id == employee.id, Ticket.status != "closed")
-            .order_by(Ticket.created_at.desc())
-        )
-    )
+    numbers, ordered = open_case_numbers(session, employee.id)
+    # Newest first in the chat list; numbers stay stable (oldest = 1).
+    rows = sorted(ordered, key=lambda ticket: ticket.created_at, reverse=True)
     employee.dialogue = {**employee.dialogue, "support_compose": {"text": text}}
-    labels = {
-        "open": "Новое",
-        "in_progress": "В работе",
-        "awaiting_confirmation": "Ожидает вашего подтверждения",
-    }
     buttons = []
-    for t in rows[:10]:
+    for ticket in rows[:10]:
+        number = numbers[ticket.id]
+        status = STATUS_LABELS.get(ticket.status, ticket.status)
         buttons.append(
             {
-                "text": "№" + t.id[:8] + " · " + labels.get(t.status, t.status),
-                "payload": "case-target:" + t.id,
+                "text": f"{case_button_label(ticket, number)} · {status}"[:64],
+                "payload": "case-target:" + ticket.id,
             }
         )
         buttons.append(
             {
-                "text": "Закрыть №" + t.id[:8],
-                "payload": "case-close:" + t.id,
+                "text": case_button_label(ticket, number, close=True),
+                "payload": "case-close:" + ticket.id,
             }
         )
     buttons.append({"text": "Новое обращение", "payload": "case-new"})
+    if rows:
+        lines = [
+            f"{numbers[t.id]}. {clip_reason(t.reason, 60)}\n   статус: {STATUS_LABELS.get(t.status, t.status)}"
+            for t in rows
+        ]
+        body = (
+            "Ваши открытые обращения.\n\n"
+            "Номер слева помогает отличить их друг от друга — это не технический код.\n\n"
+            + "\n\n".join(lines)
+            + "\n\nВыберите обращение кнопкой ниже или закройте ненужное."
+        )
+    else:
+        body = "Открытых обращений сейчас нет.\n\nМожно создать новое — кнопкой ниже или командой /hr."
     send(
         session,
         employee.identity_id,
-        "Выберите обращение или закройте ненужное:\n"
-        + (
-            "\n".join(f"№{t.id}: {t.reason} — {labels.get(t.status, t.status)}" for t in rows)
-            or "Открытых обращений нет."
-        ),
+        body,
         "case-list:" + key,
         now(session),
         buttons=buttons,

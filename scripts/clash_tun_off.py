@@ -1,7 +1,8 @@
 """Temporarily disable Clash Verge TUN via mihomo named pipe."""
+
 import ctypes
 import json
-from ctypes import byref, create_string_buffer, c_ulong
+from ctypes import byref, c_ulong, create_string_buffer
 
 
 def pipe_request(method: str, path: str, body: bytes | None = None) -> bytes:
@@ -36,7 +37,7 @@ def pipe_request(method: str, path: str, body: bytes | None = None) -> bytes:
         ok = k.ReadFile(handle, buf, 8192, byref(read), None)
         if not ok or read.value == 0:
             break
-        data += buf.raw[:read.value]
+        data += buf.raw[: read.value]
         if b"\r\n\r\n" in data:
             head, _, rest = data.partition(b"\r\n\r\n")
             for line in head.split(b"\r\n"):
@@ -47,7 +48,7 @@ def pipe_request(method: str, path: str, body: bytes | None = None) -> bytes:
                         read = c_ulong(0)
                         if not k.ReadFile(handle, buf, 8192, byref(read), None) or read.value == 0:
                             break
-                        rest += buf.raw[:read.value]
+                        rest += buf.raw[: read.value]
                     data = head + b"\r\n\r\n" + rest
             break
     k.CloseHandle(handle)

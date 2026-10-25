@@ -4,6 +4,7 @@ import csv
 import hashlib
 import io
 import json
+import re
 from collections import Counter
 from datetime import date, datetime, time, timedelta
 from xml.etree.ElementTree import Element, SubElement, tostring
@@ -300,136 +301,263 @@ def snapshot(session, actor, data, limit=10000):
     }
 
 
+def _plain_dt(value, timezone_name):
+    """ISO → «25.10.2026 14:30» in the export timezone; empty stays empty."""
+    if not value:
+        return ""
+    moment = datetime.fromisoformat(value)
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=ZoneInfo("UTC"))
+    return moment.astimezone(ZoneInfo(timezone_name)).strftime("%d.%m.%Y %H:%M")
+
+
+def _question_columns(questions):
+    """Human headers from question text; keep uniqueness for repeated wording."""
+    columns = []
+    seen = {}
+    for index, question in enumerate(questions, 1):
+        text = " ".join(question["text"].split())
+        if len(text) > 90:
+            text = text[:87] + "…"
+        base = f"{index}. {text}"
+        count = seen.get(base, 0) + 1
+        seen[base] = count
+        label = base if count == 1 else f"{base} ({count})"
+        columns.append((question, label, f"Комментарий: {label}"))
+    return columns
+
+
+def _kind_label(kind):
+    return {
+        "rating": "оценка по шкале",
+        "single": "выбор одного варианта",
+        "multiple": "выбор нескольких вариантов",
+        "text": "свободный текст",
+    }.get(kind, kind)
+
+
+def _help_summary(states):
+    labels = {
+        "resolved": "сотрудник подтвердил полезность ответа",
+        "awaiting_feedback": "ждём оценку полезности",
+        "awaiting_clarification": "ждём уточнение от сотрудника",
+        "escalated": "передано HR",
+        "error": "сбой обработки",
+        "recipient_choice": "выбор ответственного HR",
+    }
+    if not states:
+        return "—"
+    return "; ".join(labels.get(item["status"], item["status"]) for item in states)
+
+
+def _case_summary(states):
+    labels = {
+        "open": "новое",
+        "in_progress": "в работе у HR",
+        "awaiting_confirmation": "ждёт подтверждения сотрудника",
+        "closed": "закрыто",
+    }
+    if not states:
+        return "—"
+    parts = []
+    for item in states:
+        text = labels.get(item["status"], item["status"])
+        if item["outcome"] == "employee_confirmed":
+            text += ", сотрудник подтвердил решение"
+        elif item["outcome"] == "employee_closed":
+            text += ", закрыл сотрудник"
+        elif item["outcome"] == "staff_closed":
+            text += ", закрыл HR/руководитель"
+        elif item["status"] == "closed":
+            text += ", без отдельного подтверждения"
+        parts.append(text)
+    return "; ".join(parts)
+
+
+def _filter_lines(report):
+    filters = report["filters"]
+    branches = filters.get("branch_codes") or []
+    departments = filters.get("departments") or []
+    return [
+        ["Что в файле", "Ответы сотрудников на выбранный опрос за указанный период"],
+        ["Опрос", report["definition"]["title"]],
+        [
+            "Период",
+            f"с {filters['from_date']} по {filters['to_date']} включительно "
+            f"(по плановой дате назначения опроса)",
+        ],
+        ["Часовой пояс", filters["timezone"]],
+        ["Площадки", ", ".join(branches) if branches else "все доступные вам"],
+        ["Подразделения", ", ".join(departments) if departments else "все"],
+        [
+            "Архив",
+            "сотрудники в архиве включены" if filters.get("include_archived") else "только действующие",
+        ],
+        ["Сформировано", _plain_dt(report["snapshot_at"], filters["timezone"])],
+        [
+            "Важно",
+            "Выгрузка именная: в файле видны ФИО. Отменённые назначения не входят в средние и доли.",
+        ],
+    ]
+
+
 def sheet_rows(report):
+    """Three human-oriented sheets: answers, summary metrics, reading guide."""
     definition = report["definition"]
+    timezone_name = report["filters"]["timezone"]
+    question_columns = _question_columns(definition["questions"])
     header = [
-        "Назначение ID",
-        "Прохождение ID",
-        "Сотрудник ID",
-        "ФИО",
+        "Сотрудник",
         "Площадка",
         "Подразделение",
-        "Рассылка ID",
-        "Плановый запуск",
-        "Начало",
-        "Завершение",
-        "Статус",
-        "Ответов",
+        "Статус прохождения",
+        "Плановая дата",
+        "Начал отвечать",
+        "Завершил",
+        "Отвечено вопросов",
         "Всего вопросов",
-        "Ожидается комментарий",
+        "Нужен комментарий",
         "Опрос",
-        "Версия",
-        "Срез",
-        "Часовой пояс",
-        "Помощь ИИ — состояния",
-        "Связанные обращения — состояния",
-        "Решений подтверждено сотрудником",
     ]
-    for q in definition["questions"]:
-        header += [q["id"] + " — ответ", q["id"] + " — комментарий"]
+    for _, answer_label, comment_label in question_columns:
+        header += [answer_label, comment_label]
+    header += [
+        "Помощь бота",
+        "Обращения в HR",
+        "Решений подтверждено сотрудником",
+        "Код назначения (служебный)",
+        "Код прохождения (служебный)",
+        "Код сотрудника (служебный)",
+    ]
     rows = [header]
     for row in report["rows"]:
         values = [
-            row[k]
-            for k in [
-                "assignment_id",
-                "run_id",
-                "employee_id",
-                "name",
-                "branch_code",
-                "department",
-                "campaign_id",
-                "due_at",
-                "started_at",
-                "completed_at",
-                "status",
-            ]
-        ]
-        values += [
+            row["name"],
+            row["branch_code"],
+            row["department"],
+            row["status"],
+            _plain_dt(row["due_at"], timezone_name),
+            _plain_dt(row["started_at"], timezone_name),
+            _plain_dt(row["completed_at"], timezone_name),
             len(row["answers"]),
             len(definition["questions"]),
             "Да" if row["awaiting_comment"] else "Нет",
-        ]
-        values += [
             definition["title"],
-            report["filters"]["version"],
-            report["snapshot_at"],
-            report["filters"]["timezone"],
         ]
-        help_labels = {
-            "resolved": "Полезность подтверждена",
-            "awaiting_feedback": "Ожидается оценка полезности",
-            "awaiting_clarification": "Ожидается уточнение",
-            "escalated": "Передано HR",
-            "error": "Ошибка",
-            "recipient_choice": "Выбор HR",
-        }
-        case_labels = {
-            "open": "Новое",
-            "in_progress": "В работе",
-            "awaiting_confirmation": "Ожидает подтверждения сотрудника",
-            "closed": "Закрыто",
-        }
+        for question, _, _ in question_columns:
+            answer = row["answers"].get(question["id"], {})
+            values += [answer.get("display") or "—", answer.get("comment") or ""]
         values += [
-            "; ".join(h["id"] + ": " + help_labels.get(h["status"], h["status"]) for h in row["help_states"]),
-            "; ".join(
-                t["id"]
-                + ": "
-                + case_labels.get(t["status"], t["status"])
-                + (
-                    " (подтверждено сотрудником)"
-                    if t["outcome"] == "employee_confirmed"
-                    else " (без подтверждения)"
-                    if t["status"] == "closed"
-                    else ""
-                )
-                for t in row["case_states"]
-            ),
+            _help_summary(row["help_states"]),
+            _case_summary(row["case_states"]),
             sum(t["outcome"] == "employee_confirmed" for t in row["case_states"]),
+            row["assignment_id"],
+            row["run_id"] or "—",
+            row["employee_id"],
         ]
-        for q in definition["questions"]:
-            answer = row["answers"].get(q["id"], {})
-            values += [answer.get("display"), answer.get("comment")]
         rows.append(values)
+
     summary = [
-        ["Показатель", "Значение"],
-        ["Назначений", report["totals"]["assignments"]],
-        ["Уникальных сотрудников", report["totals"]["employees"]],
-        ["Доля завершения, %", report["totals"]["completion_rate"]],
+        ["Показатель", "Значение", "Пояснение"],
+        [
+            "Сколько назначений",
+            report["totals"]["assignments"],
+            "Сколько раз опрос был назначен сотрудникам в выбранном периоде",
+        ],
+        [
+            "Сколько сотрудников",
+            report["totals"]["employees"],
+            "Уникальные люди среди назначений",
+        ],
+        [
+            "Доля завершивших, %",
+            report["totals"]["completion_rate"]
+            if report["totals"]["completion_rate"] is not None
+            else "нет данных",
+            "Среди тех, у кого срок уже наступил и назначение не отменено",
+        ],
     ]
-    summary += [["Статус: " + key, value] for key, value in report["totals"]["statuses"].items()]
-    for q in report["statistics"]:
-        summary += [[q["id"] + ": N", q["n"]], [q["id"] + ": комментариев", q["comments"]]]
-        if "mean" in q:
-            summary += [[q["id"] + ": среднее", q["mean"]], [q["id"] + ": ниже порога", q["below"]]] + [
-                [q["id"] + f": оценка {key}", value] for key, value in q["distribution"].items()
-            ]
-        for label, count in q.get("options", {}).items():
+    for status, count in report["totals"]["statuses"].items():
+        summary.append([f"Статус «{status}»", count, "Сколько назначений в этом статусе"])
+    for index, question in enumerate(report["statistics"], 1):
+        title = f"Вопрос {index}. {question['text']}"
+        summary += [
+            [f"{title} — ответов", question["n"], "Сколько людей ответили на этот вопрос"],
+            [f"{title} — комментариев", question["comments"], "Сколько оставили текстовый комментарий"],
+        ]
+        if "mean" in question:
             summary += [
-                [q["id"] + ": " + label, count],
-                [q["id"] + ": доля " + label, round(count / q["n"] * 100, 2) if q["n"] else None],
+                [f"{title} — средняя оценка", question["mean"], "Среднее по выставленным баллам"],
+                [
+                    f"{title} — ниже порога комментария",
+                    question["below"],
+                    "Сколько оценок ниже порога, после которого просят комментарий",
+                ],
             ]
+            for score, count in sorted(question["distribution"].items(), key=lambda item: item[0]):
+                summary.append([f"{title} — оценка {score}", count, "Сколько раз выбрали этот балл"])
+        for label, count in question.get("options", {}).items():
+            share = round(count / question["n"] * 100, 1) if question["n"] else None
+            summary += [
+                [f"{title} — «{label}»", count, "Сколько раз выбран этот вариант"],
+                [
+                    f"{title} — доля «{label}», %",
+                    share if share is not None else "нет данных",
+                    "От числа ответивших; при множественном выборе сумма долей может быть больше 100%",
+                ],
+            ]
+
     description = [
-        ["Параметр", "Значение"],
-        ["Опрос", definition["title"]],
-        ["Срез", report["snapshot_at"]],
-        ["Фильтры", json.dumps(report["filters"], ensure_ascii=False)],
-        ["Период", "По плановой дате назначения; конец периода исключён"],
-        ["Организация", "Текущие площадка/подразделение и права на момент экспорта"],
+        ["Раздел", "Содержание"],
+        *_filter_lines(report),
         [
-            "Среднее",
-            "По принятым оценкам конкретного вопроса, включая частичные ответы; отменённые исключены; отсутствие не равно нулю",
+            "Лист «Ответы сотрудников»",
+            "Одна строка — одно назначение опроса. Сначала ФИО и статус, затем ответы, "
+            "в конце служебные коды для техподдержки.",
         ],
         [
-            "Доля завершения",
-            "Завершённые / уже наступившие неотменённые назначения; нулевой знаменатель — нет данных",
+            "Лист «Сводные показатели»",
+            "Числа по опросу целиком и по каждому вопросу с кратким пояснением.",
         ],
-        ["Множественный выбор", "Доля от ответивших; сумма долей может превышать 100%"],
-        ["ML", "Файл формируется без вызова ML; опрос не является анонимным"],
+        [
+            "Средние оценки",
+            "Считаются только по выставленным баллам, включая частичные прохождения. "
+            "Пустой ответ не считается нулём.",
+        ],
+        [
+            "Доля завершивших",
+            "Число завершённых делим на число неотменённых назначений, у которых уже наступил срок. "
+            "Если таких нет — в ячейке «нет данных».",
+        ],
+        ["Анонимность", "Опрос в выгрузке не анонимный: видны ФИО и подразделение."],
     ]
-    for q in definition["questions"]:
-        description += [[q["id"], q["text"]], [q["id"] + ": правила", json.dumps(q, ensure_ascii=False)]]
-    return {"Результаты": rows, "Сводка": summary, "Описание": description}
+    for index, question in enumerate(definition["questions"], 1):
+        description.append(
+            [
+                f"Вопрос {index}",
+                f"{question['text']} ({_kind_label(question['kind'])})",
+            ]
+        )
+        if question["kind"] == "rating":
+            description.append(
+                [
+                    f"Вопрос {index} — шкала",
+                    f"от {question['minimum']} до {question['maximum']}"
+                    + (
+                        f"; комментарий просят при оценке ниже {question['comment_below']}"
+                        if question.get("comment_below") is not None
+                        else ""
+                    ),
+                ]
+            )
+        elif question["kind"] in {"single", "multiple"}:
+            options = ", ".join(option["label"] for option in question.get("options", []))
+            description.append([f"Вопрос {index} — варианты", options or "—"])
+    return {
+        "Ответы сотрудников": rows,
+        "Сводные показатели": summary,
+        "Как читать файл": description,
+    }
 
 
 def csv_bytes(rows):
@@ -512,19 +640,20 @@ def xlsx_bytes(sheets):
             SubElement(
                 view,
                 "pane",
-                xSplit="3" if i == 1 else "0",
+                xSplit="1" if i == 1 else "0",
                 ySplit="1",
-                topLeftCell="D2" if i == 1 else "A2",
+                topLeftCell="B2" if i == 1 else "A2",
                 state="frozen",
             )
             cols = SubElement(sheet, "cols")
+            widths = {1: 28, 2: 16, 3: 22, 4: 22}
             for j in range(1, max(map(len, rows)) + 1):
                 SubElement(
                     cols,
                     "col",
                     min=str(j),
                     max=str(j),
-                    width="42" if j > 3 or i != 1 else "27",
+                    width=str(widths.get(j, 36 if i == 1 else 40)),
                     customWidth="1",
                 )
             data = SubElement(sheet, "sheetData")
@@ -537,8 +666,6 @@ def xlsx_bytes(sheets):
                     if isinstance(value, (int, float)) and not isinstance(value, bool):
                         SubElement(cell, "v").text = str(value)
                     else:
-                        import re
-
                         cell.set("t", "inlineStr")
                         content = SubElement(SubElement(cell, "is"), "t")
                         content.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
@@ -561,17 +688,24 @@ def xlsx_bytes(sheets):
     return out.getvalue()
 
 
+def export_filename(report, data):
+    title = re.sub(r'[<>:"/\\|?*\x00-\x1f]+', "", report["definition"]["title"]).strip() or "Опрос"
+    title = re.sub(r"\s+", " ", title)[:60].rstrip(" .")
+    return f"{title}_{data.from_date}_{data.to_date}.{data.format}"
+
+
 def create_file(session, actor, settings, data):
     report = snapshot(session, actor, data)
     if data.preview_hash and data.preview_hash != preview_hash(report):
         raise HTTPException(409, "Данные изменились после предпросмотра. Обновите предпросмотр")
     sheets = sheet_rows(report)
-    content = xlsx_bytes(sheets) if data.format == "xlsx" else csv_bytes(sheets["Результаты"])
+    answers = sheets["Ответы сотрудников"]
+    content = xlsx_bytes(sheets) if data.format == "xlsx" else csv_bytes(answers)
     item = ExportFile(
         actor_id=actor.id,
-        filters={**report["filters"], "snapshot_at": report["snapshot_at"], "profile": "survey_results_v1"},
+        filters={**report["filters"], "snapshot_at": report["snapshot_at"], "profile": "survey_results_v2"},
         employee_ids=sorted({r["employee_id"] for r in report["rows"]}),
-        filename="results." + data.format,
+        filename=export_filename(report, data),
         row_count=len(report["rows"]),
         expires_at=utcnow() + timedelta(minutes=15),
     )

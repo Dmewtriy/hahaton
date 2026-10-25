@@ -69,7 +69,7 @@ def finish(session, employee, help, status, text, version):
         send(
             session,
             employee.identity_id,
-            "Можно повторить запрос или продолжить обращение HR. Возврат к анкете: /resume.",
+            "Не удалось сразу помочь.\n\nМожно повторить запрос или передать вопрос HR.\nК опросу: /resume.",
             f"help-retry:{help.id}:{help.context.get('attempt', 1)}",
             now(session),
             buttons=[
@@ -105,7 +105,7 @@ def callback(runtime, session, employee, payload, key):
         send(
             session,
             employee.identity_id,
-            "Это действие устарело. Используйте текущие кнопки или /resume.",
+            "Это действие уже неактуально.\n\nИспользуйте кнопки из последнего сообщения или /resume.",
             "help-stale:" + key,
             now(session),
         )
@@ -132,7 +132,7 @@ def callback(runtime, session, employee, payload, key):
             send(
                 session,
                 employee.identity_id,
-                "Это действие уже обработано. Опрос: /resume.",
+                "Это действие уже обработано.\n\nК опросу: /resume.",
                 "help-stale:" + key,
                 now(session),
             )
@@ -149,7 +149,7 @@ def callback(runtime, session, employee, payload, key):
             send(
                 session,
                 employee.identity_id,
-                "Отлично, помощь завершена. Продолжить опрос: /resume.",
+                "Отлично, рады помочь.\n\nПродолжить опрос: /resume.",
                 "help-resolved:" + key,
                 now(session),
             )
@@ -209,7 +209,7 @@ def consume(runtime, session, employee, text, key):
         send(
             session,
             employee.identity_id,
-            "Выберите, помог ли ответ: Да / Нет. Вернуться к анкете: /resume.",
+            "Помог ли ответ?\n\nНажмите «Да» или «Нет». К анкете: /resume.",
             "help-wait:" + key,
             now(session),
             buttons=[

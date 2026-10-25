@@ -71,10 +71,15 @@ def show(runtime, session, actor, employee, key, page=0):
         buttons.append({"text": "Далее →", "payload": f"nav:page:{page + 1}"})
     if page:
         buttons.append({"text": "Главная", "payload": "nav:page:0"})
+    # Постоянная кнопка меню внизу списка действий (как закреплённый пункт в мессенджере).
+    if not any(b.get("payload") == "nav:page:0" and b.get("text") == "Меню" for b in buttons):
+        buttons.append({"text": "Меню", "payload": "nav:page:0"})
     send(
         session,
         actor.id,
-        f"Меню Корсика · страница {page + 1}\nВыберите действие. Прогресс опроса сохранён.",
+        f"Меню Корсика · страница {page + 1}\n\n"
+        "Выберите действие кнопкой ниже.\n"
+        "Прогресс опроса при этом сохранится.",
         "menu:" + key,
         now(session),
         buttons=buttons,

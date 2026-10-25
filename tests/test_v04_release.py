@@ -247,12 +247,17 @@ def test_reports_partial_answers_csv_xlsx_download_and_scopes(client, runtime):
         response = client.get(file.json()["url"])
         assert response.status_code == 200
         if format == "csv":
-            assert (
-                response.content.startswith(b"\xef\xbb\xbf") and "Оценка поддержки" not in response.text
-            )  # ID columns accompany definition in XLSX.
+            text = response.content.decode("utf-8-sig")
+            assert response.content.startswith(b"\xef\xbb\xbf")
+            assert "Сотрудник" in text and "Статус прохождения" in text
+            assert "Оценка поддержки" in text  # human question text in headers
+            assert "Код назначения (служебный)" in text
         else:
             with ZipFile(io.BytesIO(response.content)) as book:
                 assert len([p for p in book.namelist() if p.startswith("xl/worksheets/")]) == 3
+            assert (
+                "Ответы" in file.json()["filename"] or catalogue[0]["title"][:20] in file.json()["filename"]
+            )
         with runtime.db.transaction() as session:
             session.get(Identity, "hr-a").active = False
         assert client.get(file.json()["url"]).status_code == 403

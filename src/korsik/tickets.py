@@ -81,11 +81,27 @@ def open_ticket(session, employee, reason, context, dedupe_key, human=True):
             dedupe_key if dedupe_key.startswith("hr-in:") else "ticket-open:" + ticket.id,
             employee.identity_id if kind == "employee" else None,
         )
+    from .support import case_staff_title, clip_reason
+
+    detail = (description or "").strip()
+    if detail and detail != reason:
+        detail = detail[:1800]
+    else:
+        detail = ""
+    body = f"Новое обращение\n\n{case_staff_title(ticket, employee)}\nТема: {clip_reason(reason, 120)}\n"
+    if detail:
+        body += f"\n{detail}\n"
+    body += (
+        f"\nОтветить из чата:\n"
+        f"/reply {ticket.id} текст\n\n"
+        f"Предложить решение:\n"
+        f"/close {ticket.id} текст\n\n"
+        "Или откройте кабинет — там удобнее."
+    )
     notification = send(
         session,
         ticket.recruiter_id,
-        f"Новое обращение {ticket.id}\nСотрудник: {employee.name}\nПричина: {reason}\n"
-        f"{description[:1800]}\nОтвет: /reply {ticket.id} текст ответа\nЗакрытие: /close {ticket.id}",
+        body,
         f"ticket:{ticket.id}:notify",
         now(session),
     )
@@ -102,10 +118,12 @@ def employee_message(session, employee, ticket, text, event_key):
     session.add(
         TicketMessage(ticket_id=ticket.id, author_id=employee.identity_id, text=text, created_at=now(session))
     )
+    from .support import case_staff_title
+
     notification = send(
         session,
         ticket.recruiter_id,
-        f"Обращение {ticket.id}\n{employee.name}: {text}",
+        f"Дополнение к обращению\n\n{case_staff_title(ticket, employee)}\n\n{employee.name}:\n{text}",
         f"ticket-message:{event_key}",
         now(session),
     )
@@ -142,10 +160,17 @@ def reply(session, actor, employee, ticket, text, key, *, question=None):
     inbox.append(session, employee, ticket, "hr", text, "hr-out:" + key, actor.id)
     session.add(TicketMessage(ticket_id=ticket.id, author_id=actor.id, text=text, created_at=now(session)))
     session.add(ConversationMessage(employee_id=employee.id, role="hr", text=text, created_at=now(session)))
+    from .support import case_label, open_case_numbers
+
+    numbers, _ = open_case_numbers(session, employee.id)
+    parts = [case_label(ticket, numbers.get(ticket.id)), ""]
+    if question:
+        parts += [f"Ваш вопрос:\n{question}", ""]
+    parts += [f"Ответ HR:\n{text}"]
     send(
         session,
         employee.identity_id,
-        (f"Ваш вопрос: {question}\n" if question else "") + f"Ответ HR: {text}",
+        "\n".join(parts),
         f"hr-reply:{key}",
         now(session),
         buttons=[{"text": "Ответить HR", "payload": "case-reply:" + ticket.id}],

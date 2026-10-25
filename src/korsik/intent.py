@@ -28,7 +28,7 @@ def offer(session, employee, text, key, run=None, route=None):
     send(
         session,
         employee.identity_id,
-        "Уточните, как использовать это сообщение. Пока оно не записано в ответ опроса и не отправлено ИИ или HR.",
+        "Как использовать это сообщение?\n\nПока оно не записано в ответ опроса и не отправлено боту или HR.",
         "intent:" + key,
         now(session),
         buttons=[
@@ -66,7 +66,7 @@ def callback(runtime, session, employee, payload, key):
         send(
             session,
             employee.identity_id,
-            "Этот выбор устарел. Продолжить текущий вопрос: /resume.",
+            "Этот выбор уже неактуален.\n\nПродолжить текущий вопрос: /resume.",
             "intent-stale:" + key,
             now(session),
         )

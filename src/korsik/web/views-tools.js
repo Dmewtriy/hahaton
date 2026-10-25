@@ -24,7 +24,7 @@ export async function reportsPage(ctx) {
     html:
       heading(
         "Результаты опросов",
-        "Период выбирается по плановой дате назначения. Сохраняются частичные ответы; средние и доли рассчитывает backend.",
+        "Выберите опрос и период. В файле — понятные столбцы: кто ответил, что ответил, сводка и краткая памятка.",
       ) +
       (catalogue.length
         ? `<form data-report class="card"><div class="field-grid">${select("survey", "Опрос и версия", options, "0", null)}${input("from_date", "С даты", today.slice(0, 4) + "-01-01", "date", "required")}${input("to_date", "По дату включительно", today, "date", "required")}${select("branch", "Площадка", [{ value: "", label: "Все доступные" }, ...ctx.refs.branches.map((b) => ({ value: b.code, label: b.name }))], "", null)}${select("department", "Подразделение", [{ value: "", label: "Все подразделения" }, ...ctx.refs.departments.map((d) => ({ value: d.name, label: d.name }))], "", null)}${select(
@@ -33,7 +33,7 @@ export async function reportsPage(ctx) {
             ctx.refs.reference.timezones.map((t) => ({ value: t, label: t })),
             "Europe/Moscow",
             null,
-          )}</div><label class="check"><input type="checkbox" name="include_archived">Включить сотрудников в архиве</label><div class="actions">${button("Предпросмотр", "preview", "", "primary")}${button("Скачать XLSX", "xlsx")}${button("Скачать CSV", "csv")}</div><p class="draft-note">Сотрудники видны по текущей области HR. Выгрузка не анонимная; ссылка скачивания действует 60 секунд.</p><div data-result role="status" aria-live="polite"></div></form>`
+          )}</div><label class="check"><input type="checkbox" name="include_archived">Включить сотрудников в архиве</label><div class="actions">${button("Предпросмотр", "preview", "", "primary")}${button("Скачать XLSX", "xlsx")}${button("Скачать CSV", "csv")}</div><p class="draft-note">XLSX: три листа — ответы, сводные показатели, «Как читать файл». CSV: те же строки ответов. Выгрузка именная; ссылка действует 60 секунд.</p><div data-result role="status" aria-live="polite"></div></form>`
         : empty(
             "Назначенных опросов пока нет",
             "Назначьте опрос через рассылку или сценарий адаптации.",
@@ -74,7 +74,7 @@ export async function reportsPage(ctx) {
           const result = await ctx.api.post("/api/reports/preview", data);
           previewHash = result.preview_hash;
           target.querySelector("[data-result]").innerHTML =
-            `<h3>Срез: ${dateTime(result.snapshot_at)}</h3><p>Назначений: ${result.totals.assignments}; сотрудников: ${result.totals.employees}; завершение: ${result.totals.completion_rate ?? "нет данных"}${result.totals.completion_rate === null ? "" : "%"}</p><div class="detail-list">${result.statistics.map((q) => `<div><span>${e(q.text)} · ответов: ${q.n}</span><strong>${q.mean === undefined ? "Комментариев: " + q.comments : "Средняя оценка: " + (q.mean ?? "нет данных")}</strong></div>`).join("")}</div><p class="draft-note">CSV: строки назначений и ответов. XLSX: результаты, числовая сводка, описание расчёта и полный текст вопросов.</p>`;
+            `<h3>Данные на ${dateTime(result.snapshot_at)}</h3><p>Назначений: <strong>${result.totals.assignments}</strong>; сотрудников: <strong>${result.totals.employees}</strong>; завершили: <strong>${result.totals.completion_rate ?? "нет данных"}${result.totals.completion_rate === null ? "" : "%"}</strong></p><div class="detail-list">${result.statistics.map((q) => `<div><span>${e(q.text)} · ответов: ${q.n}</span><strong>${q.mean === undefined ? "Комментариев: " + q.comments : "Средняя оценка: " + (q.mean ?? "нет данных")}</strong></div>`).join("")}</div><p class="draft-note">В Excel будут листы «Ответы сотрудников», «Сводные показатели» и «Как читать файл». В CSV — только строки с ответами, с понятными заголовками вопросов.</p>`;
         } else {
           const file = await ctx.api.post("/api/reports/files", {
             ...data,
